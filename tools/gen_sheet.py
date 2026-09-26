@@ -1,9 +1,5 @@
 import os,sys,base64,json,subprocess,time,requests
-env={}
-for l in open('/Users/alexander/Repos/mindsai/webapp/.env'):
-  if '=' in l and not l.startswith('#'):
-    k,v=l.strip().split('=',1); env[k]=v.strip('"\'')
-KEY=env['OPENAI_API_KEY']
+KEY=os.environ.get('OPENAI_API_KEY') or open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'.secrets','openai')).read().strip()   # env var, or tools/.secrets/openai (gitignored)
 POSES="""Row 1: (1) IDLE fighting stance, (2) WALKING forward mid-stride, (3) JUMPING airborne tucked, (4) CROUCHING low.
 Row 2: (5) BLOCKING with guard up, (6) LIGHT ATTACK quick jab/punch extended forward, (7) HEAVY ATTACK big powerful strike or kick at full extension, (8) SPECIAL MOVE casting/throwing an energy projectile forward (projectile NOT drawn, just the throwing pose).
 Row 3: (9) HIT reeling backwards in pain, (10) KNOCKED DOWN lying flat defeated with X eyes, (11) VICTORY triumphant pose, (12) ULTIMATE powered-up pose with glowing aura."""
