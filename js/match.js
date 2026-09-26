@@ -457,21 +457,21 @@ function drawRow(c, row, frame, excited, backY, midX, base, filter, avoid = []) 
     if (excited && Math.random() < 0.08) p.cheerT = 40 + rand(0, 40);
     if (!excited && Math.random() < 0.002) p.cheerT = 30;
     if (p.cheerT > 0) p.cheerT--;
-    const pose = p.sign || p.cheerT > 0 ? 1 : 0, img = ASSETS.crowd[p.id + '_' + pose]; if (!img) continue;
+    const pose = p.cheerT > 0 ? 1 : 0, img = ASSETS.crowd[p.id + '_' + pose]; if (!img) continue;
     const hgt = base * p.s, s = hgt / img.height, hop = p.cheerT > 0 ? Math.abs(Math.sin(frame / 5 + p.ph)) * 8 : Math.sin(frame / 30 + p.ph) * 1.2;
     const face = p.x < midX ? 1 : -1; // turn toward the fight
     const top = backY - hop - hgt;
     let banner = null;
-    if (p.sign && !avoid.some(x => Math.abs(x - p.x) < 130)) { // one stick in one raised fist, each sign tilted its own way
-      const hd = HANDS[p.id] || [-0.14, 0.05, 0.14, 0.05], iw = img.width * s, useR = (p.ph * 10 | 0) % 2 === 0;
-      const hx = p.x + face * hd[useR ? 2 : 0] * iw, hy = top + hd[useR ? 3 : 1] * hgt;
-      const tilt = ((p.ph * 7) % 1 - 0.5) * 0.5 + Math.sin(frame / 22 + p.ph) * 0.06, len = 22 + (base > 70 ? 6 : 0);
-      const tx = hx + Math.sin(tilt) * len, ty = hy - Math.cos(tilt) * len;
-      c.strokeStyle = '#6b4a24'; c.lineWidth = 3; c.beginPath(); c.moveTo(hx - Math.sin(tilt) * 4, hy + Math.cos(tilt) * 4); c.lineTo(tx, ty); c.stroke();
+    if (p.sign && !avoid.some(x => Math.abs(x - p.x) < 180)) { // sign on a stick planted in the platform beside its fan, each leaning its own way
+      const iw = img.width * s, side = (p.ph * 10 | 0) % 2 ? 1 : -1, bx = p.x + side * iw * 0.42, by = backY + 2;
+      const tilt = ((p.ph * 7) % 1 - 0.5) * 0.35 + Math.sin(frame / 26 + p.ph) * 0.03, len = hgt + 14;
+      const tx = bx + Math.sin(tilt) * len, ty = by - Math.cos(tilt) * len;
+      c.strokeStyle = '#6b4a24'; c.lineWidth = 3; c.beginPath(); c.moveTo(bx, by); c.lineTo(tx, ty); c.stroke();
+      c.fillStyle = 'rgba(0,0,0,0.35)'; c.fillRect(bx - 4, by - 1, 8, 2);   // where it's jammed into the platform
       c.font = '7px "Press Start 2P"'; const tw = c.measureText(p.sign).width + 10, bh = 16;
       banner = () => { c.save(); c.translate(tx, ty); c.rotate(tilt); c.font = '7px "Press Start 2P"';
         c.fillStyle = '#f4f1e8'; c.fillRect(-tw / 2, -bh, tw, bh); c.strokeStyle = '#000'; c.lineWidth = 2; c.strokeRect(-tw / 2, -bh, tw, bh);
-        c.fillStyle = '#111'; c.textAlign = 'center'; c.fillText(p.sign, 0, -5); c.restore(); };   // drawn after the body so hair never covers it
+        c.fillStyle = '#111'; c.textAlign = 'center'; c.fillText(p.sign, 0, -5); c.restore(); };
     }
     c.save(); c.translate(p.x, backY - hop); c.scale(face * s, s * (1 + Math.sin(frame / 22 + p.ph) * 0.01)); c.filter = filter; c.drawImage(img, -img.width / 2, -img.height); c.restore(); c.filter = 'none';
     if (banner) banner();
