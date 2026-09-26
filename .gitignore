@@ -18,3 +18,4 @@ tools/xb/*.png
 tools/balance_last.json
 .DS_Store
 worker/.env.turn
+promo/

@@ -171,7 +171,7 @@ class Match {
       if (Math.abs(dx) < min) { const push = (min - Math.abs(dx)) / 2, s = Math.sign(dx) || (a.side ? -1 : 1); a.x -= s * push; b.x += s * push; }
     }
     // bounds
-    const half = W / 2 / this.cam.z;
+    const half = SIM_W / 2 / this.cam.z;
     for (const f of this.f) { if (f.state === 'ultrun' && f.ultFly) continue; f.x = clamp(f.x, 60, WORLD_W - 60); }
     const spread = 1150;
     if (Math.abs(a.x - b.x) > spread && a.state !== 'ultrun' && b.state !== 'ultrun') { const mid = (a.x + b.x) / 2, s = Math.sign(b.x - a.x); a.x = mid - s * spread / 2; b.x = mid + s * spread / 2; }
@@ -234,7 +234,7 @@ class Match {
     const tz = clamp(1180 / (dist + 520), 0.82, 1.22);
     cm.z = lerp(cm.z, this.ultCin ? 1.35 : tz, this.ultCin ? 0.12 : 0.06);
     const focus = this.ultCin ? this.ultCin.f.x : tx;
-    const half = W / 2 / cm.z; cm.x = lerp(cm.x, clamp(focus, half, WORLD_W - half), 0.1);
+    const half = SIM_W / 2 / cm.z; cm.x = lerp(cm.x, clamp(focus, half, WORLD_W - half), 0.1);
     const ty = Math.min(0, Math.min(a.y, b.y) + 200) * 0.35; cm.y = lerp(cm.y, this.ultCin ? -60 : ty, 0.1);
   }
 
@@ -281,7 +281,7 @@ class Match {
   drawArena(c) {
     const img = ASSETS.arenas[this.arena.id], cm = this.cam, fl = ARENA_FLOOR[this.arena.id] || 0.85;
     if (!img) { c.fillStyle = '#111'; c.fillRect(0, 0, W, H); return; }
-    const bz = 1 + (cm.z - 1) * 0.45, bw = 1500 * bz, bh = bw * img.height / img.width;
+    const bz = 1 + (cm.z - 1) * 0.45, bw = Math.max(1500, W + 80) * bz, bh = bw * img.height / img.width;
     const floorY = fl * bh, by = FLOOR_S - floorY - cm.y * cm.z * 0.6;
     let bx = W / 2 - bw / 2 - (cm.x - WORLD_W / 2) * 0.33 * cm.z; bx = clamp(bx, W - bw, 0);
     const drawY = Math.min(0, Math.max(H - bh, by)); c.drawImage(img, bx, drawY, bw, bh);
@@ -355,7 +355,11 @@ class Match {
     bubble(c, x, y, bw, q.text, q.t, sx < x + bw / 2);
   }
   drawBar(c, f) {
-    const L = f.side === 0, bw = 470, bh = 22, y = 30, x = L ? 92 : W - 92 - bw;
+    // on touch screens keep clear of the BACK / START buttons in the corners
+    const IN = Touch.active ? 118 : 0, L = f.side === 0, bw = Math.min(470, W / 2 - 64 - 92 - IN), bh = 22, y = 30, x = L ? 92 : W - 92 - bw;
+    c.save(); c.translate(L ? IN : -IN, 0); this.drawBar2(c, f, L, bw, bh, y, x); c.restore();
+  }
+  drawBar2(c, f, L, bw, bh, y, x) {
     // portrait
     const pi = ASSETS.sprites[f.id].idle, pm = f.meta.idle, ps = 66 / Math.max(pm[0], pm[1]);
     bevel(c, L ? 12 : W - 12 - 72, 12, 72, 72, { fill: '#10121e', border: f.cfg.color });
@@ -410,8 +414,8 @@ const CROWD_IDS = ['jensen', 'sam', 'elon', 'zuck', 'dario', 'demis', 'satya', '
 const HANDS = {"dario":[-0.364,0.099,0.302,0.111],"demis":[-0.323,0.093,0.34,0.05],"elon":[-0.309,0.102,0.4,0.102],"eng0":[-0.309,0.064,0.392,0.029],"eng10":[-0.304,0.074,0.4,0.03],"eng11":[-0.189,0.044,0.366,0.03],"eng1":[-0.321,0.117,0.353,0.029],"eng2":[-0.281,0.029,0.391,0.092],"eng3":[-0.313,0.054,0.361,0.093],"eng4":[-0.329,0.056,0.325,0.031],"eng5":[-0.334,0.03,0.363,0.041],"eng6":[-0.34,0.13,0.298,0.049],"eng7":[-0.317,0.03,0.396,0.034],"eng8":[-0.317,0.05,0.463,0.103],"eng9":[-0.26,0.18,0.325,0.052],"ilya":[-0.371,0.11,0.395,0.14],"jensen":[-0.325,0.065,0.394,0.094],"karpathy":[-0.307,0.125,0.426,0.184],"lecun":[-0.39,0.087,0.293,0.089],"lisa":[-0.314,0.121,0.424,0.114],"sam":[-0.314,0.124,0.394,0.092],"satya":[-0.351,0.079,0.318,0.133],"sundar":[-0.365,0.118,0.424,0.145],"zuck":[-0.323,0.135,0.276,0.064]};
 const CROWD_SIGNS = { jensen: 'BUY MORE GPUS', sam: 'AGI 2027 (PROBABLY)', elon: 'GROK IS BASED', zuck: 'OPEN WEIGHTS!', dario: 'WE MUST PACE THE FRONTIER', demis: 'SOLVE INTELLIGENCE', satya: 'COPILOT EVERYWHERE', sundar: 'GEMINI 4 SOON', lisa: 'MI400 > H100', karpathy: 'VIBE CODED', lecun: 'LLMS ARE NOT AGI', ilya: 'FEEL THE AGI' };
 const ENG_SIGNS = ['H100 LOL', 'RALPH WIGGUM WAS RIGHT', '9.11 > 9.9', 'STRAWBERRY: 2 Rs', 'CONTEXT ROT IS REAL', 'SHIP IT', 'LGTM', 'IT WORKS ON MY GPU', 'WILL CODE FOR H100S', 'MY PR IS STILL OPEN', 'TEAM LOCAL', '429 LOL', 'ATTENTION IS ALL', 'VIBE CODED'];
-const ENG = Array.from({ length: 26 }, (_, i) => ({ id: 'eng' + (i % 12), x: 20 + i * 49 + rand(-8, 8), ph: rand(0, 6), s: rand(0.85, 1.0), cheerT: 0, sign: i % 6 === 3 ? ENG_SIGNS[(i / 6 | 0) % ENG_SIGNS.length] : null }));
-const CROWD = (() => { const order = [...CROWD_IDS].sort(() => Math.random() - 0.5); return order.map((id, i) => ({ id, x: 60 + i * 105 + rand(-10, 10), ph: rand(0, 6), sign: id === 'dario' || (i % 3 === 1 && id !== order[i - 1]) ? CROWD_SIGNS[id] : null, s: rand(0.94, 1.06), cheerT: 0 })); })();
+const ENG = Array.from({ length: 26 }, (_, i) => ({ id: 'eng' + (i % 12), x: 20 + i * 49, lo: 20, u: i / 25, j: rand(-8, 8), ph: rand(0, 6), s: rand(0.85, 1.0), cheerT: 0, sign: i % 6 === 3 ? ENG_SIGNS[(i / 6 | 0) % ENG_SIGNS.length] : null }));
+const CROWD = (() => { const order = [...CROWD_IDS].sort(() => Math.random() - 0.5); return order.map((id, i) => ({ id, x: 60 + i * 105, lo: 60, u: i / (order.length - 1), j: rand(-10, 10), ph: rand(0, 6), sign: id === 'dario' || (i % 3 === 1 && id !== order[i - 1]) ? CROWD_SIGNS[id] : null, s: rand(0.94, 1.06), cheerT: 0 })); })();
 const ARENA_BACK = { colosseum: 0.8, datacenter: 0.66, distillation: 0.74, feed: 0.87, basement: 0.72, hackerhouse: 0.72, goldengate: 0.76, singularity: 0.76, hearing: 0.67, boardroom: 0.7, leaderboard: 0.76, tesla: 0.7, h100: 0.76, graveyard: 0.76, demoday: 0.72, waitlist: 0.76, burningman: 0.76 };
 // Strollers: now and then an engineer wanders across the back (coffee, laptop, energy drink...) with a real walk cycle.
 const STROLL = { list: [], next: 240 };
@@ -454,6 +458,7 @@ function drawCrowd(c, frame, excited, backY, midX, arenaId) {
 }
 function drawRow(c, row, frame, excited, backY, midX, base, filter, avoid = []) {
   for (const p of row) {
+    if (p.u != null) p.x = p.lo + p.u * (W - 2 * p.lo - 40) + p.j;   // spread across the current view width
     if (excited && Math.random() < 0.08) p.cheerT = 40 + rand(0, 40);
     if (!excited && Math.random() < 0.002) p.cheerT = 30;
     if (p.cheerT > 0) p.cheerT--;

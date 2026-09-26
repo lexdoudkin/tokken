@@ -20,6 +20,7 @@ const Audio = (() => {
 
   function init() {
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+    if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;   // browsers refuse audio before the first tap/key; next gesture retries
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; comp.connect(ctx.destination); 
     master = ctx.createGain(); master.gain.value = VOL.master; master.connect(comp);

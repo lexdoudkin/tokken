@@ -1,11 +1,13 @@
 // TOKKEN — the fight engine. Fixed 60Hz sim, render every rAF.
-const W = 1280, H = 720, FLOOR_S = 628, WORLD_W = 1900, GRAV = 0.82;
+// W = the VIEW width: 1280..1720 to match the screen's aspect (render only). The simulation uses SIM_W, never W.
+let W = 1280; const SIM_W = 1280, MAX_W = 1720, H = 720, FLOOR_S = 628, WORLD_W = 1900, GRAV = 0.82;
 const cv = document.getElementById('game');
 const ctx = cv.getContext('2d');
 let DPR = 1, OX = 0, OY = 0;
 function resize() {
   DPR = Math.min(matchMedia('(pointer: coarse)').matches ? 1.5 : 2, window.devicePixelRatio || 1);   // phones: cap resolution for a steady 60fps
   const vv = window.visualViewport, vw = Math.round(vv ? vv.width * (vv.scale || 1) : innerWidth), vh = Math.round(vv ? vv.height * (vv.scale || 1) : innerHeight);
+  W = Math.max(SIM_W, Math.min(MAX_W, Math.round(H * vw / vh / 2) * 2));   // widescreen phones get a wider view instead of bars
   const s = Math.min(vw / W, vh / H);
   // the canvas covers the whole screen; the fixed 1280x720 game is drawn centred (gameplay/netcode never see the screen shape)
   // and the leftover strips get an ambient extension of the picture (see ambient()) instead of black bars
@@ -13,10 +15,10 @@ function resize() {
   OX = Math.floor((cv.width - W * DPR) / 2); OY = Math.floor((cv.height - H * DPR) / 2);
   cv.style.width = vw + 'px'; cv.style.height = vh + 'px';
 }
-function ambient(c) {   // stretch the picture's outer edge across the side/top bars, fading to black
-  if (OX < 1 && OY < 1) return; c.setTransform(1, 0, 0, 1, 0, 0); c.imageSmoothingEnabled = true; const cw = cv.width, ch = cv.height, gw = W * DPR, gh = H * DPR;
+function ambient(c, cx = OX, cwid = W * DPR) {   // stretch the picture's outer edge across any leftover strips, fading to black
+  const cw = cv.width, ch = cv.height, gh = H * DPR; if (cx < 1 && OY < 1) return; c.setTransform(1, 0, 0, 1, 0, 0); c.imageSmoothingEnabled = true;
   const band = (sx, sy, sw, sh, dx, dy, dw, dh, x0, y0, x1, y1) => { c.drawImage(cv, sx, sy, sw, sh, dx, dy, dw, dh); const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, 'rgba(7,7,13,0.35)'); g.addColorStop(1, 'rgba(7,7,13,0.94)'); c.fillStyle = g; c.fillRect(dx, dy, dw, dh); };
-  if (OX >= 1) { band(OX, OY, 3, gh, 0, OY, OX, gh, OX, 0, 0, 0); band(OX + gw - 3, OY, 3, gh, OX + gw, OY, cw - OX - gw, gh, OX + gw, 0, cw, 0); }
+  if (cx >= 1) { band(cx, OY, 3, gh, 0, OY, cx, gh, cx, 0, 0, 0); band(cx + cwid - 3, OY, 3, gh, cx + cwid, OY, cw - cx - cwid, gh, cx + cwid, 0, cw, 0); }
   if (OY >= 1) { band(0, OY, cw, 3, 0, 0, cw, OY, 0, OY, 0, 0); band(0, OY + gh - 3, cw, 3, 0, OY + gh, cw, ch - OY - gh, 0, OY + gh, 0, ch); }
   c.imageSmoothingEnabled = false;
 }
@@ -539,7 +541,7 @@ const Ults = {
       if (t % 2) f.after.push({ x: f.x, y: f.y, pose: 'ult', life: 14, facing: f.facing });
       if (f.hitCd > 0) f.hitCd--;
       const hb = o.hurtbox(); if (hb && f.hitCd <= 0 && rectHit({ x: f.x - 60, y: f.y - f.h, w: 120, h: f.h }, hb)) { f.hitCd = 18; g.rawHit(f, o, u.dmg, { hitstop: 6, knock: f.facing * 0 + 8, launch: true, hitstun: 30, sfx: 'heavy' }); glyphs(o.x, o.y - o.h / 2, 'asdf;lkj'.split(''), '#0ff', 8); }
-      const L = g.cam.x - W / 2 / g.cam.z + 40, R = g.cam.x + W / 2 / g.cam.z - 40;
+      const L = g.cam.x - SIM_W / 2 / g.cam.z + 40, R = g.cam.x + SIM_W / 2 / g.cam.z - 40;
       if ((f.facing > 0 && f.x > R + 200) || (f.facing < 0 && f.x < L - 200)) { f.facing *= -1; f.passes++; Audio.S.whoosh(); floatText(clamp(f.x, L + 100, R - 100), -300, pick(['*EEE EEE*', 'COWABUNGA', 'SYNTHWAVE!', '1337']), { size: 28, color: '#ff4fd8' }); }
       if (f.passes >= u.passes && Math.abs(f.x - g.cam.x) < 200) { f.ultFly = false; f.inv = 10; f.y = 0; f.setState('idle'); f.ultRun = null; Audio.setMode('normal'); f.facing = f.x < o.x ? 1 : -1; }
     };
@@ -564,7 +566,7 @@ const Ults = {
     f.setState('idle'); announce('GENERATE 4 VARIATIONS', { size: 64, dur: 60, color: '#E8C9A8', key: 'gen_4' });
     const tints = ['#ff9ad5', '#9ad5ff', '#b6ff9a', '#ffd59a'];
     for (let i = 0; i < u.n; i++) g.later(i * 12, () => {
-      const dir = f.facing, sx = dir > 0 ? g.cam.x - W / 2 / g.cam.z - 80 : g.cam.x + W / 2 / g.cam.z + 80, yy = i % 2 ? -f.h * 0.5 : -f.h * 1.2;
+      const dir = f.facing, sx = dir > 0 ? g.cam.x - SIM_W / 2 / g.cam.z - 80 : g.cam.x + SIM_W / 2 / g.cam.z + 80, yy = i % 2 ? -f.h * 0.5 : -f.h * 1.2;
       g.projs.push(new Proj({ owner: f, target: o, x: sx, y: yy, vx: dir * 17, w: f.wBody * 1.2, h: f.h * 0.9, dmg: u.dmg, knock: 8, hitstun: 26, strength: 9, life: 160, launch: i === u.n - 1,
         render(c, p) { f.blit(c, 'heavy', 0, f.h * 0.45, dir, 1, 1, tintImg(f.id, 'heavy', tints[i])); } })); Audio.S.whoosh();
     });

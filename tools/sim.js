@@ -10,7 +10,7 @@ const sandbox = {
   performance: { now: () => Date.now() }, setTimeout: noop, setInterval: noop, clearInterval: noop,
   addEventListener: noop, innerWidth: 1280, innerHeight: 720, devicePixelRatio: 1, location: { search: '' },
   localStorage: { getItem: () => null, setItem: noop, removeItem: noop },
-  document: { addEventListener: noop, getElementById: () => fakeCanvas, createElement: () => fakeCanvas, fonts: { load: () => Promise.resolve() } },
+  document: { addEventListener: noop, hidden: false, getElementById: () => fakeCanvas, createElement: () => fakeCanvas, fonts: { load: () => Promise.resolve() } },
   navigator: { getGamepads: () => [] }, matchMedia: () => ({ matches: false }), Image: function () {}, fetch: () => Promise.reject(new Error('no fetch')),
 };
 sandbox.window = sandbox;

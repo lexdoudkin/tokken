@@ -95,6 +95,8 @@ function toVS() {
 }
 
 const me = () => Net.st.role === 'host' ? 0 : 1;
+// VS CPU: the CPU's cursor starts on a random agent every game (the player can still move it)
+function randomCpuPick() { if (!sel.cpu) return; const ids = ROSTER.map((id, i) => i).filter(i => !FIGHTERS[ROSTER[i]].secret && i !== sel.cur[0]); sel.cur[1] = ids[Math.floor(Math.random() * ids.length)]; }
 function enterOnlineSelect() { sel.online = true; sel.cpu = false; sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; scene = 'select'; sceneT = 0; Audio.startMusic('title'); vo('select', 'Select your agent'); }
 function leaveOnline(msg) { Net.reset(); sel.online = false; ctrls.forEach(c => c.cpu = null); if (msg) { online.toast = msg; online.toastT = 240; } scene = 'title'; titleArmed = true; online.mode = 'menu'; }
 function stateHash() { let h = 0; for (const f of match.f) h = (h * 31 + Math.round(f.x * 10) + f.tokens * 7 + Math.round(f.compute * 10) + f.wins * 1000003) | 0; return (h * 31 + match.time + match.round) | 0; }
@@ -157,7 +159,7 @@ function update() {
       if (item === 'RANKINGS') { scene = 'rankings'; sceneT = 0; Board.refresh(); return; }
       if (item === 'ONLINE') { scene = 'online'; online.mode = 'menu'; online.idx = 0; sceneT = 0; return; }
       sel.online = false; ctrls.forEach(c => { c.cpu = null; c.bothKB = false; c.alsoPad = null; });
-      sel.cpu = item === 'VS CPU'; ctrls[0].bothKB = sel.cpu; sel.done = [false, sel.cpu ? false : false]; sel.stage = false; sel.timer = 30 * 60; scene = 'select'; sceneT = 0; Audio.startMusic('title');
+      sel.cpu = item === 'VS CPU'; ctrls[0].bothKB = sel.cpu; sel.done = [false, sel.cpu ? false : false]; randomCpuPick(); sel.stage = false; sel.timer = 30 * 60; scene = 'select'; sceneT = 0; Audio.startMusic('title');
       vo('select', 'Select your agent');
     }
   } else if (scene === 'options') {
@@ -266,7 +268,7 @@ function update() {
       if (P('down')) { update.pauseIdx = (update.pauseIdx + 1) % N; Audio.S.move(); }
       if (P('back')) { update.paused = false; return; }                         // ESC / BACK again = resume
       if (P('confirm')) { const it = PAUSE_ITEMS[update.pauseIdx]; update.paused = false; Audio.S.select();
-        if (it === 'CHARACTER SELECT') { ctrls[1].cpu = null; scene = 'select'; sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; }
+        if (it === 'CHARACTER SELECT') { ctrls[1].cpu = null; randomCpuPick(); scene = 'select'; sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; }
         if (it === 'QUIT TO TITLE') { ctrls.forEach(c => c.cpu = null); scene = 'title'; Audio.startMusic('title'); } }
       return;
     }
@@ -284,11 +286,11 @@ function update() {
       if (online.rematch[0] && online.rematch[1] && me() === 0) { const seed = Math.floor(Math.random() * 2 ** 31); online.delay = Net.pickDelay(); Net.send({ t: 'go', cur: sel.cur, arena: sel.arena, seed, delay: online.delay }); online.seed = seed; online.rematch = [false, false]; toVS(); }
       return;
     }
-    if (sceneT > 30 && P('cancel')) { Audio.S.select(); scene = 'select'; ctrls[1].cpu = null; sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; return; }
+    if (sceneT > 30 && P('cancel')) { Audio.S.select(); scene = 'select'; ctrls[1].cpu = null; randomCpuPick(); sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; return; }
     if (sceneT > 30 && P('confirm')) {
       Audio.S.select();
       if (resultsIdx === 0) { match.f.forEach(f => f.wins = 0); startMatch(); }
-      else { scene = 'select'; ctrls[1].cpu = null; sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; }
+      else { scene = 'select'; ctrls[1].cpu = null; randomCpuPick(); sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; }
     }
   }
 }
@@ -342,7 +344,14 @@ function portrait(c, id, x, y, w, h, hidden) {
 }
 
 function render() {
-  const c = ctx; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, cv.width, cv.height); c.setTransform(DPR, 0, 0, DPR, OX, OY); c.imageSmoothingEnabled = false;
+  const c = ctx; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, cv.width, cv.height); c.imageSmoothingEnabled = false;
+  // fights, title and loading use the full (responsive) view width; the other menus are laid out for 1280 and stay centred
+  const FW = W, narrow = !['fight', 'title', 'loading'].includes(scene), cx = OX + (narrow ? (FW - SIM_W) / 2 * DPR : 0);
+  if (narrow) W = SIM_W; c.setTransform(DPR, 0, 0, DPR, cx, OY);
+  try { renderScene(c); } finally { W = FW; }
+  ambient(c, cx, (narrow ? SIM_W : FW) * DPR);
+}
+function renderScene(c) {
   if (scene === 'loading') drawLoading(c);
   else if (scene === 'title') drawTitle(c);
   else if (scene === 'select') drawSelect(c);
@@ -357,7 +366,6 @@ function render() {
   else if (scene === 'rankings') drawRankings(c);
   if (sel.online && scene === 'fight') drawNetHUD(c);
   if (online.toastT > 0) { bevel(c, W / 2 - 260, 90, 520, 44, { fill: '#b30000' }); txt(c, online.toast, W / 2, 118, 12, '#fff', 'Press Start 2P', 'center', false); }
-  ambient(c);
 }
 function drawName(c) {
   drawGridBG(c, frame, '#2a0610'); drawCRT(c);
@@ -483,7 +491,7 @@ function drawLoading(c) {
 // Title parade: real Fighter objects, the exact same walk animation as in fights and the Walk Lab.
 let PARADE = null;
 function drawParade(c) {
-  const ids = ROSTER.filter(id => !FIGHTERS[id].secret), sc = 0.5, loopW = (W + 260) / sc;
+  const ids = ROSTER.filter(id => !FIGHTERS[id].secret), sc = 0.5, loopW = (MAX_W + 260) / sc;
   if (!PARADE) { const stub = { held: () => false, pressed: () => false, buffered: () => false, consume() {} };
     PARADE = ids.map((id, i) => { const f = new Fighter(id, 0, stub); f.x = i * loopW / ids.length; f.setState('walk'); f.facing = 1; f.vx = f.cfg.speed * 0.5; return f; }); }
   const g = { phase: 'intro', frame };
