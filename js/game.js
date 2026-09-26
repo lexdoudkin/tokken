@@ -2,14 +2,30 @@
 const W = 1280, H = 720, FLOOR_S = 628, WORLD_W = 1900, GRAV = 0.82;
 const cv = document.getElementById('game');
 const ctx = cv.getContext('2d');
-let DPR = 1;
+let DPR = 1, OX = 0, OY = 0;
 function resize() {
   DPR = Math.min(matchMedia('(pointer: coarse)').matches ? 1.5 : 2, window.devicePixelRatio || 1);   // phones: cap resolution for a steady 60fps
-  cv.width = W * DPR; cv.height = H * DPR;
-  const s = Math.min(innerWidth / W, innerHeight / H);
-  cv.style.width = W * s + 'px'; cv.style.height = H * s + 'px';
+  const vv = window.visualViewport, vw = Math.round(vv ? vv.width * (vv.scale || 1) : innerWidth), vh = Math.round(vv ? vv.height * (vv.scale || 1) : innerHeight);
+  const s = Math.min(vw / W, vh / H);
+  // the canvas covers the whole screen; the fixed 1280x720 game is drawn centred (gameplay/netcode never see the screen shape)
+  // and the leftover strips get an ambient extension of the picture (see ambient()) instead of black bars
+  cv.width = Math.round(vw / s * DPR); cv.height = Math.round(vh / s * DPR);
+  OX = Math.floor((cv.width - W * DPR) / 2); OY = Math.floor((cv.height - H * DPR) / 2);
+  cv.style.width = vw + 'px'; cv.style.height = vh + 'px';
 }
-addEventListener('resize', resize); resize();
+function ambient(c) {   // stretch the picture's outer edge across the side/top bars, fading to black
+  if (OX < 1 && OY < 1) return; c.setTransform(1, 0, 0, 1, 0, 0); c.imageSmoothingEnabled = true; const cw = cv.width, ch = cv.height, gw = W * DPR, gh = H * DPR;
+  const band = (sx, sy, sw, sh, dx, dy, dw, dh, x0, y0, x1, y1) => { c.drawImage(cv, sx, sy, sw, sh, dx, dy, dw, dh); const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, 'rgba(7,7,13,0.35)'); g.addColorStop(1, 'rgba(7,7,13,0.94)'); c.fillStyle = g; c.fillRect(dx, dy, dw, dh); };
+  if (OX >= 1) { band(OX, OY, 3, gh, 0, OY, OX, gh, OX, 0, 0, 0); band(OX + gw - 3, OY, 3, gh, OX + gw, OY, cw - OX - gw, gh, OX + gw, 0, cw, 0); }
+  if (OY >= 1) { band(0, OY, cw, 3, 0, 0, cw, OY, 0, OY, 0, 0); band(0, OY + gh - 3, cw, 3, 0, OY + gh, cw, ch - OY - gh, 0, OY + gh, 0, ch); }
+  c.imageSmoothingEnabled = false;
+}
+// re-fit on anything that changes the visible area: browser bars, rotation (iOS reports late), fullscreen, tab return
+const refit = () => { resize(); setTimeout(resize, 120); setTimeout(resize, 400); setTimeout(resize, 900); };
+addEventListener('resize', resize); addEventListener('orientationchange', refit); addEventListener('pageshow', refit);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refit(); });
+if (window.visualViewport) visualViewport.addEventListener('resize', resize);
+resize();
 
 const rand = (a, b) => a + Math.random() * (b - a);
 const pick = a => a[Math.floor(Math.random() * a.length)];

@@ -7,11 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#000}
-  html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
-  body{display:flex;align-items:center;justify-content:center}
+  html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;overscroll-behavior:none;touch-action:none}
+  body{position:fixed;inset:0;height:100dvh;display:flex;align-items:center;justify-content:center}
+  #tk-rotate{display:none;position:fixed;inset:0;z-index:50;background:#07070d;color:#ffd23f;font:14px 'Press Start 2P',monospace;text-align:center;align-items:center;justify-content:center;flex-direction:column;gap:22px;line-height:1.8}
+  #tk-rotate b{font-size:54px;animation:tkrot 1.6s ease-in-out infinite}
+  @keyframes tkrot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(90deg)}}
+  @media (orientation:portrait) and (pointer:coarse){#tk-rotate{display:flex}}
   canvas{display:block;image-rendering:pixelated;background:#07070d}
 </style></head>
-<body><canvas id="game"></canvas>
+<body><canvas id="game"></canvas><div id="tk-rotate"><b>📱</b>ROTATE YOUR PHONE<br><span style="color:#aaa;font-size:9px">TOKKEN IS A LANDSCAPE-ONLY FIGHTING GAME</span></div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>window.BUILD = '__BUILD__'; window.VQ = window.BUILD === '__' + 'BUILD__' ? '' : '?v=' + window.BUILD;</script>
 <script src="js/data.js"></script>

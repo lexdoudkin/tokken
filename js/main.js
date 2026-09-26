@@ -335,7 +335,7 @@ function portrait(c, id, x, y, w, h, hidden) {
 }
 
 function render() {
-  const c = ctx; c.setTransform(DPR, 0, 0, DPR, 0, 0); c.imageSmoothingEnabled = false;
+  const c = ctx; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, cv.width, cv.height); c.setTransform(DPR, 0, 0, DPR, OX, OY); c.imageSmoothingEnabled = false;
   if (scene === 'loading') drawLoading(c);
   else if (scene === 'title') drawTitle(c);
   else if (scene === 'select') drawSelect(c);
@@ -350,6 +350,7 @@ function render() {
   else if (scene === 'rankings') drawRankings(c);
   if (sel.online && scene === 'fight') drawNetHUD(c);
   if (online.toastT > 0) { bevel(c, W / 2 - 260, 90, 520, 44, { fill: '#b30000' }); txt(c, online.toast, W / 2, 118, 12, '#fff', 'Press Start 2P', 'center', false); }
+  ambient(c);
 }
 function drawName(c) {
   drawGridBG(c, frame, '#2a0610'); drawCRT(c);

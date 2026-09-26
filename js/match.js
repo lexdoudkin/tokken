@@ -311,7 +311,7 @@ class Match {
     c.restore(); c.textAlign = 'left';
   }
   drawGlitch(c) {
-    for (let i = 0; i < 6; i++) { const y = rand(0, H), h = rand(4, 30); c.drawImage(cv, 0, y * DPR, W * DPR, h * DPR, rand(-30, 30), y, W, h); }
+    for (let i = 0; i < 6; i++) { const y = rand(0, H), h = rand(4, 30); c.drawImage(cv, OX, OY + y * DPR, W * DPR, h * DPR, rand(-30, 30), y, W, h); }
     c.fillStyle = `rgba(255,0,60,${FX.glitch / 200})`; c.fillRect(0, 0, W, H);
   }
   drawHUD(c) {

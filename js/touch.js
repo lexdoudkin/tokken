@@ -90,9 +90,11 @@ const Touch = (() => {
   // tap on the game itself = START in menus
   document.getElementById('game').addEventListener('touchstart', e => { e.preventDefault(); Audio.init(); Input.vpress('start', true); setTimeout(() => Input.vpress('start', false), 60); }, { passive: false });
   document.addEventListener('touchend', () => goFull(), { passive: true });   // fullscreen is only allowed after a finished tap
-  document.addEventListener('fullscreenchange', () => setTimeout(() => dispatchEvent(new Event('resize')), 50));
+  for (const ev of ['fullscreenchange', 'webkitfullscreenchange']) document.addEventListener(ev, () => setTimeout(() => dispatchEvent(new Event('resize')), 50));
   const standalone = matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches || navigator.standalone;
-  function goFull() { if (standalone || document.fullscreenElement) return; const d = document.documentElement; if (!document.fullscreenElement && d.requestFullscreen) d.requestFullscreen({ navigationUI: 'hide' }).then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape').catch(() => {})).catch(() => {}); }
+  const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+  function goFull() { if (standalone || fsEl()) return; const d = document.documentElement, req = d.requestFullscreen || d.webkitRequestFullscreen; if (!req) return;   // iPhone Safari has no page fullscreen: home-screen app only
+    try { const pr = req.call(d, { navigationUI: 'hide' }); if (pr && pr.then) pr.then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape').catch(() => {})).catch(() => {}); } catch (e) {} }
 
   // install as an app: Android shows a real button, iOS gets the Share → Add to Home Screen tip
   const inst = document.createElement('div'); inst.id = 'tk-inst'; document.body.appendChild(inst);
