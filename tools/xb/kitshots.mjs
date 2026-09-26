@@ -1,0 +1,22 @@
+import { chromium, devices } from 'playwright';
+const OUT = '/Users/alexander/tokken/promo/launch-kit/screenshots/';
+const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1.5 }); const p = await ctx.newPage();
+await p.addInitScript(() => { let first = true; const raf = window.requestAnimationFrame.bind(window); window.requestAnimationFrame = f => first ? (first = false, raf(f)) : 0; });
+await p.goto('http://localhost:8777/index.html?promo=1'); await p.waitForFunction(() => window.TOKKEN, null, { timeout: 60000, polling: 250 });
+await p.evaluate(() => { if (!Audio.muted) Audio.toggleMute(); TOKKEN.tick(200); }); await p.screenshot({ path: OUT + '01-title.png' });
+const fight = (a, o, arena) => p.evaluate(([a, o, arena]) => { TOKKEN.sel.cur = [ROSTER.indexOf(a), ROSTER.indexOf(o)]; TOKKEN.sel.cpu = true; TOKKEN.sel.arena = arena; TOKKEN.startMatch(); TOKKEN.ctrls[0].cpu = new CPU(0.85); TOKKEN.ctrls[1].cpu = new CPU(0.85); TOKKEN.tick(330); }, [a, o, arena]);
+const ult = (t) => p.evaluate(t => { const m = TOKKEN.match; m.f[0].compute = 100; m.startUlt(m.f[0], m.f[1]); TOKKEN.tick(t); }, t);
+await fight('claude', 'codex', 0); await p.screenshot({ path: OUT + '02-fight-claude-vs-codex.png' });
+await fight('jev', 'gemini', 12); await ult(150); await p.screenshot({ path: OUT + '03-ult-jev-json-firehose.png' });
+await fight('deepseek', 'claude', 15); await ult(125); await p.screenshot({ path: OUT + '04-ult-deepseek-distillation.png' });
+await fight('mistral', 'llama', 8); await ult(140); await p.screenshot({ path: OUT + '05-ult-mistral-strike.png' });
+await fight('kimi', 'grok', 3); await ult(160); await p.screenshot({ path: OUT + '06-ult-kimi-eclipse.png' });
+await fight('codex', 'perplexity', 13); await ult(130); await p.screenshot({ path: OUT + '07-ult-codex-ship-to-prod.png' });
+await b.close();
+// select screen (normal loop), mobile
+const b2 = await chromium.launch(); const p2 = await (await b2.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1.5 })).newPage();
+await p2.goto('http://localhost:8777/index.html'); await p2.waitForFunction(() => window.TOKKEN && TOKKEN.scene === 'title', null, { timeout: 60000 }); await p2.evaluate(() => { if (!Audio.muted) Audio.toggleMute(); });
+await p2.keyboard.press('Enter'); await p2.waitForTimeout(300); await p2.keyboard.press('Enter'); await p2.waitForTimeout(1200); await p2.screenshot({ path: OUT + '08-select-20-agents.png' });
+const p3 = await (await b2.newContext({ ...devices['Pixel 7 landscape'] })).newPage(); await p3.goto('http://localhost:8777/index.html?fight=alexa,siri&arena=9'); await p3.waitForFunction(() => window.TOKKEN && TOKKEN.match, null, { timeout: 60000 });
+await p3.evaluate(() => { if (!Audio.muted) Audio.toggleMute(); TOKKEN.tick(300); }); await p3.waitForTimeout(300); await p3.screenshot({ path: OUT + '09-mobile-pixel.png' });
+await b2.close(); console.log('ok');
