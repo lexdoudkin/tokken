@@ -11,10 +11,39 @@ function points(m) {
   p += Math.min(15, (m.combo | 0));
   return p;
 }
+// ---- matchmaking / WebRTC signaling: a PeerJS-compatible server in one Durable Object (players only use it to swap connection details)
+export class Signal {
+  constructor(state) { this.state = state; }
+  async fetch(req) {
+    const url = new URL(req.url), id = url.searchParams.get('id') || '', token = url.searchParams.get('token') || '';
+    if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) return new Response('bad id', { status: 400 });
+    const pair = new WebSocketPair(), [client, server] = Object.values(pair);
+    this.state.acceptWebSocket(server, [id]); server.serializeAttachment({ id, token });
+    const others = this.state.getWebSockets(id).filter(s => s !== server);
+    if (others.some(s => (s.deserializeAttachment() || {}).token !== token)) { server.send(JSON.stringify({ type: 'ID-TAKEN', payload: { msg: 'ID is taken' } })); server.close(1008, 'ID is taken'); }
+    else { for (const s of others) try { s.close(1000, 'replaced'); } catch (e) {} server.send(JSON.stringify({ type: 'OPEN' })); }
+    return new Response(null, { status: 101, webSocket: client });
+  }
+  webSocketMessage(ws, raw) {
+    let m; try { m = JSON.parse(raw); } catch { return; }
+    if (!m || m.type === 'HEARTBEAT' || !m.dst) return;
+    const me = (ws.deserializeAttachment() || {}).id, dst = this.state.getWebSockets(String(m.dst));
+    if (!dst.length) { if (m.type !== 'LEAVE' && m.type !== 'EXPIRE') ws.send(JSON.stringify({ type: 'EXPIRE', src: m.dst, dst: me })); return; }
+    const out = JSON.stringify({ type: m.type, src: me, dst: m.dst, payload: m.payload });
+    for (const s of dst) try { s.send(out); } catch (e) {}
+  }
+  webSocketClose(ws) { try { ws.close(); } catch (e) {} }
+  webSocketError(ws) { try { ws.close(); } catch (e) {} }
+}
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+    if (url.pathname === '/peerjs/id') return new Response(crypto.randomUUID(), { headers: { 'content-type': 'text/plain', ...CORS } });
+    if (url.pathname === '/peerjs') {
+      if (req.headers.get('Upgrade') !== 'websocket') return new Response('expected websocket', { status: 426 });
+      return env.SIGNAL.get(env.SIGNAL.idFromName('global')).fetch(req);
+    }
     if (url.pathname === '/turn') {
       // short-lived TURN relay credentials (Cloudflare Realtime TURN) so players behind strict NATs / mobile carriers can connect
       const stun = [{ urls: 'stun:stun.cloudflare.com:3478' }];

@@ -5,6 +5,8 @@
 const Net = (() => {
   const BITS = ['left', 'right', 'up', 'down', 'light', 'heavy', 'special', 'slop', 'ult', 'dash', 'block'];
   const MAXROLL = 8;
+  // our own matchmaking/signaling server (PeerJS protocol, Cloudflare Durable Object) instead of the shared public PeerJS cloud
+  const SIGNAL = { host: 'api.tokken.win', port: 443, secure: true, path: '/', key: 'peerjs' };
   const ICE = { iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }, { urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
   // TURN relay fallback (fetched per session from our Worker; never blocks longer than 2.5s)
   let turnP = null;
@@ -43,7 +45,7 @@ const Net = (() => {
   async function host() {
     reset(); st.role = 'host'; st.code = mkCode(); st.status = 'opening';
     const config = await iceConfig();
-    st.peer = new Peer(pid(st.code), { config });
+    st.peer = new Peer(pid(st.code), { ...SIGNAL, config });
     st.peer.on('open', () => { st.status = 'waiting'; });
     st.peer.on('connection', c => { if (c.label === 'fast') { setupFast(c); return; } if (st.conn) { c.close(); return; } setup(c); setTimeout(() => watchFail(c), 0); });
     st.peer.on('error', e => { if (String(e.type) === 'unavailable-id') { st.peer.destroy(); host(); return; } st.status = 'error'; st.error = e.type || String(e); });
@@ -51,7 +53,7 @@ const Net = (() => {
   async function join(code) {
     reset(); st.role = 'guest'; st.code = code.toUpperCase(); st.status = 'connecting';
     const config = await iceConfig();
-    st.peer = new Peer({ config });
+    st.peer = new Peer({ ...SIGNAL, config });
     st.peer.on('open', () => { const c = st.peer.connect(pid(st.code), { reliable: true }); setup(c); setTimeout(() => watchFail(c), 0); });
     setTimeout(() => { if (st.status === 'connecting') { st.status = 'error'; st.error = 'COULD NOT CONNECT (20S). CHECK THE CODE / NETWORK'; } }, 20000);
     st.peer.on('error', e => { st.status = 'error'; st.error = e.type === 'peer-unavailable' ? 'NO GAME WITH THAT CODE' : (e.type || String(e)); });

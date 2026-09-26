@@ -11,3 +11,12 @@ routes = [{ pattern = "api.tokken.win", custom_domain = true }]
 binding = "DB"
 database_name = "tokken-leaderboard"
 database_id = "2588c2e7-9702-4848-9689-6729f807bf10"
+
+# matchmaking / signaling (PeerJS protocol) — one hibernating Durable Object
+[[durable_objects.bindings]]
+name = "SIGNAL"
+class_name = "Signal"
+
+[[migrations]]
+tag = "v1-signal"
+new_sqlite_classes = ["Signal"]
