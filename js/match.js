@@ -45,7 +45,7 @@ class Match {
     f.compute = 0; f.stats.compute += 100; f.setState('ultcin');
     this.ultCin = { f, o, t: 0, name: f.cfg.ult.name }; Audio.S.ult(); Audio.duck(0.05, 1800); Audio.crowd(0.8, 2);
     if (['claude', 'codex', 'cursor'].includes(f.id) && memeOk('yolo')) { floatText(f.x, f.y - f.h - 110, '--dangerously-skip-permissions', { size: 10, font: 'Press Start 2P', color: '#ff5555', life: 90 }); aTimeout(() => boothEvent('yolo', { p: 0.4 }), 2600); }
-    const d = vo(`v_${f.id}_ult`, '', { who: 'char' }); aTimeout(() => vo(`ult_${f.id}`, f.cfg.ult.name, { interrupt: false }), (d || 0) * 700 + 200);
+    const d = vo(`v_${f.id}_ult`, '', { who: 'char', interrupt: true });   // key lines cut in over long taunts aTimeout(() => vo(`ult_${f.id}`, f.cfg.ult.name, { interrupt: false }), (d || 0) * 700 + 200);
     aTimeout(() => comment('ult', { a: f.cfg.name, aid: f.id }), 1600);
   }
   spawnMoveProj(f, o, kind) {
@@ -131,12 +131,12 @@ class Match {
     this.perfects = this.perfects || [0, 0]; if (a.tokens >= MAX_TOKENS) this.perfects[a.side]++;
     this.hitstop = 30; FX.slowmo = 90; FX.flash = 8; FX.flashColor = '#fff'; FX.glitch = 40; shake(20);
     Audio.duck(0.02, 3000); Audio.S.ko();
-    vo(`v_${d.id}_ko`, '', { who: 'char' });
+    vo(`v_${d.id}_ko`, '', { who: 'char', interrupt: true });
     this.later(25, () => announce(why, { size: why.length > 16 ? 64 : 90, dur: 110, color: '#ff4040', key: whyKey(why), speak: why.replace('429', 'four two nine') }));
     const perfect = a.tokens >= MAX_TOKENS;
     this.later(150, () => { if (perfect && boothEvent('perfect', { force: true })) return; if (Math.random() < 0.5 && Audio.has(`f_${d.id}_ko`)) boothKey([`b_ko_x`, `f_${d.id}_ko`].filter(k => Audio.has(k)), true); else comment('ko', {}); });
     this.later(115, () => { announce('K.O.', { size: 200, dur: 80, color: '#FFD23F', key: 'ko' }); });
-    this.later(200, () => { a.setState('win'); const w = a.wins >= 2 ? vo(`wins_${a.id}`, '') : 0; const wk = pick(['', '1', '2'].filter(x => !x || Audio.has(`v_${a.id}_winq${x}`))); const wt = (wk && Audio.lineText(`v_${a.id}_winq${wk}`)) || a.cfg.win; aTimeout(() => vo(`v_${a.id}_winq${wk}`, wt, { who: 'char' }), (w || 0) * 1000 + 100); if (!RESIM) this.winQuote = { f: a, text: `"${wt}"`, t: 0 }; });
+    this.later(200, () => { a.setState('win'); const w = a.wins >= 2 ? vo(`wins_${a.id}`, '') : 0; const wk = pick(['', '1', '2'].filter(x => !x || Audio.has(`v_${a.id}_winq${x}`))); const wt = (wk && Audio.lineText(`v_${a.id}_winq${wk}`)) || a.cfg.win; aTimeout(() => vo(`v_${a.id}_winq${wk}`, wt, { who: 'char', interrupt: true }), (w || 0) * 1000 + 100); if (!RESIM) this.winQuote = { f: a, text: `"${wt}"`, t: 0 }; });
     this.later(330, () => {
       if (a.wins >= 2) { this.over = true; this.winner = a; }
       else { this.round++; this.startRound(); }

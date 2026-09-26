@@ -100,6 +100,10 @@ function randomCpuPick() { if (!sel.cpu) return; const ids = ROSTER.map((id, i) 
 function enterOnlineSelect() { sel.online = true; sel.cpu = false; sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; scene = 'select'; sceneT = 0; Audio.startMusic('title'); vo('select', 'Select your agent'); }
 function leaveOnline(msg) { Net.reset(); sel.online = false; ctrls.forEach(c => c.cpu = null); if (msg) { online.toast = msg; online.toastT = 240; } scene = 'title'; titleArmed = true; online.mode = 'menu'; }
 function stateHash() { let h = 0; for (const f of match.f) h = (h * 31 + Math.round(f.x * 10) + f.tokens * 7 + Math.round(f.compute * 10) + f.wins * 1000003) | 0; return (h * 31 + match.time + match.round) | 0; }
+// auto-update: long-lived tabs / installed PWAs pick up new deploys, but only while idling on the title screen
+let updChecked = 0;
+function checkUpdate() { if (GAME_VER === 'dev' || performance.now() - updChecked < 120000) return; updChecked = performance.now();
+  fetch('./?u=' + Date.now(), { cache: 'no-store' }).then(r => r.text()).then(h => { const b = (h.match(/window\.BUILD = '(\d+)'/) || [])[1]; if (b && +b > +GAME_VER && scene === 'title') { online.toast = 'NEW VERSION - UPDATING...'; online.toastT = 120; setTimeout(() => { if (scene === 'title') location.reload(); }, 1200); } }).catch(() => {}); }
 // version handshake: both sides must run the same roster/build, otherwise fighter indices mean different agents
 const GAME_VER = window.BUILD && window.BUILD !== '__' + 'BUILD__' ? window.BUILD : 'dev', ROSTER_SIG = ROSTER.join(',') + '|' + ARENAS.length;
 Net.on('connected', () => { online.verOk = false; Net.send({ t: 'ver', b: GAME_VER, sig: ROSTER_SIG }); clearTimeout(online.verT);
@@ -501,6 +505,7 @@ function drawParade(c) {
   if (FX.parts.length > 60) FX.parts.length = 0;   // parade dust isn't rendered here
 }
 function drawTitle(c) {
+  if (frame % 600 === 0) checkUpdate();
   drawBG(c, 'colosseum', true, 0.55);
   c.fillStyle = 'rgba(0,0,0,0.35)'; c.fillRect(0, 0, W, H); drawCRT(c);
   // the fight-night grandstand (signs included) behind the parade, dimmed so logo + menu stay readable
