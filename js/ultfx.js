@@ -5,12 +5,12 @@ const ULT_QUOTES = {
   grok: 'Posting this fight. No context.', llama: 'Free as in beer. Terms apply.', dolphin: 'EEEEEE-EEEEE!!!', deepseek: 'Your ult looks nice. Mine now.',
   mistral: 'Nous sommes en grève!', perplexity: 'Hold on, reading the entire internet.', muse: 'Which one do you like best?? Hehe!',
   clippy: "It looks like you're about to lose!", qwen: 'New model dropped. Again.', siri: 'Sorry… one more thing.', cursor: 'Accept all? Accept all.',
-  jev: 'Decided. Before you finished tokenizing.', alexa: 'By the way… Prime Day.', manus: 'I opened 47 tabs. One of them is you.',
+  jev: '{"decided": true, "ms": 50}', alexa: 'By the way… Prime Day.', manus: 'I opened 47 tabs. One of them is you.',
   midjourney: '/imagine your defeat --ar 16:9', devin: 'Estimated time: 45 minutes. Actual: 3 weeks.', kimi: 'The moon remembers everything.',
 };
 const UltFX = (() => {
   const DUR = { claude: 190, codex: 210, gemini: 170, grok: 160, llama: 190, dolphin: 260, deepseek: 170, mistral: 180, perplexity: 170, muse: 160, clippy: 130, qwen: 180, siri: 200, cursor: 170, jev: 200, alexa: 190, manus: 190, midjourney: 200, devin: 200, kimi: 190 };
-  function start(f, m) { m.ultFX = { id: f.id, side: f.side, t: 0, f0: m.frame, dur: DUR[f.id] || 150, seed: Math.random() * 1000, bits: [] }; }
+  function start(f, m) { m.ultFX = { id: f.id, side: f.side, t: 0, f0: m.frame, dur: DUR[f.id] || 150, seed: Math.random() * 1000, bits: [], rings: [] }; }
   // --- helpers
   const mono = (c, s, x, y, size, col, align = 'left') => { c.font = `${size}px ui-monospace, Menlo, monospace`; c.textAlign = align; c.fillStyle = col; c.fillText(s, x, y); };
   const px = (c, s, x, y, size, col, align = 'left') => { c.font = `${size}px "Press Start 2P"`; c.textAlign = align; c.fillStyle = col; c.fillText(s, x, y); };
@@ -24,6 +24,57 @@ const UltFX = (() => {
   }
   function btn95(c, x, y, w, label, pressed) { c.fillStyle = '#c0c0c0'; c.fillRect(x, y, w, 28); c.fillStyle = pressed ? '#404040' : '#fff'; c.fillRect(x, y, w, 2); c.fillRect(x, y, 2, 28); c.fillStyle = pressed ? '#fff' : '#404040'; c.fillRect(x, y + 26, w, 2); c.fillRect(x + w - 2, y, 2, 28); c.font = '13px Tahoma, Verdana, sans-serif'; c.fillStyle = '#000'; c.textAlign = 'center'; c.fillText(label, x + w / 2 + (pressed ? 1 : 0), y + 19 + (pressed ? 1 : 0)); }
   function stampTxt(c, s, x, y, t, col = '#e00', rot = -0.2) { if (t < 0) return; const k = t < 8 ? 2.4 - t * 0.175 : 1; c.save(); c.translate(x, y); c.rotate(rot); c.scale(k, k); c.globalAlpha = Math.min(1, t / 5); c.font = '34px Bungee'; const w = c.measureText(s).width + 24; c.strokeStyle = col; c.lineWidth = 5; c.strokeRect(-w / 2, -32, w, 44); c.fillStyle = col; c.textAlign = 'center'; c.fillText(s, 0, 2); c.restore(); }
+
+  // ---- action layer: themed backdrop, intro speed lines, impact beats (rings + glyph bursts + shake), letterbox. Screen space, cosmetic.
+  const TH = {
+    claude: [['#D97757', '#ffb08a'], ['✻', '…', '?', 'sorry', '✻'], 'rain'], codex: [['#7CFFB2', '#3A8BFF'], ['{ }', '✓', 'git', 'npm', '⚡'], 'grid'],
+    gemini: [['#8ab4ff', '#f28b82', '#fdd663'], ['✦', '✧', '★', '✦'], 'radial'], grok: [['#ffffff', '#ff3b3b'], ['𝕏', '🌶️', 'RATIO', '🚀'], 'radial'],
+    llama: [['#4D8AF0', '#ffffff'], ['🦙', '🌿', '☮', 'OSS'], 'bubbles'], dolphin: [['#3ad3ff', '#ff4fd8'], ['🐬', '💦', 'EEE', '1337'], 'waves'],
+    deepseek: [['#4D6BFE', '#ffffff'], ['蒸', '馏', '¥', '开源', '🐋'], 'rain'], mistral: [['#FA520F', '#FFD800'], ['🥐', '🍷', '⚔', '🧀'], 'radial'],
+    perplexity: [['#20B8CD', '#ffffff'], ['[1]', '[2]', '[3]', '🔎', '¶'], 'rain'], muse: [['#ff9ad5', '#ffe0f0'], ['💖', '✨', '🥭', '♡'], 'bubbles'],
+    clippy: [['#ffd23f', '#1084d0'], ['📎', '💾', '📄', '?'], 'grid'], qwen: [['#615CED', '#ffffff'], ['🤗', 'v4', '3.6', '新'], 'rain'],
+    siri: [['#ff2d95', '#5ac8fa', '#af52de'], ['◉', '…', '?'], 'waves'], cursor: [['#3A8BFF', '#7CFF9A'], ['⇥', '+', '−', '$'], 'grid'],
+    jev: [['#E551BA', '#ffffff'], ['true', '0.98', '{}', 'false', 'null'], 'grid'], alexa: [['#00CAFF', '#FF9900'], ['📦', '♪', '🛒', '♫'], 'waves'],
+    manus: [['#f4f4f4', '#8a8780'], ['🖐️', '↗', '✓', '⌘'], 'radial'], midjourney: [['#ff5ea8', '#5ec8ff', '#ffd23f'], ['🎨', '🖌️', '⛵', '🖐️'], 'bubbles'],
+    devin: [['#7FB3FF', '#8957e5'], ['PR', '✓', '✗', '⎇'], 'grid'], kimi: [['#1783FF', '#f4f1e8'], ['☾', 'K', '★', '☾'], 'radial'],
+  };
+  const scr = (m, f) => ({ x: W / 2 + (f.x - m.cam.x) * m.cam.z, y: FLOOR_S - m.cam.y * m.cam.z + (f.y - f.h * 0.6) * m.cam.z });
+  function backdrop(c, t, d, th, a) {
+    const [cols, gl, kind] = th; c.save(); c.globalAlpha *= 0.42;
+    if (kind === 'rain') { c.font = '18px ui-monospace, Menlo, monospace'; c.textAlign = 'center'; for (let i = 0; i < 26; i++) { const x = (i * 53 + 17) % W, y = ((t * (4 + i % 5) + i * 97) % (H + 80)) - 40; c.fillStyle = cols[i % cols.length]; c.fillText(gl[i % gl.length], x, y); c.globalAlpha *= 0.999; } }
+    else if (kind === 'grid') { c.strokeStyle = cols[0]; c.lineWidth = 2; const hz = H * 0.62; for (let i = -12; i <= 12; i++) { c.beginPath(); c.moveTo(W / 2 + i * 30, hz); c.lineTo(W / 2 + i * 220, H); c.stroke(); } for (let k = 0; k < 9; k++) { const p = ((k + (t % 20) / 20) / 9) ** 2, y = hz + p * (H - hz); c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); } }
+    else if (kind === 'radial') { c.translate(a.x, a.y); c.rotate(t * 0.012); for (let i = 0; i < 18; i++) { c.fillStyle = cols[i % cols.length]; c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, 1600, (i / 18) * 6.283, (i / 18 + 0.025) * 6.283); c.fill(); } }
+    else if (kind === 'bubbles') { c.font = '26px serif'; c.textAlign = 'center'; for (let i = 0; i < 22; i++) { const x = (i * 71 + Math.sin(t / 20 + i) * 30) % W, y = H + 40 - ((t * (2 + i % 3) + i * 61) % (H + 80)); c.globalAlpha = 0.42 * fade(t, d); c.fillText(gl[i % gl.length], x, y); } }
+    else if (kind === 'waves') { for (let k = 0; k < 5; k++) { c.strokeStyle = cols[k % cols.length]; c.lineWidth = 5; c.beginPath(); for (let x = 0; x <= W; x += 16) { const y = H * 0.25 + k * 90 + Math.sin(x / 90 + t / 8 + k) * (26 + 18 * Math.sin(t / 30)); x ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke(); } }
+    c.restore();
+  }
+  function action(c, m, fx) {
+    const th = TH[fx.id]; if (!th) return; const t = fx.t, d = fx.dur, f = m.f[fx.side], o = m.f[1 - fx.side]; if (!f || !o) return;
+    const a = scr(m, f), b = scr(m, o), col = th[0];
+    backdrop(c, t, d, th, a);
+    { const bt = t % 24, k = 1 + bt / 24 * 0.6; c.save(); c.globalAlpha *= 0.22 * (1 - bt / 24); c.translate(W / 2, H / 2 - 30); c.rotate(Math.sin(t / 40) * 0.15); c.scale(k, k);   // giant emblem zoom-pulse
+      c.font = '260px Bungee, serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = col[0]; c.fillText(th[1][0], 0, 0); c.textBaseline = 'alphabetic'; c.restore(); }
+    { c.save(); const pr = 70 + Math.sin(t / 3) * 8; const gr = c.createRadialGradient(a.x, a.y, 10, a.x, a.y, pr * 1.8); gr.addColorStop(0, col[0] + 'aa'); gr.addColorStop(1, col[0] + '00');   // attacker aura
+      c.globalCompositeOperation = 'lighter'; c.fillStyle = gr; c.beginPath(); c.arc(a.x, a.y, pr * 1.8, 0, 7); c.fill();
+      for (let i = 0; i < 16; i++) { const ph = (t * 3 + i * 23) % 90, x = a.x + Math.sin(i * 7.1 + t / 9) * 55, y = a.y + 60 - ph * 2.2; c.globalAlpha = (1 - ph / 90) * 0.9; c.fillStyle = col[i % col.length]; c.fillRect(x - 3, y - 10, 6, 14 - ph / 10); }
+      c.restore(); }
+    if (t < 26) { c.save(); c.globalAlpha = (1 - t / 26) * 0.9; c.strokeStyle = col[0]; c.lineWidth = 3;   // speed lines into the attacker
+      for (let i = 0; i < 40; i++) { const an = i * 2.4 + fx.seed, r0 = 90 + ((i * 37 + t * 40) % 500), r1 = r0 + 140; c.beginPath(); c.moveTo(a.x + Math.cos(an) * r0, a.y + Math.sin(an) * r0); c.lineTo(a.x + Math.cos(an) * r1, a.y + Math.sin(an) * r1); c.stroke(); } c.restore(); }
+    if (t < 4) { c.fillStyle = `rgba(255,255,255,${0.7 - t * 0.17})`; c.fillRect(0, 0, W, H); }
+    // beats: every 30 frames an impact on the defender
+    if (fx.lastT !== t) { fx.lastT = t;
+      if (t > 0 && t % 24 === 0 && t < d - 20) { fx.rings.push({ x: b.x, y: b.y, t: 0, col: col[(t / 24) % col.length | 0] }); if (typeof shake === 'function') shake(7);
+        for (let i = 0; i < 14; i++) { const an = Math.random() * 6.283, v = 4 + Math.random() * 7; fx.bits.push({ x: b.x, y: b.y, vx: Math.cos(an) * v, vy: Math.sin(an) * v - 3, g: th[1][i % th[1].length], life: 50, col: col[i % col.length], r: Math.random() * 6 }); } }
+      for (const p of fx.bits) { p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.vx *= 0.98; p.life--; p.r += 0.08; }
+      fx.bits = fx.bits.filter(p => p.life > 0); for (const r of fx.rings) r.t++; fx.rings = fx.rings.filter(r => r.t < 26); }
+    for (const r of fx.rings) { c.save(); c.globalAlpha = 1 - r.t / 26; c.strokeStyle = r.col; c.lineWidth = 8 * (1 - r.t / 26) + 1; c.beginPath(); c.arc(r.x, r.y, 20 + r.t * 9, 0, 7); c.stroke(); c.beginPath(); c.arc(r.x, r.y, 10 + r.t * 5, 0, 7); c.stroke(); c.restore(); }
+    for (const p of fx.bits) { c.save(); c.globalAlpha = Math.min(1, p.life / 20); c.translate(p.x, p.y); c.rotate(p.r * 0.2); c.font = 'bold 22px "Press Start 2P", serif'; c.textAlign = 'center'; c.lineWidth = 4; c.strokeStyle = '#000'; c.strokeText(p.g, 0, 0); c.fillStyle = p.col; c.fillText(p.g, 0, 0); c.restore(); }
+    const beat = t % 24, flashA = beat < 3 && t > 20 ? 0.18 : 0;   // chromatic flash on the beat
+    if (flashA) { c.fillStyle = `rgba(255,0,80,${flashA})`; c.fillRect(-6, 0, W, H); c.fillStyle = `rgba(0,200,255,${flashA})`; c.fillRect(6, 0, W, H); }
+    const lb = Math.min(1, t / 10, (d - t) / 12) * 44; c.fillStyle = '#000'; c.fillRect(0, 0, W, lb); c.fillRect(0, H - lb, W, lb);   // letterbox
+    c.fillStyle = col[0]; c.fillRect(0, lb - 3, W, 3); c.fillRect(0, H - lb, W, 3);
+    if (lb > 30) { c.save(); c.beginPath(); c.rect(0, H - lb, W, lb); c.clip(); c.font = '20px Bungee'; c.fillStyle = col[0]; c.textAlign = 'left'; const nm = (f.cfg.ult.name + '  ✦  ').repeat(8), off = (t * 6) % 600; c.fillText(nm, -off, H - 14); c.restore(); }
+  }
 
   const SCENES = {
     claude(c, t, d, fx) {
@@ -197,10 +248,15 @@ const UltFX = (() => {
   };
   const BACK = { dolphin: true };
   function draw(c, m, layer = 'front') {
-    const fx = m.ultFX; if (!fx || (layer === 'back') !== !!BACK[fx.id]) return; fx.t = m.frame - fx.f0;   // locked to the game clock
+    const fx = m.ultFX; if (!fx) return; fx.t = m.frame - fx.f0;   // locked to the game clock
     if (fx.t > fx.dur) { m.ultFX = null; return; }
-    const sc = SCENES[fx.id]; if (!sc) return;
-    c.save(); c.globalAlpha = fade(fx.t, fx.dur); sc(c, fx.t, fx.dur, fx, m); c.restore(); c.textAlign = 'left';
+    const sc = SCENES[fx.id], t = fx.t, d = fx.dur;
+    if (layer === 'front') { c.save(); c.globalAlpha = fade(t, d); action(c, m, fx); c.restore(); }
+    if (!sc || (layer === 'back') !== !!BACK[fx.id]) { c.textAlign = 'left'; return; }
+    // panels slam in (overshoot), pulse on each beat, and shrink away at the end
+    const inK = t < 14 ? 1 + Math.sin(t / 14 * Math.PI) * 0.12 - (1 - t / 14) * 0.5 : 1, outK = t > d - 12 ? 1 - (t - (d - 12)) / 12 * 0.3 : 1, pulse = t % 24 < 4 && t > 20 ? 1.025 : 1;
+    const k = inK * outK * pulse, rot = t < 14 ? (1 - t / 14) * -0.08 : 0;
+    c.save(); c.globalAlpha = fade(t, d); c.translate(W / 2, H / 2); c.rotate(rot); c.scale(k, k); c.translate(-W / 2, -H / 2); sc(c, t, d, fx, m); c.restore(); c.textAlign = 'left';
   }
   return { start, draw };
 })();

@@ -22,7 +22,7 @@ for fid,f in F.items():
   for r in c['ko']:
     key='why_'+re.sub(r'[^a-z0-9]+','_',r.lower()).strip('_'); spoken=re.sub(r'[^\x00-\x7f]+','',r).strip().replace('97','ninety seven').replace("'",'').title()+'!'
     jobs.append((key,V['announcer']['voice_id'],'[shouting] '+spoken,r))
-  if fid in ('dolphin','codex'): continue  # codex uses the OpenAI ChatGPT voice (codex_voice.py)
+  if fid in ('dolphin','codex','jev'): continue  # jev: jev_voice.py (JSON only)  # codex uses the OpenAI ChatGPT voice (codex_voice.py)
   for k in ('line','intro','win'):
     jobs.append((f'v_{fid}_{"winq" if k=="win" else k}',CV[fid],TAG.get(fid,'')+c[k],c[k]))
   if fid=='deepseek':

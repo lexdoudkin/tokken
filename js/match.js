@@ -462,13 +462,14 @@ function drawRow(c, row, frame, excited, backY, midX, base, filter, avoid = []) 
     const face = p.x < midX ? 1 : -1; // turn toward the fight
     const top = backY - hop - hgt;
     let banner = null;
-    if (p.sign && !avoid.some(x => Math.abs(x - p.x) < 130)) { // banner on two sticks gripped in the raised fists (fist spots measured per sprite: HANDS)
-      const hd = HANDS[p.id] || [-0.14, 0.05, 0.14, 0.05], iw = img.width * s;
-      const xa = p.x + face * hd[0] * iw, ya = top + hd[1] * hgt, xb = p.x + face * hd[2] * iw, yb = top + hd[3] * hgt;
-      const xl = Math.min(xa, xb), xr = Math.max(xa, xb), mid = (xl + xr) / 2, by = Math.min(ya, yb) - 16 - (base > 70 ? 4 : 0);
-      c.font = '7px "Press Start 2P"'; const tw = Math.max(c.measureText(p.sign).width + 10, xr - xl + 10), bh = 16;
-      c.strokeStyle = '#5a3d1e'; c.lineWidth = 3; c.beginPath(); c.moveTo(xa, ya + 3); c.lineTo(xa, by); c.moveTo(xb, yb + 3); c.lineTo(xb, by); c.stroke();
-      banner = () => { c.save(); c.translate(mid, by); c.font = '7px "Press Start 2P"';
+    if (p.sign && !avoid.some(x => Math.abs(x - p.x) < 130)) { // one stick in one raised fist, each sign tilted its own way
+      const hd = HANDS[p.id] || [-0.14, 0.05, 0.14, 0.05], iw = img.width * s, useR = (p.ph * 10 | 0) % 2 === 0;
+      const hx = p.x + face * hd[useR ? 2 : 0] * iw, hy = top + hd[useR ? 3 : 1] * hgt;
+      const tilt = ((p.ph * 7) % 1 - 0.5) * 0.5 + Math.sin(frame / 22 + p.ph) * 0.06, len = 22 + (base > 70 ? 6 : 0);
+      const tx = hx + Math.sin(tilt) * len, ty = hy - Math.cos(tilt) * len;
+      c.strokeStyle = '#6b4a24'; c.lineWidth = 3; c.beginPath(); c.moveTo(hx - Math.sin(tilt) * 4, hy + Math.cos(tilt) * 4); c.lineTo(tx, ty); c.stroke();
+      c.font = '7px "Press Start 2P"'; const tw = c.measureText(p.sign).width + 10, bh = 16;
+      banner = () => { c.save(); c.translate(tx, ty); c.rotate(tilt); c.font = '7px "Press Start 2P"';
         c.fillStyle = '#f4f1e8'; c.fillRect(-tw / 2, -bh, tw, bh); c.strokeStyle = '#000'; c.lineWidth = 2; c.strokeRect(-tw / 2, -bh, tw, bh);
         c.fillStyle = '#111'; c.textAlign = 'center'; c.fillText(p.sign, 0, -5); c.restore(); };   // drawn after the body so hair never covers it
     }

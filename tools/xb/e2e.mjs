@@ -1,7 +1,7 @@
 // Real-network online E2E: run as host (prints invite code) or guest (joins code). Bot plays; reports netcode stats.
 import { chromium } from 'playwright';
 const [,, role, code, secs = '170'] = process.argv;
-const U = 'https://tokken-6t6.pages.dev/';
+const U = process.env.TOKKEN_URL || 'https://tokken-6t6.pages.dev/';
 const opts = process.env.CHROME ? { executablePath: process.env.CHROME } : {};
 const b = await chromium.launch({ ...opts, args: ['--autoplay-policy=no-user-gesture-required', '--disable-background-timer-throttling', '--disable-renderer-backgrounding'] });
 const p = await (await b.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
@@ -17,7 +17,7 @@ if (role === 'host') {
   console.log('CODE', await p.evaluate(() => Net.st.code));
   await p.waitForFunction(() => Net.st.status === 'connected', null, { timeout: 180000 });
   await p.waitForTimeout(3000);   // let pings settle so the delay pick is real
-  await p.evaluate(() => { sel.cur = [6, 10]; sel.arena = 11; online.delay = Net.pickDelay(); const seed = 424242; Net.send({ t: 'go', cur: sel.cur, arena: sel.arena, seed, delay: online.delay }); online.seed = seed; toVS(); });
+  await p.evaluate(([a, b]) => { sel.cur = [ROSTER.indexOf(a), ROSTER.indexOf(b)]; sel.arena = 11; online.delay = Net.pickDelay(); const seed = 424242; Net.send({ t: 'go', cur: sel.cur, arena: sel.arena, seed, delay: online.delay }); online.seed = seed; toVS(); }, [process.env.P1 || 'jev', process.env.P2 || 'kimi']);
 } else {
   await p.waitForFunction(() => Net.st.status === 'connected', null, { timeout: 60000 });
 }
