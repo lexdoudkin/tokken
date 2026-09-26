@@ -578,10 +578,15 @@ const Ults = {
     floatText(f.x, f.y - f.h - 70, '蒸馏', { size: 36, font: 'sans-serif', color: '#fff', life: 110, vy: -0.5 });
     Ults[src.kind](f, src, g, o);
   },
-  bullettime(f, u, g, o) {   // Jev: opponent runs at half speed; Jev decides in 50ms
+  bullettime(f, u, g, o) {   // Jev: opponent drops to half speed, Jev opens the JSON firehose
     f.setState('idle'); o.status.slowmo = u.dur;
-    for (let i = 0; i < 7; i++) g.later(20 + i * 7, () => { if (o.tokens <= 0) return; f.x = o.x - f.facing * f.h * 0.45; f.after.push({ x: f.x, y: f.y, pose: i % 2 ? 'light' : 'heavy', life: 14, facing: f.facing }); floatText(o.x, o.y - o.h - 20 - i * 12, (0.9 + i * 0.012).toFixed(2), { size: 10, font: 'Press Start 2P', color: '#E551BA', life: 30 });
-      g.areaHit(f, o, { x: o.x - 60, y: o.y - o.h, w: 120, h: o.h }, { dmg: i === 6 ? 3584 : 1280, knock: i === 6 ? 10 : 1, launch: i === 6, hitstun: 20, hitstop: 3, name: u.name, blockable: false, multi: true }); });
+    const J = ['{"hit": true}', '[true, true]', 'null', '{"you": "lose"}', 'NaN', 'true', '{"ok": false}', '[]', '{"p": 0.98}', 'undefined', '{"gg": false}', '0.02', '{"latency": 50}', 'TRUE'];
+    for (let i = 0; i < 24; i++) g.later(12 + i * 3, () => { if (o.tokens <= 0 || f.tokens <= 0) return; const sx = f.x + f.facing * f.h * 0.35, sy = f.y - f.h * 0.62, a = Math.atan2(o.y - o.h * 0.55 - sy, o.x - sx) + grand(-0.22, 0.22), sp = 14 + grand(0, 4);
+      g.projs.push(new Proj({ owner: f, target: o, x: sx, y: sy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1.5, g: 0.1, w: 96, h: 34, dmg: 330,
+        blockable: false, knock: 1, hitstun: 12, hitstop: 1, life: 80, label: gpick(J), fs: 13 + (i % 3) * 3, color: gpick(['#E551BA', '#ffffff', '#ffb3e6', '#7CFFB2']) }));
+      if (i % 4 === 0) { f.squash = 0.06; Audio.S.key(2); } });
+    g.later(12 + 24 * 3 + 8, () => { if (o.tokens <= 0 || f.tokens <= 0) return; Audio.S.beam();
+      g.projs.push(new Proj({ owner: f, target: o, x: f.x + f.facing * f.h * 0.4, y: f.y - f.h * 0.6, vx: f.facing * 11, vy: 0, w: 260, h: 64, dmg: 3584, blockable: false, knock: 10, launch: true, hitstun: 30, hitstop: 10, life: 140, label: '{"ko": true}', fs: 30, color: '#E551BA' })); });
     announce('50MS', { size: 110, dur: 60, color: '#E551BA', sub: 'FORWARD PASS. EVERYONE ELSE: STILL TOKENIZING', say: false });
   },
   painting(f, u, g, o) {   // Midjourney: giant framed painting slam

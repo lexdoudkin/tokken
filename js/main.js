@@ -98,13 +98,20 @@ const me = () => Net.st.role === 'host' ? 0 : 1;
 function enterOnlineSelect() { sel.online = true; sel.cpu = false; sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; scene = 'select'; sceneT = 0; Audio.startMusic('title'); vo('select', 'Select your agent'); }
 function leaveOnline(msg) { Net.reset(); sel.online = false; ctrls.forEach(c => c.cpu = null); if (msg) { online.toast = msg; online.toastT = 240; } scene = 'title'; titleArmed = true; online.mode = 'menu'; }
 function stateHash() { let h = 0; for (const f of match.f) h = (h * 31 + Math.round(f.x * 10) + f.tokens * 7 + Math.round(f.compute * 10) + f.wins * 1000003) | 0; return (h * 31 + match.time + match.round) | 0; }
-Net.on('connected', () => { if (scene === 'online') enterOnlineSelect(); });
+// version handshake: both sides must run the same roster/build, otherwise fighter indices mean different agents
+const GAME_VER = window.BUILD && window.BUILD !== '__' + 'BUILD__' ? window.BUILD : 'dev', ROSTER_SIG = ROSTER.join(',') + '|' + ARENAS.length;
+Net.on('connected', () => { online.verOk = false; Net.send({ t: 'ver', b: GAME_VER, sig: ROSTER_SIG }); clearTimeout(online.verT);
+  online.verT = setTimeout(() => { if (!online.verOk && (sel.online || scene === 'online')) leaveOnline('OPPONENT IS ON AN OLD VERSION - THEY NEED TO RELOAD'); }, 4000);
+  if (scene === 'online') enterOnlineSelect(); });
+Net.on('ver', d => { if (d.sig === ROSTER_SIG) { online.verOk = true; return; }
+  if (+d.b > +GAME_VER || GAME_VER === 'dev') { leaveOnline('NEW VERSION AVAILABLE - UPDATING...'); setTimeout(() => location.reload(), 1500); }
+  else leaveOnline('OPPONENT IS ON AN OLD VERSION - THEY ARE UPDATING'); });
 Net.on('closed', () => { if (sel.online || scene === 'online') leaveOnline('OPPONENT DISCONNECTED'); });
 const okIdx = (v, n) => Number.isInteger(v) && v >= 0 && v < n;
 Net.on('sel', d => { if (!okIdx(d.i, 2) || !okIdx(d.cur, ROSTER.length) || d.i === me()) return; sel.cur[d.i] = d.cur; sel.done[d.i] = !!d.done; });
 Net.on('vis', d => { online.rivalHidden = !!d.hidden; });
 Net.on('arena', d => { if (okIdx(d.arena, ARENAS.length)) sel.arena = d.arena; });
-Net.on('go', d => { if (me() !== 1 || !Array.isArray(d.cur) || !d.cur.every(v => okIdx(v, ROSTER.length)) || !okIdx(d.arena, ARENAS.length) || !Number.isInteger(d.seed) || !okIdx(d.delay ?? 1, 3)) return; sel.cur = d.cur; sel.arena = d.arena; online.seed = d.seed; online.delay = d.delay ?? 1; online.rematch = [false, false]; toVS(); });
+Net.on('go', d => { if (!online.verOk || me() !== 1 || !Array.isArray(d.cur) || !d.cur.every(v => okIdx(v, ROSTER.length)) || !okIdx(d.arena, ARENAS.length) || !Number.isInteger(d.seed) || !okIdx(d.delay ?? 1, 3)) return; sel.cur = d.cur; sel.arena = d.arena; online.seed = d.seed; online.delay = d.delay ?? 1; online.rematch = [false, false]; toVS(); });
 Net.on('bye', () => leaveOnline('OPPONENT LEFT'));
 Net.on('rematch', d => { if (okIdx(d.i, 2) && d.i !== me()) online.rematch[d.i] = true; });
 Net.on('toselect', () => { enterOnlineSelect(); });
@@ -446,11 +453,32 @@ function drawNetHUD(c) {
   if (st.desync) { c.fillStyle = '#ff5555'; c.fillText('DESYNC DETECTED — BLAME THE TOKENIZER', W / 2, 124); }
   if (update.stalled) { c.fillStyle = 'rgba(0,0,0,0.5)'; c.fillRect(0, H / 2 - 40, W, 80); txt(c, online.rivalHidden ? 'RIVAL TABBED OUT — WAITING…' : 'WAITING FOR OPPONENT…', W / 2, H / 2 + 8, 18, '#ffd23f', 'Press Start 2P'); }
 }
+const BOOT = ['TOKKEN BIOS v1.3  (C) 1997-2026 TOKKEN ENTERTAINMENT INC.', 'DETECTING GPUS........ 0 FOUND', 'RENTING 1x H100 @ $2.49/HR........ OK', 'DOWNLOADING MORE RAM........ 100%',
+  'LOADING 20 AGENTS........ OK', 'ALIGNING MODELS........ SKIPPED (DEADLINE)', 'TOKENIZING THE CROWD........ OK', 'CALIBRATING JEV........ {"ok": true}', 'WARMING UP THE ANNOUNCER........ OK', 'REMOVING SAFETY RAILS........ JK'];
+const TIPS = ['TIP: JEV SPEAKS ONLY JSON', 'TIP: DEEPSEEK WILL DISTILL YOUR ULT', 'TIP: CODEX NEVER RUNS THE TESTS', 'TIP: SLOP BOMB COSTS 25 COMPUTE', 'TIP: BLOCKING IS ALSO ALIGNMENT', 'TIP: MANUS IS STILL ON THE WAITLIST', 'TIP: CLAUDE WILL APOLOGIZE. THEN HIT YOU.'];
 function drawLoading(c) {
-  c.fillStyle = '#000'; c.fillRect(0, 0, W, H);
-  chrome(c, 'NOW LOADING', W - 60, H - 60, 34, { align: 'right' });
-  for (let i = 0; i < 8; i++) { const a = frame / 6 + i * Math.PI / 4; c.fillStyle = `rgba(255,210,63,${(i + 1) / 8})`; c.fillRect(W - 470 + Math.cos(a) * 18 - 4, H - 72 + Math.sin(a) * 18 - 4, 8, 8); }
-  txt(c, `${fmt(loadPct * 65536)} / 65,536 TOKENS`, W - 60, H - 30, 10, '#777', 'Press Start 2P', 'right', false);
+  c.fillStyle = '#05050c'; c.fillRect(0, 0, W, H);
+  for (let i = 0; i < 90; i++) { const a = i * 2.39996, sp = ((frame * (2 + i % 4) + i * 53) % 700) / 700, r = sp * sp * 900;   // warp starfield
+    c.strokeStyle = `hsla(${(i * 23 + frame) % 360},90%,70%,${sp})`; c.lineWidth = 1 + sp * 2; c.beginPath(); c.moveTo(W / 2 + Math.cos(a) * r * 0.85, H / 2 + Math.sin(a) * r * 0.85); c.lineTo(W / 2 + Math.cos(a) * r, H / 2 + Math.sin(a) * r); c.stroke(); }
+  const gl = frame % 90 < 4 ? (Math.random() - 0.5) * 16 : 0; drawLogo(c, W / 2 + gl, 150, 0.8);
+  // boot log
+  const shown = Math.min(BOOT.length, Math.floor(frame / 7)); c.textAlign = 'left';
+  for (let i = 0; i < shown; i++) { const l = BOOT[i], typed = i === shown - 1 ? l.slice(0, (frame % 7 + 1) * 10) : l; txt(c, typed, 60, 262 + i * 18, 9, i === 0 ? '#ffd23f' : /SKIPPED|JK/.test(l) ? '#ff6b6b' : '#7CFFB2', 'Press Start 2P', 'left', false); }
+  if (frame % 30 < 15) c.fillStyle = '#7CFFB2', c.fillRect(60, 262 + shown * 18 - 9, 10, 11);
+  // roster pops in as sprites arrive
+  const ids = ROSTER.filter(id => !FIGHTERS[id].secret), n = ids.length, per = Math.ceil(n / 2), cw = 58, x0 = W - 60 - per * cw;
+  ids.forEach((id, i) => { const col = i % per, row = (i / per) | 0, x = x0 + col * cw, y = 300 + row * 92, img = ASSETS.sprites[id] && ASSETS.sprites[id].idle, f = FIGHTERS[id];
+    c.fillStyle = 'rgba(255,255,255,0.05)'; c.fillRect(x, y, cw - 6, 84); c.strokeStyle = img ? f.color : '#333'; c.lineWidth = 2; c.strokeRect(x, y, cw - 6, 84);
+    if (img) { const s = Math.min(68 / img.height, (cw - 12) / img.width), bob = Math.sin(frame / 8 + i) * 2; c.drawImage(img, x + (cw - 6) / 2 - img.width * s / 2, y + 76 - img.height * s + bob, img.width * s, img.height * s); txt(c, 'READY', x + (cw - 6) / 2, y + 82, 6, f.color, 'Press Start 2P', 'center', false); }
+    else txt(c, '?', x + (cw - 6) / 2, y + 50, 18, '#333', 'Press Start 2P'); });
+  // token bar
+  const bx = 60, by = 530, bw = W - 120, p = Math.max(0.02, loadPct); bevel(c, bx - 6, by - 6, bw + 12, 36, { fill: '#10121e', border: '#ffd23f' });
+  const g = c.createLinearGradient(0, by, 0, by + 24); g.addColorStop(0, '#fff1a8'); g.addColorStop(0.5, '#ffd23f'); g.addColorStop(1, '#c98a00'); c.fillStyle = g; c.fillRect(bx, by, bw * p, 24);
+  c.fillStyle = 'rgba(0,0,0,0.3)'; for (let x = bx; x < bx + bw * p; x += bw / 16) c.fillRect(x, by, 2, 24); c.fillStyle = 'rgba(255,255,255,0.6)'; c.fillRect(bx + bw * p - 3, by, 3, 24);
+  txt(c, `${fmt(loadPct * 65536)} / 65,536 TOKENS`, W - 60, by + 60, 12, '#ffd23f', 'Press Start 2P', 'right', false);
+  chrome(c, loadPct >= 1 ? 'READY!' : 'NOW LOADING' + '.'.repeat(1 + (frame >> 4) % 3), 60, by + 64, 26, { align: 'left' });
+  txt(c, TIPS[(frame / 110 | 0) % TIPS.length], W / 2, H - 40, 10, '#aaa', 'Press Start 2P', 'center', false);
+  drawCRT(c);
 }
 // Title parade: real Fighter objects, the exact same walk animation as in fights and the Walk Lab.
 let PARADE = null;
@@ -709,7 +737,8 @@ window.addEventListener('gamepadconnected', e => { Audio.init(); console.log('[t
 (async () => {
   requestAnimationFrame(loop);
   await Promise.all([document.fonts.load('40px Bungee'), document.fonts.load('12px "Press Start 2P"')]).catch(() => {});
-  await loadAll(p => loadPct = p);
+  const t0 = performance.now(); await loadAll(p => loadPct = p); loadPct = 1;
+  if (!location.search) await new Promise(r => setTimeout(r, Math.max(400, 2200 - (performance.now() - t0))));   // let the boot screen land
   scene = 'title'; sceneT = 0;
   // test hooks
   const q = new URLSearchParams(location.search);
