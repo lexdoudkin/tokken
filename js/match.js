@@ -139,7 +139,7 @@ class Match {
     for (const t of this.timers) if (--t.n <= 0) t.fn(); this.timers = this.timers.filter(t => t.n > 0);
     if (this.ultCin) {
       const u = this.ultCin; u.t++; u.f.st++;
-      if (u.t === 70) { this.ultCin = null; Ults[u.f.cfg.ult.kind](u.f, u.f.cfg.ult, this, u.o); u.f.inv = Math.max(u.f.inv, 10); }
+      if (u.t === 70) { this.ultCin = null; if (!RESIM) UltFX.start(u.f, this); Ults[u.f.cfg.ult.kind](u.f, u.f.cfg.ult, this, u.o); u.f.inv = Math.max(u.f.inv, 10); }
       this.updateFX(); return;
     }
     if (this.hitstop > 0) { this.hitstop--; this.updateFX(true); return; }
@@ -253,6 +253,7 @@ class Match {
     c.restore();
     if (FX.flash > 0) { c.fillStyle = FX.flashColor; c.globalAlpha = FX.flash / 10; c.fillRect(0, 0, W, H); c.globalAlpha = 1; }
     if (FX.glitch > 0) this.drawGlitch(c);
+    UltFX.draw(c, this, 'front');
     drawCRT(c);
     this.drawWinQuote(c);
     this.drawHUD(c);
@@ -272,6 +273,7 @@ class Match {
     const v = c.createRadialGradient(W / 2, H / 2, H * 0.4, W / 2, H / 2, H); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.55)'); c.fillStyle = v; c.fillRect(0, 0, W, H);
     // front-row crowd signs
     if (this.ultCin || this.f.some(f => f.state === 'ultrun')) { c.fillStyle = 'rgba(5,0,20,0.55)'; c.fillRect(0, 0, W, H); }
+    UltFX.draw(c, this, 'back');
   }
   drawUltCin(c) {
     const u = this.ultCin, t = u.t, f = u.f;
@@ -286,6 +288,7 @@ class Match {
     c.font = '78px Bungee'; c.textAlign = f.side ? 'left' : 'right'; c.lineWidth = 10; c.strokeStyle = '#000'; const tx = f.side ? 90 : W - 90;
     c.strokeText(u.name, tx, y + 135); c.fillStyle = '#fff'; c.fillText(u.name, tx, y + 135);
     c.font = '18px "Press Start 2P"'; c.fillStyle = '#FFD23F'; c.fillText('ULTIMATE · 100 COMPUTE', tx, y + 175);
+    if (ULT_QUOTES[f.id]) bubble(c, f.side ? W - 420 : 60, y - 110, 360, ULT_QUOTES[f.id], t * 1.6, !!f.side);
     c.restore(); c.textAlign = 'left';
   }
   drawGlitch(c) {

@@ -18,7 +18,7 @@ sandbox.window = sandbox;
 sandbox.Audio = new Proxy({ S: new Proxy({}, { get: () => noop }), has: () => false, play: () => false, chain: () => null, lineText: () => '', VOL: {}, muted: true, voiceProgress: 1 }, { get: (t, k) => (k in t ? t[k] : noop) });
 vm.createContext(sandbox);
 const load = f => vm.runInContext(fs.readFileSync(path.join(ROOT, 'js', f), 'utf8'), sandbox, { filename: f });
-load('data.js'); load('input.js'); load('game.js'); load('snap.js'); load('retro.js'); load('match.js');
+load('data.js'); load('input.js'); load('game.js'); load('snap.js'); load('retro.js'); load('ultfx.js'); load('match.js');
 // CPU class lives in main.js; pull just that class out.
 const main = fs.readFileSync(path.join(ROOT, 'js/main.js'), 'utf8');
 vm.runInContext(main.slice(main.indexOf('class CPU {'), main.indexOf('// ---------------- Scenes')) + '\nthis.CPU = CPU;', sandbox);
