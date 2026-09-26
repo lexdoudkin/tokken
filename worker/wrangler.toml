@@ -4,6 +4,9 @@ compatibility_date = "2026-09-01"
 # IKAROS account (never the Art of X company account)
 account_id = "ecb4b473e61e57b0edf4052fb0d0963a"
 
+# api.tokken.win → leaderboard + TURN credentials
+routes = [{ pattern = "api.tokken.win", custom_domain = true }]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "tokken-leaderboard"

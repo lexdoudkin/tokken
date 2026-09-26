@@ -1,6 +1,6 @@
 // TOKKEN public leaderboard client (Cloudflare Worker + D1 backend).
 const Board = (() => {
-  const API = 'https://tokken-leaderboard.tokken.workers.dev';
+  const API = 'https://api.tokken.win';
   const st = { top: [], status: 'idle', last: null, name: '', pid: '' };
   try { st.name = localStorage.getItem('tokken.name') || ''; st.pid = localStorage.getItem('tokken.pid') || ''; } catch (e) {}
   if (!st.pid) { st.pid = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, '0')).join(''); try { localStorage.setItem('tokken.pid', st.pid); } catch (e) {} }

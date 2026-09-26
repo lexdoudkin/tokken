@@ -392,6 +392,7 @@ function drawWalkLab(c) {
   const g = { phase: 'intro', frame };
   WL.forEach(f => {
     const col = f.lane % 2, row = Math.floor(f.lane / 2), ox = col * 640, oy = 120 + row * 88, laneW = 560;
+    if (FX.parts.length > 60) FX.parts.length = 0;
     f.update(g, f); f.state = 'walk'; if (f.x > laneW - 60) { f.vx = -f.cfg.speed * 0.75; f.facing = -1; } if (f.x < 60) { f.vx = f.cfg.speed * 0.75; f.facing = 1; }
     c.save(); c.translate(ox + 40, oy); c.scale(0.5, 0.5); c.fillStyle = '#222638'; c.fillRect(0, 0, laneW * 2, 6); f.draw(c, g); c.restore();
     txt(c, f.cfg.name + (f.cfg.walkStyle === 'waddle' ? ' (WADDLE)' : ''), ox + 50, oy - 64, 8, '#aaa', 'Press Start 2P', 'left', false);
@@ -450,12 +451,22 @@ function drawLoading(c) {
   for (let i = 0; i < 8; i++) { const a = frame / 6 + i * Math.PI / 4; c.fillStyle = `rgba(255,210,63,${(i + 1) / 8})`; c.fillRect(W - 470 + Math.cos(a) * 18 - 4, H - 72 + Math.sin(a) * 18 - 4, 8, 8); }
   txt(c, `${fmt(loadPct * 65536)} / 65,536 TOKENS`, W - 60, H - 30, 10, '#777', 'Press Start 2P', 'right', false);
 }
+// Title parade: real Fighter objects, the exact same walk animation as in fights and the Walk Lab.
+let PARADE = null;
+function drawParade(c) {
+  const ids = ROSTER.filter(id => !FIGHTERS[id].secret), sc = 0.5, loopW = (W + 260) / sc;
+  if (!PARADE) { const stub = { held: () => false, pressed: () => false, buffered: () => false, consume() {} };
+    PARADE = ids.map((id, i) => { const f = new Fighter(id, 0, stub); f.x = i * loopW / ids.length; f.setState('walk'); f.facing = 1; f.vx = f.cfg.speed * 0.5; return f; }); }
+  const g = { phase: 'intro', frame };
+  c.save(); c.translate(-130, 676); c.scale(sc, sc); c.filter = 'brightness(0.55)';
+  for (const f of PARADE) { f.update(g, f); f.state = 'walk'; f.vx = f.cfg.speed * 0.5; if (f.x > loopW) f.x -= loopW; f.draw(c, g); }
+  c.restore(); c.filter = 'none';
+  if (FX.parts.length > 60) FX.parts.length = 0;   // parade dust isn't rendered here
+}
 function drawTitle(c) {
   drawBG(c, 'colosseum', true, 0.55);
   c.fillStyle = 'rgba(0,0,0,0.35)'; c.fillRect(0, 0, W, H); drawCRT(c);
-  const parade = ROSTER.filter(id => !FIGHTERS[id].secret), loopW = W + 260, gap = loopW / parade.length;
-  parade.forEach((id, i) => { const x = ((i * gap + frame * 0.9) % loopW) - 130, h = presH(id, 74), cnt = Object.keys(ASSETS.meta[id] || {}).filter(k => /^walk\d$/.test(k)).length || 8, step = Math.floor((frame * 0.9 + i * 37) / (h * 1.3 / cnt)) % cnt;   // legs synced to distance walked: no foot sliding
-    drawSprite(c, id, ASSETS.meta[id]?.walk0 ? 'walk' + step : animPose(id, 'walk', frame), x, 676, h, false, 'brightness(0.55)'); });
+  drawParade(c);
   drawLogo(c, W / 2, 196, 0.9 + Math.sin(frame / 40) * 0.01);
   txt(c, TAGLINES[Math.floor(frame / 240) % TAGLINES.length], W / 2, 256, 13, '#fff', 'Press Start 2P');
   if (showControls) return drawControls(c);

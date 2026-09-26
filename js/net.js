@@ -9,7 +9,7 @@ const Net = (() => {
   // TURN relay fallback (fetched per session from our Worker; never blocks longer than 2.5s)
   let turnP = null;
   function iceConfig() {
-    turnP = turnP || Promise.race([fetch('https://tokken-leaderboard.tokken.workers.dev/turn').then(r => r.json()), new Promise(r => setTimeout(() => r(null), 2500))])
+    turnP = turnP || Promise.race([fetch('https://api.tokken.win/turn').then(r => r.json()), new Promise(r => setTimeout(() => r(null), 2500))])
       .then(d => { st.relay = !!(d && d.relay); return d && d.iceServers ? { iceServers: [...ICE.iceServers, ...d.iceServers.filter(s => String(s.urls).includes('turn'))] } : ICE; }).catch(() => ICE);
     return turnP;
   }

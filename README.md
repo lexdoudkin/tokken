@@ -2,7 +2,7 @@
 
 *Same tokens. Different problems.* A 90s arcade fighting game where AI agents beat the tokens out of each other.
 
-- Live: https://tokken-6t6.pages.dev (IKAROS Cloudflare account — never the Art of X account)
+- Live: https://tokken.win (Pages project `tokken`, IKAROS Cloudflare account — never Art of X); API: https://api.tokken.win
 - Play locally: `python3 -m http.server 8777` → http://localhost:8777
 - Deploy: `./build.sh deploy` (builds `dist/`, deploys via `worker/deploy.sh`, which refuses any non-IKAROS account)
 - Leaderboard: Cloudflare Worker + D1 in `worker/` (`worker/deploy.sh deploy`)
