@@ -195,7 +195,7 @@ class Match {
       if (p.strength <= 0) p.dead = true; if (q.strength <= 0) q.dead = true;
     }
     for (const p of this.projs) {
-      if (p.dead) continue; const d = p.target, hu = d.hurtbox();
+      if (p.dead || !p.w) continue; const d = p.target, hu = d.hurtbox();   // zero-size projectiles are markers (targets, shadows), never hits
       if (hu && d.inv <= 0 && p.hitCd <= 0 && rectHit(p.box(), hu)) {
         const r = this.applyHit(p.owner, d, { dmg: p.dmg, hitstun: p.hitstun, blockstun: 12, knock: p.knock, push: 6, launch: p.launch, fromX: p.x - Math.sign(p.vx || 1) * 50, chipMul: p.chipMul, blockable: p.blockable, gain: 5 });
         if (p.slop) { if (r === 'hit') { Audio.S.slop(); glyphs(d.x, d.y - d.h / 2, ['🖐️', '🚀', '✨', '💯', '🤖', '📈', 'lorem', 'ipsum'], '#ff4fd8', 12); announce('SLOP!', { size: 90, dur: 40, color: '#b6ff3b', key: 'slop_hit' }); aTimeout(() => comment('slop', {}), 700); } }

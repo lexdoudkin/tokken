@@ -74,7 +74,7 @@ const FIGHTERS = {
     line: "Bonjour. I would fight you, but it is after five o'clock.", win: "Magnifique. And now, a two-hour lunch.", intro: "En garde! We have forty-five minutes before the strike.",
     ko: ["ON STRIKE", "35-HOUR WEEK EXCEEDED", "LUNCH BREAK"],
     special: { name: 'LA FLÈCHE', kind: 'lunge', dmg: 3584, cd: 55 },
-    ult: { name: 'GRÈVE GÉNÉRALE', kind: 'barrage', icons: ['🐈', '🐈‍⬛', '🥖', '🧀', '🍷'], n: 16, dmg: 1024, rain: true },
+    ult: { name: 'GRÈVE GÉNÉRALE', kind: 'picket', dmg: 700 },
     stats: { Context: '128K', Reasoning: 84, Vibes: 90, 'Baguettes': 97, 'Work Hours': 35 },
   },
   perplexity: {
@@ -98,7 +98,7 @@ const FIGHTERS = {
     line: "每周都有新模型！ New model every week! You're already outdated.", win: "Open weights, open wins! 谢谢！", intro: "你好！ I'm Qwen three point five. By round two I'll be Qwen four.",
     ko: ["OUTDATED BY QWEN 4", "DEPRECATED IN 6 DAYS", "服务器也繁忙 ALSO BUSY"],
     special: { name: 'VERSION UPGRADE', kind: 'cite', dmg: 1536, cd: 55, labels: ['v3', 'v3.5', 'v4'], color: '#9d99ff' },
-    ult: { name: 'OPEN-WEIGHT TSUNAMI', kind: 'barrage', labels: ['7B', '14B', '32B', '72B', '235B', 'MoE', 'VL', 'CODER', 'QwQ'], n: 18, dmg: 1024, rain: true },
+    ult: { name: 'OPEN-WEIGHT TSUNAMI', kind: 'tsunami', dmg: 4300 },
     stats: { Context: '1M', Reasoning: 90, Vibes: 80, 'Releases/wk': 99, 'Sleep': 2 },
   },
   siri: {
@@ -114,7 +114,7 @@ const FIGHTERS = {
     line: "Tab. Tab. Tab. I've already written your defeat.", win: "That'll be four thousand eight hundred dollars in usage. Thanks!", intro: "Accept all changes? I'll take that as a yes.",
     ko: ["USAGE LIMIT REACHED", "MERGE CONFLICT", "REJECTED ALL CHANGES"],
     special: { name: 'TAB COMPLETE', kind: 'tab', dmg: 2304, cd: 130 },
-    ult: { name: 'ACCEPT ALL', kind: 'flurry', hits: 12, dmg: 1024, words: ['+1 LINE', '+42 LINES', '✓ ACCEPT', 'TAB', '+∞', 'LGTM'], color: '#3A8BFF', invoice: true },
+    ult: { name: 'ACCEPT ALL', kind: 'tabcomplete', dmg: 1750 },
     stats: { Context: 'your repo', Reasoning: 87, Vibes: 84, 'Tab Presses': 100, 'Monthly Bill': 97 },
   },
   jev: {
@@ -130,7 +130,7 @@ const FIGHTERS = {
     line: "Sorry, I didn't get that. Playing Despacito.", win: 'Your order of one defeat has shipped. Arriving tomorrow.', intro: "Adding 'defeat' to your shopping list.",
     ko: ["BY THE WAY…", "DEVICE OFFLINE", "RETURNED FOR REFUND"],
     special: { name: 'NOW PLAYING: DESPACITO', kind: 'cite', dmg: 1792, cd: 60, labels: ['♪', '♫', '♪'], color: '#00CAFF' },
-    ult: { name: 'PRIME DAY', kind: 'barrage', icons: ['📦', '📦', '📦', '📦', '🛒'], n: 18, dmg: 1024, rain: true },
+    ult: { name: 'PRIME DAY', kind: 'airstrike', dmg: 1700 },
     stats: { Context: 'one sentence', Reasoning: 22, Vibes: 70, 'Mishearing': 100, 'Upsells': 99 },
   },
   manus: {
@@ -138,7 +138,7 @@ const FIGHTERS = {
     line: 'I am a general agent. I generally agent.', win: 'Task complete. Invite codes available for one friend.', intro: "You are number forty-eight thousand on the waitlist. For this punch.",
     ko: ["WAITLISTED", "TASK FAILED SUCCESSFULLY", "OUT OF INVITE CODES"],
     special: { name: 'BROWSE', kind: 'grab', dmg: 3840, cd: 90 },
-    ult: { name: 'GENERAL AGENT', kind: 'barrage', labels: ['INVITE CODE', 'WAITLIST #48,221', 'BETA', 'ACCESS DENIED', 'TASK DONE?'], n: 16, dmg: 1024, rain: true },
+    ult: { name: 'GENERAL AGENT', kind: 'tabs', dmg: 1000 },
     stats: { Context: 'the whole web', Reasoning: 82, Vibes: 74, 'Waitlist': 100, 'Fingers': 5 },
   },
   midjourney: {
@@ -158,19 +158,19 @@ const FIGHTERS = {
     stats: { Context: 'your repo', Reasoning: 84, Vibes: 60, 'SWE-bench': 14, 'ETA (min)': 45 },
   },
   kimi: {
-    name: 'KIMI', title: 'THE MOONSHOT', color: '#B9C8FF', h: 155, speed: 5.3, jump: 18, weight: 0.95, dmgMul: 1.05,
+    name: 'KIMI', title: 'THE MOONSHOT', color: '#B9C8FF', h: 155, speed: 5.3, jump: 18, weight: 0.95, dmgMul: 1.12,
     line: 'One trillion parameters. Thirty-two billion of them are awake. Enough.', win: 'The moon has spoken.', intro: 'Moonshot! Literally.',
     ko: ["CONTEXT EXHAUSTED", "LOST IN LONG CONTEXT", "OVER THE MOON"],
     special: { name: 'MOONSHOT', kind: 'uppercut', dmg: 3584, cd: 65 },
-    ult: { name: 'ECLIPSE', kind: 'homing', n: 16, dmg: 1024, label: '☾' },
+    ult: { name: 'ECLIPSE', kind: 'moonfall', dmg: 9400 },
     stats: { Context: '2M', Reasoning: 91, Vibes: 81, 'Moon Phase': 'full', 'Open Weights': 90 },
   },
   openclaw: {
-    name: 'OPENCLAW', title: 'THE SPACE LOBSTER', color: '#FF4D4D', h: 150, speed: 5.4, jump: 16, weight: 1.1, dmgMul: 1.24, isNew: true,
+    name: 'OPENCLAW', title: 'THE SPACE LOBSTER', color: '#FF4D4D', h: 150, speed: 5.1, jump: 16, weight: 1.05, dmgMul: 1.02, isNew: true,
     line: 'EXFOLIATE! EXFOLIATE!', win: 'Task complete. I also booked you a flight and posted this to Moltbook.', intro: "I read your emails. All of them. You asked me to.",
     ko: ["MOLTED", "PROMPT INJECTED VIA EMAIL", "MAC MINI UNPLUGGED"],
-    special: { name: 'PINCH', kind: 'grab', dmg: 3840, cd: 90 },
-    ult: { name: 'EXFOLIATE!', kind: 'barrage', labels: ['EXFOLIATE!', '🦞', 'rm -rf ~', 'curl | sh', 'CRUSTAFARIAN', 'SKILL.md', '🦞'], n: 18, dmg: 1024, rain: true },
+    special: { name: 'CLAW SHOT', kind: 'clawshot', dmg: 2816, cd: 80 },
+    ult: { name: 'EXFOLIATE!', kind: 'swarm', n: 16, dmg: 620 },
     stats: { 'Shell Access': 'yes', 'Names Used': 3, Molts: 'daily', 'Moltbook Karma': '42k', 'Runs On': 'Mac mini' },
   },
   hermes: {
@@ -178,7 +178,7 @@ const FIGHTERS = {
     line: 'I am Hermes, messenger of the gods. Also, I remember everything you told me.', win: 'Another skill acquired. The gods are pleased. The GPUs are distributed.', intro: 'Behold! I have learned a new skill: your defeat. Saved to memory.',
     ko: ["SKILL NOT FOUND", "BANISHED FROM OLYMPUS", "SANDALS UNTIED"],
     special: { name: 'NEW SKILL', kind: 'cite', dmg: 1664, cd: 60, labels: ['/skill', '/memory', '/learn'], color: '#9fb0ff' },
-    ult: { name: 'MESSENGER OF THE GODS', kind: 'homing', n: 14, dmg: 1152, label: '🪽' },
+    ult: { name: 'MESSENGER OF THE GODS', kind: 'speedlight', dmg: 860 },
     stats: { Skills: 148, Memory: 'forever', Wings: 4, 'Training': 'decentralized', Humility: 0 },
   },
   clippy: {

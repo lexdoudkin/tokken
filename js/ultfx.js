@@ -239,13 +239,10 @@ const UltFX = (() => {
       stampTxt(c, 'MERGED', x + w - 130, y + h - 50, t - (d - 60), '#8957e5');
     },
     kimi(c, t, d) {
-      c.fillStyle = 'rgba(2,4,20,0.6)'; c.fillRect(0, 0, W, H);
-      const r = 150, cx = W / 2, cy = 300 - Math.min(80, t); c.fillStyle = '#f4f1e8'; c.beginPath(); c.arc(cx, cy, r, 0, 7); c.fill();
-      const e = Math.min(1, t / 120); c.fillStyle = '#05060f'; c.beginPath(); c.arc(cx + r * 2 * (1 - e) - r * 0.25 * e, cy - 10 * e, r * 0.98, 0, 7); c.fill();
-      c.strokeStyle = `rgba(23,131,255,${0.5 + 0.5 * Math.sin(t / 4)})`; c.lineWidth = 6; c.beginPath(); c.arc(cx, cy, r + 8, 0, 7); c.stroke();
-      px(c, 'K2', cx, cy + 14, 40, '#fff', 'center');
-      mono(c, `context remembered: ${Math.min(2000000, Math.floor(t * t * 60)).toLocaleString('en-US')} tokens`, cx, cy + r + 50, 16, '#b9c8ff', 'center');
-      if (t > 60) mono(c, '1T parameters · 32B awake · 300 agents in the swarm', cx, cy + r + 76, 14, '#8aa', 'center');
+      const cx = W / 2, y = 150; c.fillStyle = 'rgba(2,4,20,0.8)'; c.fillRect(cx - 330, y, 660, 150); c.strokeStyle = '#1783FF'; c.lineWidth = 3; c.strokeRect(cx - 330, y, 660, 150);
+      px(c, 'K2 ☾ ECLIPSE', cx, y + 46, 28, '#f4f1e8', 'center');
+      mono(c, `context remembered: ${Math.min(2000000, Math.floor(t * t * 60)).toLocaleString('en-US')} tokens`, cx, y + 90, 16, '#b9c8ff', 'center');
+      if (t > 40) mono(c, '1T parameters · 32B awake · the moon is also awake now', cx, y + 120, 14, '#8aa', 'center');
     },
     openclaw(c, t, d) {
       const x = 80, y = 110, w = 560, h = 400; c.fillStyle = 'rgba(12,14,20,0.95)'; c.fillRect(x, y, w, h); c.fillStyle = '#FF4D4D'; c.fillRect(x, y, w, 34);
@@ -267,7 +264,7 @@ const UltFX = (() => {
       stampTxt(c, 'SKILL +1', x + w - 130, y + h - 40, t - (d - 70), '#e8fff4');
     },
   };
-  const BACK = { dolphin: true };
+  const BACK = { dolphin: true }, FULL = { dolphin: true, siri: true };
   function draw(c, m, layer = 'front') {
     const fx = m.ultFX; if (!fx) return; fx.t = m.frame - fx.f0;   // locked to the game clock
     if (fx.t > fx.dur) { m.ultFX = null; return; }
@@ -277,7 +274,9 @@ const UltFX = (() => {
     // panels slam in (overshoot), pulse on each beat, and shrink away at the end
     const inK = t < 14 ? 1 + Math.sin(t / 14 * Math.PI) * 0.12 - (1 - t / 14) * 0.5 : 1, outK = t > d - 12 ? 1 - (t - (d - 12)) / 12 * 0.3 : 1, pulse = t % 24 < 4 && t > 20 ? 1.025 : 1;
     const k = inK * outK * pulse, rot = t < 14 ? (1 - t / 14) * -0.08 : 0;
-    c.save(); c.globalAlpha = fade(t, d); c.translate(W / 2, H / 2); c.rotate(rot); c.scale(k, k); c.translate(-W / 2, -H / 2); sc(c, t, d, fx, m); c.restore(); c.textAlign = 'left';
+    // comedy panels live in the top band (scaled down) so the ult's actual action on the stage stays visible; a few are staged full-screen on purpose
+    const band = !FULL[fx.id], bs = band ? 0.6 : 1;
+    c.save(); c.globalAlpha = fade(t, d); c.translate(W / 2, band ? 58 : H / 2); c.rotate(rot); c.scale(k * bs, k * bs); c.translate(-W / 2, band ? -100 : -H / 2); sc(c, t, d, fx, m); c.restore(); c.textAlign = 'left';
   }
   return { start, draw };
 })();

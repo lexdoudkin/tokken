@@ -6,7 +6,7 @@ const noop = () => {};
 const ctx2d = new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 10 }) : k === 'createLinearGradient' || k === 'createRadialGradient' ? () => ({ addColorStop: noop }) : noop), set: () => true });
 const fakeCanvas = { getContext: () => ctx2d, style: {}, width: 0, height: 0 };
 const sandbox = {
-  console, Math, JSON, Promise, Set, Map, Object, Array, Number, String, Boolean, Symbol, Error, parseInt, parseFloat, isNaN,
+  console,   // builtins come from the context itself (injecting Node's Object breaks `v.constructor === Object` checks in snap.js)
   performance: { now: () => Date.now() }, setTimeout: noop, setInterval: noop, clearInterval: noop,
   addEventListener: noop, innerWidth: 1280, innerHeight: 720, devicePixelRatio: 1, location: { search: '' },
   localStorage: { getItem: () => null, setItem: noop, removeItem: noop },
@@ -41,6 +41,8 @@ function simMatch(a, b, lvl, arena, seed) {
 }
 this.simMatch = simMatch;`, sandbox);
 
+module.exports = { sandbox, vm };   // reuse the headless engine (e.g. tools/ultcheck.js)
+if (require.main === module) {
 const N = +(process.argv[2] || 6), LVL = +(process.argv[3] || 0.7);
 const only = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
 const R = vm.runInContext('ROSTER', sandbox).filter(f => !only.length || only.includes(f));
@@ -53,3 +55,4 @@ const out = Object.entries(S).map(([f, s]) => ({ f, win: +(s.w / s.g * 100).toFi
 for (const o of out) console.log(`${o.f.padEnd(11)} win ${String(o.win).padStart(5)}%  dealt ${String(o.dealt).padStart(6)}  taken ${String(o.taken).padStart(6)}  hits ${String(o.hits).padStart(5)}  ${o.secs}s/match  TO ${o.timeouts}`);
 console.log(`\n${R.length * (R.length - 1) * N} matches in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
 fs.writeFileSync(path.join(__dirname, 'balance_last.json'), JSON.stringify(out, null, 1));
+}

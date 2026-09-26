@@ -489,6 +489,20 @@ const Specials = {
       if (g.areaHit(f, o, box, { dmg: sp.dmg, knock: 11, launch: true, hitstun: 36, hitstop: 12, name: sp.name, blockable: false, onHit: (a, d) => { floatText(d.x, d.y - d.h - 40, 'BROWSING…', { size: 16, font: 'Press Start 2P', color: '#fff', life: 60 }); } })) { f.grabbed = true; shake(10); Audio.S.huge(); } } },
     onEnd(f) { f.grabbed = false; },
   }),
+  clawshot: (f, sp) => ({   // OpenClaw: fire the claw on a cable, clamp on, reel them in
+    startup: 8, active: 1, recovery: 24, pose: 'special',
+    onFrame(f, g, o, t) { if (t !== 8) return; Audio.S.throw();
+      g.projs.push(new Proj({ owner: f, target: o, x: f.x + f.facing * f.h * 0.4, y: f.y - f.h * 0.55, vx: f.facing * 19, w: 70, h: 54, dmg: sp.dmg, life: 34, knock: 0, hitstun: 34, hitstop: 10,
+        onUpdate(p) { if (p.t > 22) p.vx = -f.facing * 22; },   // missed: the claw retracts
+        onHit: (a, d) => { const dir = Math.sign(a.x - d.x) || -a.facing, dist = Math.abs(a.x - d.x); d.vx = dir * Math.min(24, Math.max(8, dist * 0.085)); d.stun = Math.max(d.stun || 0, 34);
+          floatText(d.x, d.y - d.h - 40, 'GET OVER HERE', { size: 22, color: '#FF4D4D', life: 60 }); floatText(d.x, d.y - d.h - 16, '(via WhatsApp)', { size: 10, font: 'Press Start 2P', color: '#fff', life: 60 }); Audio.S.huge(); shake(8); },
+        render(c, p) { const ox = p.owner.x - p.x, oy = (p.owner.y - p.owner.h * 0.55) - p.y, s = Math.sign(p.vx) || p.owner.facing;
+          c.strokeStyle = '#7a1010'; c.lineWidth = 5; c.beginPath(); c.moveTo(0, 0); c.lineTo(ox, oy); c.stroke(); c.strokeStyle = '#ff8a8a'; c.lineWidth = 2; c.setLineDash([6, 6]); c.beginPath(); c.moveTo(0, 0); c.lineTo(ox, oy); c.stroke(); c.setLineDash([]);
+          const open = 0.35 + 0.25 * Math.sin(p.t * 0.9); c.scale(s, 1); c.fillStyle = '#FF4D4D'; c.strokeStyle = '#000'; c.lineWidth = 3;
+          for (const k of [-1, 1]) { c.save(); c.rotate(k * open); c.beginPath(); c.ellipse(20, k * 9, 26, 13, 0, 0, Math.PI * 2); c.fill(); c.stroke(); c.restore(); }
+          c.beginPath(); c.arc(0, 0, 13, 0, Math.PI * 2); c.fill(); c.stroke(); } }));
+      floatText(f.x, f.y - f.h - 30, 'curl | sh', { size: 12, font: 'Press Start 2P', color: '#00E5CC', life: 40 }); },
+  }),
   uppercut: (f, sp) => ({   // Kimi: rising moonshot uppercut
     startup: 4, active: 8, recovery: 20, pose: 'heavy', windup: 'crouch', keepVx: true, box: [0.05, -1.1, 0.7, 1.0], dmg: sp.dmg, hitstun: 30, blockstun: 12, push: 6, launch: true, gain: 10, lunge: 0,
     onFrame(f, g, o, t) { if (t === 4) { f.vy = -13; f.y = -1; f.vx = f.facing * 3; Audio.S.whoosh(); } if (t > 4 && t < 12) f.after.push({ x: f.x, y: f.y, pose: 'heavy', life: 10, facing: f.facing }); },
@@ -501,6 +515,15 @@ const Specials = {
   }),
 };
 
+// a small flying space-lobster (OpenClaw swarm), drawn as vector art so it looks the same on every platform
+function drawLobster(c, t) {
+  const flap = Math.sin(t * 0.8) * 0.35; c.lineWidth = 2.5; c.strokeStyle = '#3a0505';
+  for (const k of [-1, 1]) { c.save(); c.translate(16, k * 9); c.rotate(k * (0.35 + flap)); c.fillStyle = '#e03a3a'; c.beginPath(); c.ellipse(12, 0, 12, 7, 0, 0, Math.PI * 2); c.fill(); c.stroke(); c.restore(); }   // claws
+  c.fillStyle = '#c42a2a'; for (let i = 0; i < 3; i++) { c.beginPath(); c.ellipse(-14 - i * 8, 0, 7 - i, 8 - i * 1.5, 0, 0, Math.PI * 2); c.fill(); c.stroke(); }   // tail
+  const gr = c.createLinearGradient(-10, -12, 12, 12); gr.addColorStop(0, '#ff4d4d'); gr.addColorStop(1, '#991b1b'); c.fillStyle = gr; c.beginPath(); c.ellipse(0, 0, 15, 13, 0, 0, Math.PI * 2); c.fill(); c.stroke();   // body
+  c.strokeStyle = '#ff6b6b'; c.lineWidth = 2; for (const k of [-1, 1]) { c.beginPath(); c.moveTo(8, k * 6); c.quadraticCurveTo(22, k * 20, 30, k * 16); c.stroke(); }   // antennae
+  for (const k of [-1, 1]) { c.fillStyle = '#05070f'; c.beginPath(); c.arc(7, k * 5, 4, 0, Math.PI * 2); c.fill(); c.fillStyle = '#00e5cc'; c.beginPath(); c.arc(8, k * 5, 1.8, 0, Math.PI * 2); c.fill(); }   // eyes
+}
 // ---------------- Ultimates ----------------
 const Ults = {
   think(f, u, g, o) { f.status.think = u.dur; f.setState('idle'); announce('THINKING...', { size: 90, dur: 80, color: '#ffb000', key: 'thinking' }); },
@@ -591,6 +614,88 @@ const Ults = {
     g.later(12 + 24 * 3 + 8, () => { if (o.tokens <= 0 || f.tokens <= 0) return; Audio.S.beam();
       g.projs.push(new Proj({ owner: f, target: o, x: f.x + f.facing * f.h * 0.4, y: f.y - f.h * 0.6, vx: f.facing * 11, vy: 0, w: 260, h: 64, dmg: 3584, blockable: false, knock: 10, launch: true, hitstun: 30, hitstop: 10, life: 140, label: '{"ko": true}', fs: 30, color: '#E551BA' })); });
     announce('50MS', { size: 110, dur: 60, color: '#E551BA', sub: 'FORWARD PASS. EVERYONE ELSE: STILL TOKENIZING', say: false });
+  },
+  // ---- signature ults (one mechanic per fighter)
+  swarm(f, u, g, o) {   // OpenClaw: a flock of lobsters orbits, then peels off and dive-bombs
+    f.setState('idle'); const N = u.n || 16;
+    for (let i = 0; i < N; i++) g.projs.push(new Proj({ owner: f, target: o, x: f.x, y: f.y - f.h * 0.6, w: 46, h: 38, dmg: u.dmg, life: 70 + i * 5 + 80, knock: 3, hitstun: 14, hitstop: 3, ph: i / N * Math.PI * 2, dive: 50 + i * 5, dir: 1,
+      onUpdate(p) { if (p.t < p.dive) { const a = p.ph + p.t * 0.17, r = 95 + 22 * Math.sin(p.t / 6 + p.ph); const nx = f.x + Math.cos(a) * r * 1.5, ny = f.y - f.h * 0.75 + Math.sin(a) * r * 0.55; p.dir = Math.sign(nx - p.x) || p.dir; p.x = nx; p.y = ny; p.vx = 0; p.vy = 0; }
+        else if (p.t === p.dive) { const dx = o.x - p.x, dy = (o.y - o.h * 0.5) - p.y, d = Math.hypot(dx, dy) || 1; p.vx = dx / d * 17; p.vy = dy / d * 17; p.dir = Math.sign(p.vx) || 1; } },
+      render(c, p) { if (p.t < p.dive) { c.scale(p.dir, 1); c.rotate(Math.sin(p.t / 3 + p.ph) * 0.3); } else c.rotate(Math.atan2(p.vy, p.vx)); c.scale(1.35, 1.35); drawLobster(c, p.t); } }));
+  },
+  picket(f, u, g, o) {   // Mistral: a marching picket line shoves you into the wall
+    f.setState('idle'); const dir = f.facing, SIGNS = [['EN GRÈVE', 'NON!'], ['35H MAX', 'GRÈVE!'], ['PAUSE DÉJ', 'SOLIDARITÉ']];
+    for (let i = 0; i < 3; i++) g.later(i * 24, () => g.projs.push(new Proj({ owner: f, target: o, x: clamp(f.x - dir * 140, -100, WORLD_W + 100), y: -80, vx: dir * 4.4, w: 160, h: 150, dmg: u.dmg, hits: 3, life: 260, knock: 7, hitstun: 18, hitstop: 3, ground: true, signs: SIGNS[i],
+      render(c, p) { for (let k = 0; k < 3; k++) { const x = (k - 1) * 46, step = Math.sin(p.t / 4 + k * 2) * 8;
+          c.strokeStyle = '#111'; c.lineWidth = 4; c.beginPath(); c.moveTo(x, 20); c.lineTo(x - step, 75); c.moveTo(x, 20); c.lineTo(x + step, 75); c.moveTo(x, -20); c.lineTo(x, 20); c.stroke();
+          c.fillStyle = ['#FA520F', '#fff', '#1e3a8a'][k]; c.beginPath(); c.arc(x, -30, 12, 0, 7); c.fill(); c.stroke();
+          c.strokeStyle = '#5a3d1e'; c.beginPath(); c.moveTo(x + 10, -5); c.lineTo(x + 10, -70); c.stroke(); }
+        c.fillStyle = '#f4f1e8'; c.strokeStyle = '#000'; c.lineWidth = 3; c.fillRect(-80, -118, 160, 46); c.strokeRect(-80, -118, 160, 46);
+        c.fillStyle = '#c1121f'; c.font = '15px "Press Start 2P"'; c.textAlign = 'center'; c.fillText(p.signs[(p.t >> 5) % 2], 0, -88); } })));
+  },
+  tsunami(f, u, g, o) {   // Qwen: a wave of open-weight checkpoints sweeps the stage
+    f.setState('idle'); const dir = f.facing, sx = clamp(g.cam.x - dir * (SIM_W / 2 / g.cam.z + 120), -150, WORLD_W + 150);
+    g.projs.push(new Proj({ owner: f, target: o, x: sx, y: -160, vx: dir * 9.5, w: 260, h: 320, dmg: u.dmg, hits: 3, life: 260, knock: 9, launch: true, hitstun: 30, hitstop: 6, blockable: false, ground: true,
+      render(c, p) { const s = Math.sign(p.vx) || 1; c.scale(s, 1); const gr = c.createLinearGradient(0, -170, 0, 170); gr.addColorStop(0, '#9d99ff'); gr.addColorStop(0.5, '#615CED'); gr.addColorStop(1, '#1a1560');
+        c.fillStyle = gr; c.beginPath(); c.moveTo(-170, 170); c.lineTo(-170, -40); c.quadraticCurveTo(-60, -200, 90, -150); c.quadraticCurveTo(150, -120, 110, -70); c.quadraticCurveTo(60, -110, 40, -60); c.quadraticCurveTo(80, 40, 140, 170); c.closePath(); c.fill();
+        c.fillStyle = '#fff'; for (let i = 0; i < 14; i++) { const a = i / 14 * 3, r = 4 + (i * 7 + p.t) % 6; c.beginPath(); c.arc(-100 + i * 16, -150 + Math.sin(a + p.t / 5) * 16, r, 0, 7); c.fill(); }
+        c.scale(s, 1); c.font = '12px "Press Start 2P"'; c.textAlign = 'center'; c.fillStyle = '#fff';
+        ['Qwen3.5-72B', 'Qwen4-preview', '235B-A22B', 'QwQ', 'Qwen3.6'].forEach((l, i) => c.fillText(l, s * (-60 + Math.sin(p.t / 9 + i) * 40), -90 + i * 44)); } }));
+  },
+  airstrike(f, u, g, o) {   // Alexa: Prime Air drones lock on and drop packages
+    f.setState('idle');
+    for (let i = 0; i < 6; i++) g.later(8 + i * 17, () => { if (o.tokens <= 0) return; const tx = clamp(o.x + grand(-40, 40), 60, WORLD_W - 60);
+      g.projs.push(new Proj({ owner: f, target: o, x: tx, y: -2, w: 0, h: 0, dmg: 0, life: 26, blockable: true, ground: true, render(c, p) { const k = 1 - p.t / 26; c.strokeStyle = '#ff2d2d'; c.lineWidth = 3; c.beginPath(); c.ellipse(0, 0, 40 * (0.4 + k), 10 * (0.4 + k), 0, 0, 7); c.stroke(); c.beginPath(); c.moveTo(-50, 0); c.lineTo(50, 0); c.stroke(); } }));
+      g.later(24, () => g.projs.push(new Proj({ owner: f, target: o, x: tx, y: -620, vy: 20, g: 0.4, w: 70, h: 60, dmg: u.dmg, life: 120, knock: 5, hitstun: 20, hitstop: 5,
+        onGround(p, game) { burst(p.x, -20, '#FF9900', 14, 8); floatText(p.x, -90, 'DELIVERED', { size: 14, font: 'Press Start 2P', color: '#FF9900', life: 40 }); game.areaHit(f, o, { x: p.x - 90, y: -90, w: 180, h: 90 }, { dmg: u.dmg * 0.35, knock: 6, hitstun: 16, hitstop: 3, name: u.name, multi: true }); },
+        render(c, p) { c.fillStyle = '#c8955a'; c.strokeStyle = '#000'; c.lineWidth = 3; c.fillRect(-30, -26, 60, 52); c.strokeRect(-30, -26, 60, 52); c.fillStyle = '#e8c89a'; c.fillRect(-6, -26, 12, 52);
+          c.strokeStyle = '#222'; c.lineWidth = 2; c.beginPath(); c.moveTo(-18, -44); c.lineTo(18, -44); c.moveTo(0, -44); c.lineTo(0, -26); c.stroke(); c.fillStyle = '#00CAFF'; c.fillRect(-26, -50, 10, 4); c.fillRect(16, -50, 10, 4);
+          c.fillStyle = '#FF9900'; c.font = '9px "Press Start 2P"'; c.textAlign = 'center'; c.fillText('prime', 0, 8); } }))); });
+  },
+  tabs(f, u, g, o) {   // Manus: 47 browser tabs bounce around like a DVD screensaver
+    f.setState('idle'); const L = g.cam.x - SIM_W / 2 / g.cam.z + 70, R = g.cam.x + SIM_W / 2 / g.cam.z - 70;
+    for (let i = 0; i < 7; i++) g.later(i * 8, () => g.projs.push(new Proj({ owner: f, target: o, x: f.x + f.facing * 50, y: f.y - f.h * 0.7, vx: f.facing * grand(6, 10), vy: grand(-10, -4), w: 120, h: 80, dmg: u.dmg, hits: 2, life: 210, knock: 5, hitstun: 16, hitstop: 3, n: 3 + i * 7, ground: true,
+      onUpdate(p) { if (p.x < L) { p.x = L; p.vx = Math.abs(p.vx); } if (p.x > R) { p.x = R; p.vx = -Math.abs(p.vx); } if (p.y < -560) p.vy = Math.abs(p.vy); if (p.y > -50) { p.y = -50; p.vy = -Math.abs(p.vy); } },
+      render(c, p) { c.fillStyle = '#f8f8f6'; c.strokeStyle = '#34322D'; c.lineWidth = 3; c.fillRect(-60, -40, 120, 80); c.strokeRect(-60, -40, 120, 80); c.fillStyle = '#34322D'; c.fillRect(-60, -40, 120, 16);
+        c.fillStyle = '#ff5f57'; c.beginPath(); c.arc(-50, -32, 3, 0, 7); c.fill(); c.fillStyle = '#34322D'; c.font = '9px "Press Start 2P"'; c.textAlign = 'center'; c.fillText(`tab ${p.n}/47`, 0, 4); c.fillText('🖐️ loading…', 0, 24); } })));
+  },
+  tabcomplete(f, u, g, o) {   // Cursor: ghost-text predictions appear, then Tab Tab Tab snaps onto you (re-predicting every step)
+    const dir = f.facing, sx = f.x, tx = clamp(o.x + dir * 130, 60, WORLD_W - 60), pts = [1, 2, 3, 4, 5].map(i => sx + (tx - sx) * i / 5);
+    f.setState('ultrun'); f.ultPose = 'light'; f.inv = 999; f.ut = 0;
+    f.ultRun = (f, g, o, t) => {
+      if (t === 1) for (const x of pts) f.after.push({ x, y: 0, pose: 'heavy', life: 22, facing: dir });
+      if (t < 18) return;
+      const k = (t - 18) / 7; if (!Number.isInteger(k)) return;
+      if (k < 5) { const side = k % 2 ? -1 : 1; f.x = clamp(o.x - side * dir * (o.wBody * 0.5 + f.wBody * 0.5 + 10), 60, WORLD_W - 60); f.facing = Math.sign(o.x - f.x) || dir;
+        f.after.push({ x: f.x, y: 0, pose: 'light', life: 12, facing: f.facing }); floatText(f.x, f.y - f.h - 24, '⇥ TAB', { size: 12, font: 'Press Start 2P', color: '#7CFF9A', life: 26 });
+        o.setState('hitstun'); o.stun = 14; o.vx = 0; g.rawHit(f, o, u.dmg, { hitstop: 4, knock: 0, hitstun: 14, sfx: 'light' }); }
+      else { f.facing = Math.sign(o.x - f.x) || dir; g.rawHit(f, o, u.dmg * 3, { hitstop: 12, knock: 12, launch: true, hitstun: 36, sfx: 'huge' });
+        floatText(f.x, f.y - f.h - 60, 'ACCEPT ALL ⌘⏎', { size: 22, color: '#3A8BFF', life: 60 }); floatText(o.x, o.y - o.h - 90, 'INVOICE: $4,812.00', { size: 20, color: '#ffd23f', life: 80 });
+        f.inv = 8; f.setState('idle'); f.ultRun = null; } };
+  },
+  moonfall(f, u, g, o) {   // Kimi: the moon falls (drifting after you); crescent shockwaves roll out
+    f.setState('idle'); const tx = clamp(o.x, 100, WORLD_W - 100);
+    const moon = new Proj({ owner: f, target: o, x: tx, y: -1100, vy: 15, g: 0.55, w: 250, h: 250, dmg: u.dmg, life: 200, knock: 10, launch: true, hitstun: 34, hitstop: 12, blockable: false,
+      onUpdate(p) { p.x += clamp(o.x - p.x, -6, 6); } });
+    g.projs.push(new Proj({ owner: f, target: o, x: tx, y: -4, w: 0, h: 0, dmg: 0, life: 44, ground: true, onUpdate(p) { p.x = moon.x; }, render(c, p) { const k = p.t / 44; c.fillStyle = `rgba(0,0,0,${0.2 + k * 0.5})`; c.beginPath(); c.ellipse(0, 0, 40 + k * 90, 10 + k * 16, 0, 0, 7); c.fill(); } }));
+    Object.assign(moon, {
+      onGround(p, game) { shake(20); FX.flash = 6; FX.flashColor = '#b9c8ff'; Audio.S.huge();
+        for (const s of [-1, 1]) game.projs.push(new Proj({ owner: f, target: o, x: p.x, y: -45, vx: s * 12, w: 110, h: 90, dmg: u.dmg * 0.4, life: 75, knock: 8, hitstun: 20, hitstop: 5, ground: true,
+          render(c, q) { c.scale(Math.sign(q.vx), 1); c.fillStyle = '#b9c8ff'; c.beginPath(); c.arc(0, 0, 44, -1.4, 1.4); c.arc(-18, 0, 40, 1.3, -1.3, true); c.fill(); } })); },
+      render(c, p) { c.rotate(p.t * 0.02); c.fillStyle = '#f4f1e8'; c.beginPath(); c.arc(0, 0, 110, 0, 7); c.fill(); c.fillStyle = '#d9d4c6';
+        for (const [x, y, r] of [[-40, -30, 22], [35, 20, 30], [-10, 50, 14], [50, -45, 12]]) { c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); }
+        c.fillStyle = 'rgba(5,6,15,0.75)'; c.beginPath(); c.arc(38, -10, 104, 0, 7); c.fill(); c.strokeStyle = '#1783FF'; c.lineWidth = 6; c.beginPath(); c.arc(0, 0, 116, 0, 7); c.stroke(); } });
+    g.projs.push(moon);
+  },
+  speedlight(f, u, g, o) {   // Hermes: orbits you at the speed of light, then throws the caduceus
+    f.setState('ultrun'); f.ultPose = 'light'; f.inv = 999; f.ut = 0; f.ultFly = true;
+    f.ultRun = (f, g, o, t) => {
+      const a = t * 0.34; f.x = o.x + Math.cos(a) * 125; f.y = Math.min(0, -50 + Math.sin(a) * 55); f.facing = Math.sign(o.x - f.x) || 1;
+      f.after.push({ x: f.x, y: f.y, pose: t % 2 ? 'light' : 'heavy', life: 16, facing: f.facing });
+      if (t % 9 === 0 && t < 82) { g.rawHit(f, o, u.dmg, { hitstop: 2, knock: 0, hitstun: 14, sfx: 'light' }); o.vx = 0; glyphs(o.x, o.y - o.h * 0.6, ['🪽', '✉', '⚚'], '#e8fff4', 2); }
+      if (t >= 90) { f.ultFly = false; f.y = 0; f.x = clamp(f.x, 60, WORLD_W - 60); f.facing = Math.sign(o.x - f.x) || 1; f.inv = 10; f.setState('idle'); f.ultRun = null;
+        g.projs.push(new Proj({ owner: f, target: o, x: f.x + f.facing * 50, y: f.y - f.h * 0.6, vx: f.facing * 15, w: 90, h: 90, dmg: u.dmg * 3.5, knock: 11, launch: true, hitstun: 32, hitstop: 10, life: 90, blockable: false,
+          render(c, p) { c.rotate(p.t * 0.5); c.font = '64px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#e8fff4'; c.fillText('⚚', 0, 0); } })); } };
   },
   painting(f, u, g, o) {   // Midjourney: giant framed painting slam
     f.setState('idle');
