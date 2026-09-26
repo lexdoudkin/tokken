@@ -6,6 +6,14 @@ const Net = (() => {
   const BITS = ['left', 'right', 'up', 'down', 'light', 'heavy', 'special', 'slop', 'ult', 'dash', 'block'];
   const MAXROLL = 8;
   const ICE = { iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }, { urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
+  // TURN relay fallback (fetched per session from our Worker; never blocks longer than 2.5s)
+  let turnP = null;
+  function iceConfig() {
+    turnP = turnP || Promise.race([fetch('https://tokken-leaderboard.tokken.workers.dev/turn').then(r => r.json()), new Promise(r => setTimeout(() => r(null), 2500))])
+      .then(d => { st.relay = !!(d && d.relay); return d && d.iceServers ? { iceServers: [...ICE.iceServers, ...d.iceServers.filter(s => String(s.urls).includes('turn'))] } : ICE; }).catch(() => ICE);
+    return turnP;
+  }
+  function watchFail(conn) { const pc = conn.peerConnection; if (!pc) return; pc.addEventListener('iceconnectionstatechange', () => { if (pc.iceConnectionState === 'failed' && st.status !== 'connected') { st.status = 'error'; st.error = 'NETWORK BLOCKED THE CONNECTION'; } }); }
   const st = { delay: 1, inbox: [], rb: null, rollbacks: 0, maxDepth: 0, peer: null, conn: null, fast: null, path: '', peerAck: -1, role: null, code: '', status: 'idle', error: '', local: new Map(), remote: new Map(), sim: 0, waitT: 0, hashes: {}, desync: false, handlers: {}, rtt: 0, rtts: [] };
   const ALPH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const mkCode = () => Array.from({ length: 4 }, () => ALPH[Math.floor(Math.random() * ALPH.length)]).join('');
@@ -24,22 +32,26 @@ const Net = (() => {
   function setup(conn) {
     st.conn = conn; wire(conn);
     conn.on('open', () => { st.status = 'connected'; emit('connected'); ping(); detectPath(); if (st.role === 'guest') openFast(); });
+    conn.on('iceStateChanged', s => { if (s === 'failed' && st.status !== 'connected') { st.status = 'error'; st.error = 'NETWORK BLOCKED THE CONNECTION'; } });
     conn.on('close', () => { st.status = 'closed'; emit('closed'); });
     conn.on('error', e => { st.error = String(e); emit('closed'); });
   }
   function openFast() { const f = st.peer.connect(pid(st.code), { reliable: false, label: 'fast', serialization: 'json' }); setupFast(f); }
   function setupFast(f) { wire(f); f.on('open', () => { st.fast = f; }); f.on('close', () => { if (st.fast === f) st.fast = null; }); }
-  function host() {
+  async function host() {
     reset(); st.role = 'host'; st.code = mkCode(); st.status = 'opening';
-    st.peer = new Peer(pid(st.code), { config: ICE });
+    const config = await iceConfig();
+    st.peer = new Peer(pid(st.code), { config });
     st.peer.on('open', () => { st.status = 'waiting'; });
-    st.peer.on('connection', c => { if (c.label === 'fast') { setupFast(c); return; } if (st.conn) { c.close(); return; } setup(c); });
+    st.peer.on('connection', c => { if (c.label === 'fast') { setupFast(c); return; } if (st.conn) { c.close(); return; } setup(c); setTimeout(() => watchFail(c), 0); });
     st.peer.on('error', e => { if (String(e.type) === 'unavailable-id') { st.peer.destroy(); host(); return; } st.status = 'error'; st.error = e.type || String(e); });
   }
-  function join(code) {
+  async function join(code) {
     reset(); st.role = 'guest'; st.code = code.toUpperCase(); st.status = 'connecting';
-    st.peer = new Peer({ config: ICE });
-    st.peer.on('open', () => setup(st.peer.connect(pid(st.code), { reliable: true })));
+    const config = await iceConfig();
+    st.peer = new Peer({ config });
+    st.peer.on('open', () => { const c = st.peer.connect(pid(st.code), { reliable: true }); setup(c); setTimeout(() => watchFail(c), 0); });
+    setTimeout(() => { if (st.status === 'connecting') { st.status = 'error'; st.error = 'COULD NOT CONNECT (20S). CHECK THE CODE / NETWORK'; } }, 20000);
     st.peer.on('error', e => { st.status = 'error'; st.error = e.type === 'peer-unavailable' ? 'NO GAME WITH THAT CODE' : (e.type || String(e)); });
   }
   // Is this a direct peer-to-peer path, or relayed through a TURN server?

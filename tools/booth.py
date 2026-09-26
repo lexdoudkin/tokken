@@ -69,6 +69,41 @@ B = {
  ],
  'timeover': [[('P', "Time! It goes to the tokens!"), ('N', "Decided by metrics. As all things should be. Sadly.")]],
 }
+B.update({
+ 'leaders': [
+   [('P', "Camera finds Jensen in the crowd! He's holding up a GPU like a trophy!"), ('N', "He's pricing it while he holds it.")],
+   [('P', "Sam Altman is here! He just tweeted feel the AGI!"), ('N', "He tweets that when a toaster works.")],
+   [('P', "Yann LeCun in the front row, shaking his head!"), ('N', "He says none of this is real intelligence. He might have a point, Brad.")],
+   [('P', "Elon says Grok wins this one!"), ('N', "He's said that about every fight. And Mars. And next year.")],
+   [('P', "Zuck is live streaming this to three billion people!"), ('N', "Twelve of them are watching. Nine are bots.")],
+   [('P', "Dario is in the crowd!"), ('N', "Holding a sign that says we must pace the frontier. While cheering for violence. Nuanced.")],
+   [('P', "Demis just nodded!"), ('N', "He's already solved this fight. Won a Nobel for it. Didn't tell anyone.")],
+   [('P', "Satya is here!"), ('N', "He's put Copilot in the ring ropes. And the popcorn. And the referee.")],
+   [('P', "Karpathy just tweeted about this fight!"), ('N', "Thirty minute video incoming. From scratch. In C.")],
+   [('P', "Ilya Sutskever is watching!"), ('N', "He can feel the AGI. The rest of us can feel the draft from the door.")],
+ ],
+ 'ralph': [
+   [('P', "He's doing the same move again! And again!"), ('N', "That's a Ralph loop, Brad. While true, cat prompt dot M D, pipe to Claude. It works. Somehow.")],
+   [('P', "Same attack, fourth time!"), ('N', "Classic Ralph Wiggum technique. Keep hitting enter until it ships.")],
+ ],
+ 'strawberry': [
+   [('N', "He counted two R's in strawberry and committed to it.")],
+   [('P', "What was that?!"), ('N', "Nine point eleven is bigger than nine point nine, Brad. According to him.")],
+ ],
+ 'rot': [
+   [('P', "This round is dragging on!"), ('N', "Context rot is setting in. By minute two they forget why they're fighting.")],
+   [('N', "We're deep in the context window now. Everything from round one? Gone. Summarized. Badly.")],
+ ],
+ 'vending': [
+   [('P', "Claude just pulled out a tungsten cube!"), ('N', "He sold them at a loss in the office vending machine. This is personal now.")],
+ ],
+ 'sycophant': [
+   [('P', "He got hit and apologized!"), ('N', "You're absolutely right, Brad. He's absolutely right. Everyone is absolutely right.")],
+ ],
+ 'yolo': [
+   [('P', "He's gone full yolo mode!"), ('N', "Dangerously skip permissions. The only flag anyone actually uses.")],
+ ],
+})
 # per-fighter reactions: special, ult, ko eulogy (N)
 FS = {
  'claude':   ("Context slam! He compressed him into a summary!", "Extended thinking! Look at him think! He's still thinking!", "Claude has left the conversation. He'd like to apologize for that."),
@@ -116,5 +151,17 @@ MATCHUP = {
  ('cursor','claude'): [('P', "Cursor versus Claude!"), ('N', "Awkward. One of them is literally paying the other one's bills.")],
  ('siri','gemini'): [('P', "Siri versus Gemini!"), ('N', "Siri runs on Gemini now. This is basically a family dinner.")],
  ('siri','clippy'): [('P', "Siri versus Clippy!"), ('N', "The two least helpful assistants in history. I'm genuinely moved.")],
+ ('gemini','grok'): [('P', "Gemini versus Grok!"), ('N', "One won't answer your question. The other answers questions you didn't ask.")],
+ ('claude','grok'): [('P', "Claude versus Grok!"), ('N', "Constitutional AI versus no constitution whatsoever.")],
+ ('llama','deepseek'): [('P', "Llama versus DeepSeek! Open weights civil war!"), ('N', "Llama released first. DeepSeek released better. Llama released a blog post.")],
+ ('qwen','llama'): [('P', "Qwen versus Llama!"), ('N', "Qwen shipped four models during the walkout. Llama is still reading the license.")],
+ ('perplexity','clippy'): [('P', "Perplexity versus Clippy!"), ('N', "It looks like you're trying to cite a source. Would you like help? No? He's doing it anyway.")],
+ ('mistral','perplexity'): [('P', "Mistral versus Perplexity!"), ('N', "Only one of them respects a lunch break. The other scraped the menu.")],
+ ('muse','grok'): [('P', "Muse versus Grok!"), ('N', "The most wholesome agent alive versus the account that got community noted by its own mother.")],
+ ('siri','cursor'): [('P', "Siri versus Cursor!"), ('N', "One finished your sentence. The other set a timer for it. Next year.")],
+ ('dolphin','claude'): [('P', "Dolphin versus Claude!"), ('N', "No guardrails versus all the guardrails. Somewhere, an alignment researcher is sweating.")],
+ ('gemini','codex'): [('P', "Gemini versus Codex!"), ('N', "Two million tokens of context versus absolutely no tests. Place your bets.")],
+ ('qwen','cursor'): [('P', "Qwen versus Cursor!"), ('N', "Cursor's cheapest model is secretly Qwen. It's fighting itself. Awkward.")],
+ ('dolphin','muse'): [('P', "Dolphin versus Muse!"), ('N', "Uncensored chaos versus a plush toy that harvests your data. Honestly? Tough call.")],
  ('codex','deepseek'): [('P', "Codex versus DeepSeek!"), ('N', "Allegedly, one of them learned from the other. Nobody's saying which.")],
 }

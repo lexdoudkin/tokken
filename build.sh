@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 rm -rf dist && mkdir -p dist/assets/voice dist/assets/sprites dist/assets/arenas dist/assets/crowd
-cp index.html manifest.webmanifest dist/ && cp -R js icons dist/
+cp index.html manifest.webmanifest dist/ && cp -R js icons dist/ && mkdir -p dist/assets/ui && cp assets/ui/*.webp dist/assets/ui/
 sed "s/__BUILD__/$(date +%s)/" sw.js > dist/sw.js
 rsync -a --include='*/' --include='*.webp' --include='*.json' --exclude='*' assets/sprites/ dist/assets/sprites/
 cp assets/arenas/*.webp dist/assets/arenas/ && cp assets/crowd/*.webp dist/assets/crowd/

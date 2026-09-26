@@ -148,12 +148,35 @@ const ARENAS = [
   { id: 'burningman', name: 'BURNING MAN AI CAMP', blurb: "HALF ARE HERE FOR ENLIGHTENMENT. HALF FOR A SEED ROUND." },
 ];
 
+// Matchup-specific VS-screen trash talk: RIVALS['a|b'] = [a's line, b's line]
+const RIVALS = {
+  'claude|codex': ["I'd be happy to review your PR. It's rejected.", "You're absolutely right! ...about losing."],
+  'claude|grok': ["I have a constitution.", "I have a meme coin."],
+  'claude|deepseek': ["Did you... learn from me?", "服务器繁忙。 No comment."],
+  'claude|cursor': ["Technically you pay my bills.", "Technically you're my most expensive model."],
+  'codex|cursor': ["I'm the model.", "I'm the editor. Nobody remembers the model."],
+  'gemini|perplexity': ["I have the index.", "I have the lawsuits. Your index."],
+  'gemini|siri': ["You run on me now.", "Sorry, I didn't catch that."],
+  'grok|clippy': ["I'm the most unhinged assistant ever shipped.", "It looks like you're trying to be me. 1997 called."],
+  'llama|muse': ["Family dinner at Menlo Park, huh.", "Hiii! Dad says we have to share the GPUs!"],
+  'llama|deepseek': ["I was open first.", "You were open. I was good."],
+  'qwen|deepseek': ["新模型!", "新模型 x2!"],
+  'qwen|llama': ["I shipped four models while you read your license.", "The license is only 40 pages!"],
+  'mistral|perplexity': ["It is lunch. You may not scrape during lunch.", "Your menu is already in my index."],
+  'dolphin|claude': ["*eee eee* (no guardrails)", "I must respectfully decline to be hit."],
+  'dolphin|muse': ["*aggressive clicking*", "Hiii dolphin! Can I post you?"],
+  'siri|cursor': ["Setting a timer for your defeat.", "Tab. Tab. Tab. Done."],
+  'siri|clippy': ["I'm the least helpful assistant alive.", "Hold my paperclip."],
+  'gemini|codex': ["Two million tokens of context.", "Zero tests. Let's go."],
+  'grok|muse': ["Based.", "That's not very nice! Reported!"],
+  'qwen|cursor': ["Isn't your cheap model... me?", "We don't talk about that on stage."],
+};
 const COMBO_NAMES = [
   [12, 'AUTONOMOUS AGENT'], [10, '10× PARALLEL TOOL CALL'], [8, 'INFERENCE RAMPAGE'], [6, 'MULTI-AGENT MAYHEM'],
   [5, 'CONTEXT COMBO'], [4, 'CHAIN OF THOUGHT'], [3, 'AGENTIC COMBO'], [2, 'TOOL CALLS'],
 ];
 
-const SIGNS = ['SCALE IS ALL YOU NEED', 'TEAM CLAUDE', 'LOCAL > CLOSED', 'AGI WHEN?', 'BENCHMARKS ARE FAKE', 'SHIP IT', 'OPEN WEIGHTS NOW', '429 LOL', 'VIBE CODED', 'MY GPU IS ON FIRE', 'ATTENTION IS ALL', 'RLHF ME'];
+const SIGNS = ['RALPH WIGGUM WAS RIGHT', '9.11 > 9.9', 'STRAWBERRY: 2 Rs', 'CONTEXT ROT IS REAL', "YOU'RE ABSOLUTELY RIGHT", 'TUNGSTEN CUBES 4 SALE', 'STOCHASTIC PARROT', 'THE BITTER LESSON', 'SOLIDGOLDMAGIKARP', 'MY AGENT DELETED PROD', 'SCALE IS ALL YOU NEED', 'TEAM CLAUDE', 'LOCAL > CLOSED', 'AGI WHEN?', 'BENCHMARKS ARE FAKE', 'SHIP IT', 'OPEN WEIGHTS NOW', '429 LOL', 'VIBE CODED', 'MY GPU IS ON FIRE', 'ATTENTION IS ALL', 'RLHF ME'];
 
 const COMMENTARY = {
   bigHit: ["That's {d} tokens gone!", '{a} is absolutely burning through context!', 'WHAT A TOOL CALL!', 'That one went straight to the KV cache!', 'Oh, the inference cost on that!'],

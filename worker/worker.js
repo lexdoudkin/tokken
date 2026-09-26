@@ -15,6 +15,14 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+    if (url.pathname === '/turn') {
+      // short-lived TURN relay credentials (Cloudflare Realtime TURN) so players behind strict NATs / mobile carriers can connect
+      const stun = [{ urls: 'stun:stun.cloudflare.com:3478' }];
+      if (!env.TURN_KEY_ID || !env.TURN_KEY_TOKEN) return json({ iceServers: stun, relay: false });
+      const r = await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${env.TURN_KEY_ID}/credentials/generate-ice-servers`, { method: 'POST', headers: { Authorization: `Bearer ${env.TURN_KEY_TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ ttl: 86400 }) });
+      if (!r.ok) return json({ iceServers: stun, relay: false, error: r.status });
+      const d = await r.json(); return json({ iceServers: [...stun, ...[].concat(d.iceServers || [])], relay: true });
+    }
     if (url.pathname === '/top') {
       const lim = Math.min(50, +url.searchParams.get('limit') || 20);
       const { results } = await env.DB.prepare('SELECT name, points, wins, losses, best_combo, perfects, main FROM players ORDER BY points DESC, wins DESC LIMIT ?').bind(lim).all();

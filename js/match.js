@@ -8,7 +8,7 @@ class Match {
   }
   later(n, fn) { this.timers.push({ n, fn }); }
   startRound() {
-    this.winQuote = null;
+    this.winQuote = null; this.rotSaid = false;
     this.f.forEach(f => { f.reset(); f.setState('intro'); });
     this.projs = []; this.timers = []; this.time = 99 * 60; this.phase = 'intro'; this.pt = 0; this.koInfo = null;
     FX.parts = []; FX.texts = []; Ann.big = null; Audio.setMode('normal');
@@ -34,6 +34,7 @@ class Match {
   startUlt(f, o) {
     f.compute = 0; f.stats.compute += 100; f.setState('ultcin');
     this.ultCin = { f, o, t: 0, name: f.cfg.ult.name }; Audio.S.ult(); Audio.duck(0.05, 1800); Audio.crowd(0.8, 2);
+    if (['claude', 'codex', 'cursor'].includes(f.id)) { floatText(f.x, f.y - f.h - 110, '--dangerously-skip-permissions', { size: 10, font: 'Press Start 2P', color: '#ff5555', life: 90 }); aTimeout(() => boothEvent('yolo', { p: 0.4 }), 2600); }
     const d = vo(`v_${f.id}_ult`, '', { who: 'char' }); aTimeout(() => vo(`ult_${f.id}`, f.cfg.ult.name, { interrupt: false }), (d || 0) * 700 + 200);
     aTimeout(() => comment('ult', { a: f.cfg.name, aid: f.id }), 1600);
   }
@@ -91,6 +92,7 @@ class Match {
       if (d.move) d.move = null;
     }
     d.flash = 5; d.squash = -0.08;
+    if ((d.id === 'claude' || d.id === 'codex') && dmg >= 2000 && Math.random() < 0.18) { floatText(d.x, d.y - d.h - 80, "YOU'RE ABSOLUTELY RIGHT", { size: 11, font: 'Press Start 2P', color: '#bfe0ff', life: 70 }); boothEvent('sycophant', { p: 0.35 }); }
     if (a.id === 'codex' && (!a.quipT || this.frame - a.quipT > 240) && Math.random() < 0.3) { a.quipT = this.frame; const q = 1 + Math.floor(Math.random() * 5); vo(`v_codex_quip${q}`, '', { who: 'char' }); const t = Audio.lineText(`v_codex_quip${q}`); if (t) floatText(a.x, a.y - a.h - 50, t, { size: 10, font: 'Press Start 2P', color: '#bfe0ff', life: 110, vy: -0.5 }); }
     if (dmg >= 1200 && (!d.hurtT || this.frame - d.hurtT > 35) && d.tokens - dmg > 0) { d.hurtT = this.frame; vo(`v_${d.id}_hurt${1 + (Math.random() < 0.5)}`, '', { who: 'char' }); }
     const big = dmg >= 3000;
@@ -189,7 +191,8 @@ class Match {
     if (this.phase === 'fight') {
       if (--this.time <= 0) this.timeOver();
       if (this.time === 10 * 60) boothEvent('timelow', { force: true });
-      if (++this.noHitT === 60 * 7) { boothEvent('neutral'); this.noHitT = 60 * 3; }
+      if (++this.noHitT === 60 * 7) { boothEvent(Math.random() < 0.45 ? 'leaders' : 'neutral'); this.noHitT = 60 * 3; }
+      if (this.time === 50 * 60 && !this.rotSaid) { this.rotSaid = true; boothEvent('rot', { p: 0.8 }); }
       for (const f of this.f) if (f.state === 'jump' && f.st === 1) { this.jumps = (this.jumps || []).filter(t => this.frame - t < 240); this.jumps.push(this.frame); if (this.jumps.length >= 6) { this.jumps = []; boothEvent('jumpspam', { p: 0.7 }); } }
     }
     this.updateFX();
@@ -299,6 +302,7 @@ class Match {
     bevel(c, W / 2 - 52, 14, 104, 70, { fill: '#0b0d18', border: '#000' });
     chrome(c, String(secs).padStart(2, '0'), W / 2, 72, 52, { italic: false, font: 'Russo One', tone: secs <= 10 ? 'red' : 'silver' });
     c.font = '7px "Press Start 2P"'; c.fillStyle = '#aaa'; c.textAlign = 'center'; c.fillText(this.arena.name, W / 2, 98);
+    if (this.time < 50 * 60 && this.phase === 'fight') { const rot = Math.min(99, Math.round((50 * 60 - this.time) / (50 * 60) * 100 + 40)); c.fillStyle = `rgba(255,120,120,${0.5 + 0.3 * Math.sin(this.frame / 12)})`; c.fillText(`CONTEXT ROT ${rot}%`, W / 2, 124); }
     // combo counters
     Ann.combo.forEach((cb, side) => {
       if (!cb) return; const x = side ? W - 60 : 60, al = cb.done ? Math.max(0, 1 - (cb.t - 30) / 60) : 1, pop = 1 + Math.max(0, 0.4 - cb.t * 0.05);
@@ -382,7 +386,7 @@ function shade(hex) { const n = parseInt(hex.slice(1), 16); const r = (n >> 16) 
 // Crowd: AI leaders & scientists at the back of the stage, side profile, watching the carnage.
 const CROWD_IDS = ['jensen', 'sam', 'elon', 'zuck', 'dario', 'demis', 'satya', 'sundar', 'lisa', 'karpathy', 'lecun', 'ilya'];
 const CROWD_SIGNS = { jensen: 'BUY MORE GPUS', sam: 'AGI 2027 (PROBABLY)', elon: 'GROK IS BASED', zuck: 'OPEN WEIGHTS!', dario: 'WE MUST PACE THE FRONTIER', demis: 'SOLVE INTELLIGENCE', satya: 'COPILOT EVERYWHERE', sundar: 'GEMINI 4 SOON', lisa: 'MI400 > H100', karpathy: 'VIBE CODED', lecun: 'LLMS ARE NOT AGI', ilya: 'FEEL THE AGI' };
-const ENG_SIGNS = ['H100 LOL', 'SHIP IT', 'LGTM', 'IT WORKS ON MY GPU', 'WILL CODE FOR H100S', 'MY PR IS STILL OPEN', 'TEAM LOCAL', '429 LOL', 'ATTENTION IS ALL', 'VIBE CODED'];
+const ENG_SIGNS = ['H100 LOL', 'RALPH WIGGUM WAS RIGHT', '9.11 > 9.9', 'STRAWBERRY: 2 Rs', 'CONTEXT ROT IS REAL', 'SHIP IT', 'LGTM', 'IT WORKS ON MY GPU', 'WILL CODE FOR H100S', 'MY PR IS STILL OPEN', 'TEAM LOCAL', '429 LOL', 'ATTENTION IS ALL', 'VIBE CODED'];
 const ENG = Array.from({ length: 26 }, (_, i) => ({ id: 'eng' + (i % 12), x: 20 + i * 49 + rand(-8, 8), ph: rand(0, 6), s: rand(0.85, 1.0), cheerT: 0, sign: i % 6 === 3 ? ENG_SIGNS[(i / 6 | 0) % ENG_SIGNS.length] : null }));
 const CROWD = (() => { const order = [...CROWD_IDS].sort(() => Math.random() - 0.5); return order.map((id, i) => ({ id, x: 60 + i * 105 + rand(-10, 10), ph: rand(0, 6), sign: id === 'dario' || (i % 3 === 1 && id !== order[i - 1]) ? CROWD_SIGNS[id] : null, s: rand(0.94, 1.06), cheerT: 0 })); })();
 const ARENA_BACK = { colosseum: 0.8, datacenter: 0.66, distillation: 0.74, feed: 0.87, basement: 0.72, hackerhouse: 0.72, goldengate: 0.76, singularity: 0.76, hearing: 0.67, boardroom: 0.7, leaderboard: 0.76, tesla: 0.7, h100: 0.76, graveyard: 0.76, demoday: 0.72, waitlist: 0.76, burningman: 0.76 };

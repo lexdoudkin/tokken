@@ -172,6 +172,8 @@ class Fighter {
   }
   setState(s) { this.state = s; this.st = 0; }
   startMove(key, m) {
+    if (key === this.lastKey && this.st < 90) this.sameN = (this.sameN || 1) + 1; else this.sameN = 1; this.lastKey = key;
+    if (this.sameN === 4 && !RESIM) { floatText(this.x, this.y - this.h - 70, 'RALPH LOOP DETECTED', { size: 20, color: '#ffd23f', life: 90, vy: -0.6 }); floatText(this.x, this.y - this.h - 44, 'while :; do cat PROMPT.md | claude; done', { size: 9, font: 'Press Start 2P', color: '#7CFFB2', life: 90, vy: -0.6 }); boothEvent('ralph', { force: true }); }
     this.move = { key, ...m }; this.mt = 0; this.hitDone = false; this.setState('attack');
     if (m.cost) { this.compute -= m.cost; this.stats.compute += m.cost; }
     if (key !== 'light') Audio.S.whoosh();
@@ -187,7 +189,7 @@ class Fighter {
     if (this.lastFacing && this.lastFacing !== this.facing) this.turnT = 6; this.lastFacing = this.facing;
     if (this.state === 'walk' || this.state === 'dash') {
       const cnt = this.walkCount || (this.walkCount = Object.keys(this.meta).filter(k => /^walk\d$/.test(k)).length || 1);
-      this.walkDist = (this.walkDist || 0) + Math.abs(this.vx); const n = Math.floor(this.walkDist / (this.h * 1.12 / cnt)) % cnt;
+      this.walkDist = (this.walkDist || 0) + Math.abs(this.vx); const n = Math.floor(this.walkDist / (this.h * 1.3 / cnt)) % cnt;
       if (n !== this.walkN && n % (cnt / 2) === 0 && this.grounded) dust(this.x - this.facing * 10, 0, 2); this.walkN = n;
     }
     if (this.after.length) this.after = this.after.filter(a => --a.life > 0);
@@ -224,7 +226,7 @@ class Fighter {
         if (c.pressed('dash')) { this.dashDir = back ? -1 : 1; this.setState('dash'); Audio.S.whoosh(); return; }
         if (c.held('up')) { this.vy = -this.cfg.jump; this.vx = (fwd ? 1 : back ? -1 : 0) * this.facing * spd * 1.25; this.y = -1; this.airUsed = false; this.setState('jump'); Audio.S.jump(); this.squash = -0.18; return; }
         if (this.holdDown) { if (this.state !== 'crouch') this.setState('crouch'); this.vx *= 0.6; }
-        else if (L || R) { if (this.state !== 'walk') this.setState('walk'); const target = (R ? 1 : -1) * spd * (back ? 0.8 : 1); this.vx = lerp(this.vx, target, 0.35); }
+        else if (L || R) { if (this.state !== 'walk') this.setState('walk'); const target = (R ? 1 : -1) * spd * 0.75 * (back ? 0.8 : 1); this.vx = lerp(this.vx, target, 0.35); }
         else { if (this.state !== 'idle') this.setState('idle'); this.vx *= 0.7; }
       } else {
         if (!this.airUsed && (buf('light') || buf('heavy'))) { c.consume('light'); c.consume('heavy'); this.airUsed = true; const m = { ...BASE_MOVES.air }; this.move = { key: 'air', ...m }; this.mt = 0; this.hitDone = false; this.state = 'attack'; Audio.S.whoosh(); }
@@ -260,7 +262,7 @@ class Fighter {
     if (m.lunge && this.mt === m.startup + 1) this.vx += this.facing * m.lunge * 0.35;
     const total = m.startup + m.active + m.recovery;
     // whiff tracking
-    if (this.mt === m.startup + m.active + 1 && m.box && !this.hitDone && !m.noWhiff) { this.stats.whiffs++; if (Math.random() < 0.18) floatText(this.x + this.facing * 60, this.y - this.h - 10, pick(['HALLUCINATED', 'CONFIDENTLY WRONG', '404', 'MISSED (100% SURE)']), { size: 11, font: 'Press Start 2P', color: '#ff9ad5', life: 45 }); if (Math.random() < 0.08) comment('whiff', { a: this.cfg.name }); }
+    if (this.mt === m.startup + m.active + 1 && m.box && !this.hitDone && !m.noWhiff) { this.stats.whiffs++; if (Math.random() < 0.06) { floatText(this.x + this.facing * 60, this.y - this.h - 20, pick(["STRAWBERRY HAS 2 R'S", '9.11 > 9.9', 'SEAHORSE EMOJI: 🐴🌊', 'SOLIDGOLDMAGIKARP']), { size: 11, font: 'Press Start 2P', color: '#ff9ad5', life: 70 }); boothEvent('strawberry', { p: 0.5 }); } else if (Math.random() < 0.18) floatText(this.x + this.facing * 60, this.y - this.h - 10, pick(['HALLUCINATED', 'CONFIDENTLY WRONG', '404', 'MISSED (100% SURE)']), { size: 11, font: 'Press Start 2P', color: '#ff9ad5', life: 45 }); if (Math.random() < 0.08) comment('whiff', { a: this.cfg.name }); }
     // cancels: on hit, light->light(x2)->heavy->special/slop
     if (this.hitDone && this.mt > m.startup + 1 && !m.noCancel) {
       const c = this.ctrl;
@@ -284,6 +286,7 @@ class Fighter {
     }
     const s = Specials[sp.kind]; this.startMove('special', { name: sp.name, pose: 'special', noWhiff: true, ...s(this, sp, g, opp) });
     floatText(this.x, this.y - this.h - 30, sp.name, { size: 26, color: this.cfg.color, life: 55 });
+    if (this.id === 'claude' && Math.random() < 0.3) { floatText(this.x, this.y - this.h - 64, 'TUNGSTEN CUBE (SOLD AT A LOSS)', { size: 10, font: 'Press Start 2P', color: '#c9d3e3', life: 70 }); aTimeout(() => boothEvent('vending', { p: 0.6 }), 400); }
     if (this.id === 'deepseek') floatText(this.x, this.y - this.h - 64, '蒸馏！', { size: 34, font: 'sans-serif', color: '#fff', life: 55 });
     vo(`v_${this.id}_special`, '', { who: 'char', interrupt: true });
     if (Math.random() < 0.45) aTimeout(() => boothKey([`f_${this.id}_special`]), 500);
@@ -326,14 +329,14 @@ class Fighter {
     c.fillStyle = 'rgba(0,0,0,0.35)'; c.beginPath(); c.ellipse(this.x, 2, this.wBody * 0.75 * clamp(1 + this.y / 600, 0.4, 1), 9, 0, 0, Math.PI * 2); c.fill();
     let sx = 1, sy = 1, rot = 0; const st = this.state;
     if (st === 'idle' && !this.meta.idle0) { const b = Math.sin(g.frame / 9 + this.side) * 0.025; sx = 1 - b; sy = 1 + b; }
-    if (st === 'walk') { const fwd = Math.sign(this.vx) === this.facing; rot = (fwd ? 0.05 : -0.035) * this.facing * Math.min(1, Math.abs(this.vx) / 3); if (!this.meta.walk0) sy *= 1 + Math.abs(Math.sin(this.walkDist / (this.h * 0.14) * Math.PI / 4)) * 0.03; }
+    if (this.squash) { sx *= 1 + this.squash; sy *= 1 - this.squash; }
+    if (st === 'walk') { const fwd = Math.sign(this.vx) === this.facing; rot = (fwd ? 0.05 : -0.035) * this.facing * Math.min(1, Math.abs(this.vx) / 3); }
     if (st === 'dash') { rot = 0.12 * this.facing * (this.dashDir || 1); sx *= 1.12; sy *= 0.94; }
     if (st === 'hitstun') rot = -this.facing * 0.14 * Math.min(1, this.stun / 10);
     if (st === 'launched' && !this.grounded) rot = -this.facing * Math.min(1.3, this.st * 0.09);
     if (st === 'jump') rot = this.facing * clamp(this.vx * 0.012, -0.12, 0.12) + (this.vy < 0 ? 0 : this.facing * 0.04);
     if (this.turnT > 0) sx *= 0.55 + 0.45 * (1 - this.turnT / 6);
-    let bobY = 0; if ((st === 'walk') && this.walkCount === 4 && (this.walkN || 0) % 2 === 1) bobY = -this.h * 0.03;
-    if (this.squash) { sx *= 1 + this.squash; sy *= 1 - this.squash; }
+    let bobY = 0; if (st === 'walk' && this.walkCount === 4 && (this.walkN || 0) % 2 === 1) bobY = -Math.round(this.h * 0.025);
     let ox = 0; if (this.state === 'hitstun' && this.stun > 0 && g.hitstop > 0) ox = rand(-4, 4);
     if (this.state === 'attack' && this.move) { const m = this.move; if (this.mt > m.startup && this.mt <= m.startup + m.active + 3) ox += this.facing * (m.lunge || 0) * 0.35; }
     if (this.status.think) { c.save(); c.shadowColor = '#ffb000'; c.shadowBlur = 30 + Math.sin(g.frame / 4) * 10; }

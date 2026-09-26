@@ -343,6 +343,7 @@ function render() {
   else if (scene === 'vs') drawVS(c);
   else if (scene === 'fight') { match.render(c); if (update.paused) drawPause(c); }
   else if (scene === 'results') drawResults(c);
+  else if (scene === 'walklab') drawWalkLab(c);
   else if (scene === 'online') drawOnline(c);
   else if (scene === 'options') drawOptions(c);
   else if (scene === 'name') drawName(c);
@@ -381,6 +382,20 @@ function drawRankings(c) {
   }
   txt(c, `YOU: ${st.name || '(NO NAME YET)'}  ·  SPECIAL = CHANGE NAME  ·  ESC BACK`, W / 2, 672, 9, '#bbb', 'Press Start 2P');
   txt(c, 'POINTS: CPU WIN 5/10/20/35 BY DIFFICULTY · ONLINE WIN 50 · PERFECT +25 · LOSS +2 (PARTICIPATION TROPHY)', W / 2, 694, 7, '#777', 'Press Start 2P');
+}
+// ---- Walk Lab (?walklab): every fighter pacing in its own lane with the real animation code, for reviewing walks
+let WL = null;
+function drawWalkLab(c) {
+  if (!WL) { const stub = { held: () => false, pressed: () => false, buffered: () => false, consume() {} };
+    WL = ROSTER.map((id, i) => { const f = new Fighter(id, 0, stub); f.lane = i; f.x = 100; f.setState('walk'); f.vx = f.cfg.speed * 0.75; f.facing = 1; return f; }); }
+  c.fillStyle = '#10121e'; c.fillRect(0, 0, W, H); txt(c, 'WALK LAB — every fighter, real in-game animation', W / 2, 30, 12, '#ffd23f', 'Press Start 2P');
+  const g = { phase: 'intro', frame };
+  WL.forEach(f => {
+    const col = f.lane % 2, row = Math.floor(f.lane / 2), ox = col * 640, oy = 120 + row * 88, laneW = 560;
+    f.update(g, f); f.state = 'walk'; if (f.x > laneW - 60) { f.vx = -f.cfg.speed * 0.75; f.facing = -1; } if (f.x < 60) { f.vx = f.cfg.speed * 0.75; f.facing = 1; }
+    c.save(); c.translate(ox + 40, oy); c.scale(0.5, 0.5); c.fillStyle = '#222638'; c.fillRect(0, 0, laneW * 2, 6); f.draw(c, g); c.restore();
+    txt(c, f.cfg.name + (f.cfg.walkStyle === 'waddle' ? ' (WADDLE)' : ''), ox + 50, oy - 64, 8, '#aaa', 'Press Start 2P', 'left', false);
+  });
 }
 function drawOptions(c) {
   drawGridBG(c, frame, '#1a1030'); drawCRT(c);
@@ -439,7 +454,7 @@ function drawTitle(c) {
   drawBG(c, 'colosseum', true, 0.55);
   c.fillStyle = 'rgba(0,0,0,0.35)'; c.fillRect(0, 0, W, H); drawCRT(c);
   const parade = ROSTER.filter(id => !FIGHTERS[id].secret), loopW = W + 260, gap = loopW / parade.length;
-  parade.forEach((id, i) => { const x = ((i * gap + frame * 1.1) % loopW) - 130, h = presH(id, 74), cnt = Object.keys(ASSETS.meta[id] || {}).filter(k => /^walk\d$/.test(k)).length || 8, step = Math.floor((frame * 1.1 + i * 37) / (h * 1.12 / cnt)) % cnt;   // legs synced to distance walked: no foot sliding
+  parade.forEach((id, i) => { const x = ((i * gap + frame * 0.9) % loopW) - 130, h = presH(id, 74), cnt = Object.keys(ASSETS.meta[id] || {}).filter(k => /^walk\d$/.test(k)).length || 8, step = Math.floor((frame * 0.9 + i * 37) / (h * 1.3 / cnt)) % cnt;   // legs synced to distance walked: no foot sliding
     drawSprite(c, id, ASSETS.meta[id]?.walk0 ? 'walk' + step : animPose(id, 'walk', frame), x, 676, h, false, 'brightness(0.55)'); });
   drawLogo(c, W / 2, 196, 0.9 + Math.sin(frame / 40) * 0.01);
   txt(c, TAGLINES[Math.floor(frame / 240) % TAGLINES.length], W / 2, 256, 13, '#fff', 'Press Start 2P');
@@ -600,8 +615,9 @@ function drawVS(c) {
   chrome(c, A.name, 240, 92, 58, { maxW: 440 }); chrome(c, B.name, W - 240, 92, 58, { maxW: 440 });
   txt(c, A.title, 240, 118, 10, '#fff', 'Press Start 2P'); txt(c, B.title, W - 240, 118, 10, '#fff', 'Press Start 2P');
   // trash-talk bubbles
-  if (t > 40) bubble(c, 40, 140, 330, A.intro || A.line, t - 40, false);
-  if (t > 70) bubble(c, W - 370, 140, 330, B.intro || B.line, t - 70, true);
+  const rv = RIVALS[`${a}|${b}`] || (RIVALS[`${b}|${a}`] && [RIVALS[`${b}|${a}`][1], RIVALS[`${b}|${a}`][0]]);
+  if (t > 40) bubble(c, 40, 140, 330, rv ? rv[0] : (A.intro || A.line), t - 40, false);
+  if (t > 70) bubble(c, W - 370, 140, 330, rv ? rv[1] : (B.intro || B.line), t - 70, true);
   const vsS = t > 16 ? 1 + Math.max(0, (26 - t) / 8) : 0; if (vsS) { c.save(); c.translate(W / 2, 300); c.scale(vsS, vsS); c.rotate(Math.sin(t / 10) * 0.03); chrome(c, 'VS', 0, 40, 150, { tone: 'red' }); c.restore(); flare(c, W / 2 + 60, 250, 0.7); }
   // tale of the tape
   if (t > 30) {
@@ -681,6 +697,7 @@ window.addEventListener('gamepadconnected', e => { Audio.init(); console.log('[t
   scene = 'title'; sceneT = 0;
   // test hooks
   const q = new URLSearchParams(location.search);
+  if (q.has('walklab')) { scene = 'walklab'; }
   if (q.get('join')) { titleArmed = true; scene = 'online'; online.mode = 'join'; online.typed = q.get('join').toUpperCase().slice(0, 4); Net.join(online.typed); }
   if (q.get('fight')) { const [a, b] = q.get('fight').split(','); sel.cur = [ROSTER.indexOf(a), ROSTER.indexOf(b)]; sel.cpu = q.get('cpu') !== '0'; sel.arena = Math.abs(+(q.get('arena') || 0) | 0) % ARENAS.length; await preloadMatch(a, b, ARENAS[sel.arena].id); startMatch(); }
   window.TOKKEN = { get match() { return match; }, ctrls, sel, startMatch, get scene() { return scene; }, tick(n = 1) { for (let i = 0; i < n; i++) update(); render(); return scene; } };
