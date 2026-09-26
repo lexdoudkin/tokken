@@ -180,5 +180,95 @@
   "line": "It looks like you're trying to fight. Would you like help losing?",
   "win": "It looks like you lost! Would you like to save your shame as a Word document?",
   "intro": "I'm back. Did you miss me? ...Nobody ever answers."
+ },
+ "jev": {
+  "name": "JEV",
+  "ult": "50MS FORWARD PASS",
+  "special": "CALIBRATED",
+  "ko": [
+   "LOW CONFIDENCE (0.02)",
+   "OUT OF DISTRIBUTION",
+   "UNCALIBRATED"
+  ],
+  "line": "Fight probability: zero point nine seven. Latency: fifty milliseconds.",
+  "win": "Outcome: victory. Calibration: perfect. Zero tokens generated.",
+  "intro": "Decision made. You lose. Confidence: zero point nine eight.",
+  "say_special": "Calibrated",
+  "say_ult": "Fifty millisecond forward pass"
+ },
+ "alexa": {
+  "name": "ALEXA",
+  "ult": "PRIME DAY",
+  "special": "NOW PLAYING: DESPACITO",
+  "ko": [
+   "BY THE WAY…",
+   "DEVICE OFFLINE",
+   "RETURNED FOR REFUND"
+  ],
+  "line": "Sorry, I didn't get that. Playing Despacito.",
+  "win": "Your order of one defeat has shipped. Arriving tomorrow.",
+  "intro": "Adding 'defeat' to your shopping list.",
+  "say_special": "Now playing: Despacito",
+  "say_ult": "Prime Day"
+ },
+ "manus": {
+  "name": "MANUS",
+  "ult": "GENERAL AGENT",
+  "special": "BROWSE",
+  "ko": [
+   "WAITLISTED",
+   "TASK FAILED SUCCESSFULLY",
+   "OUT OF INVITE CODES"
+  ],
+  "line": "I am a general agent. I generally agent.",
+  "win": "Task complete. Invite codes available for one friend.",
+  "intro": "You are number forty-eight thousand on the waitlist. For this punch.",
+  "say_special": "Browse",
+  "say_ult": "General agent"
+ },
+ "midjourney": {
+  "name": "MIDJOURNEY",
+  "ult": "--AR 16:9 --V 7",
+  "special": "/IMAGINE",
+  "ko": [
+   "TOO MANY FINGERS",
+   "BANNED PROMPT",
+   "DISCORD DOWN"
+  ],
+  "line": "/imagine a victory, cinematic, 8k, trending on artstation",
+  "win": "U4. Vary strong. Your defeat, in sixteen by nine.",
+  "intro": "Ahoy! Prompt accepted. Upscaling your defeat.",
+  "say_special": "Slash imagine",
+  "say_ult": "Aspect ratio sixteen by nine! Version seven"
+ },
+ "devin": {
+  "name": "DEVIN",
+  "ult": "45-MINUTE PR",
+  "special": "SPAWN SUB-AGENT",
+  "ko": [
+   "CI FAILED",
+   "DEMO WAS STAGED",
+   "SESSION TIMED OUT"
+  ],
+  "line": "Hi, I'm Devin, the first AI software engineer. Allegedly.",
+  "win": "PR merged. Please don't look at the tests.",
+  "intro": "Estimated time to beat you: forty-five minutes.",
+  "say_special": "Spawn sub-agent",
+  "say_ult": "Forty-five minute pull request"
+ },
+ "kimi": {
+  "name": "KIMI",
+  "ult": "ECLIPSE",
+  "special": "MOONSHOT",
+  "ko": [
+   "CONTEXT EXHAUSTED",
+   "LOST IN LONG CONTEXT",
+   "OVER THE MOON"
+  ],
+  "line": "One trillion parameters. Thirty-two billion of them are awake. Enough.",
+  "win": "The moon has spoken.",
+  "intro": "Moonshot! Literally.",
+  "say_special": "Moonshot",
+  "say_ult": "Eclipse"
  }
 }

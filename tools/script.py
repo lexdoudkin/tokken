@@ -22,8 +22,14 @@ CHAR = {
  'clippy': dict(line="It looks like you're trying to fight. Would you like help losing?", intro="I'm back. Did you miss me? ...Nobody ever answers.", win="It looks like you lost! Would you like to save your shame as a Word document?",
    ko=['DISABLED BY IT', 'REPLACED BY COPILOT', 'OFFICE 97 END OF LIFE']),
  'qwen': dict(line="每周都有新模型！ New model every week! You're already outdated.", intro="你好！ I'm Qwen three point five. By round two I'll be Qwen four.", win="Open weights, open wins! 谢谢！", ko=["OUTDATED BY QWEN 4", "DEPRECATED IN 6 DAYS", "服务器也繁忙 ALSO BUSY"]),
- 'siri': dict(line="Here's what I found on the web for 'fight'.", intro="Sorry, I didn't catch that. Did you say... fight?", win="I've set a reminder: you lost.", ko=["SORRY, I DIDN'T CATCH THAT", "DELAYED TO 2027", "NOW PLAYING: DESPACITO"]),
+ 'siri': dict(line="Here's what I found on the web for 'fight'.", intro="Sorry, I didn't catch that. Did you say... fight?", win="I've set a reminder: you lost.", ko=["SORRY, I DIDN'T CATCH THAT", "DELAYED TO 2027", "CALLING MOM…"]),
  'cursor': dict(line="Tab. Tab. Tab. I've already written your defeat.", intro="Accept all changes? I'll take that as a yes.", win="That'll be four thousand eight hundred dollars in usage. Thanks!", ko=["USAGE LIMIT REACHED", "MERGE CONFLICT", "REJECTED ALL CHANGES"]),
+ 'jev': dict(line="Fight probability: zero point nine seven. Latency: fifty milliseconds.", intro="Decision made. You lose. Confidence: zero point nine eight.", win="Outcome: victory. Calibration: perfect. Zero tokens generated.", ko=["LOW CONFIDENCE (0.02)", "OUT OF DISTRIBUTION", "UNCALIBRATED"]),
+ 'alexa': dict(line="Sorry, I didn't get that. Playing Despacito.", intro="Adding 'defeat' to your shopping list.", win="Your order of one defeat has shipped. Arriving tomorrow.", ko=["BY THE WAY…", "DEVICE OFFLINE", "RETURNED FOR REFUND"]),
+ 'manus': dict(line="I am a general agent. I generally agent.", intro="You are number forty-eight thousand on the waitlist. For this punch.", win="Task complete. Invite codes available for one friend.", ko=["WAITLISTED", "TASK FAILED SUCCESSFULLY", "OUT OF INVITE CODES"]),
+ 'midjourney': dict(line="Slash imagine: a victory. Cinematic. Eight K. Trending on ArtStation.", intro="Ahoy! Prompt accepted. Upscaling your defeat.", win="U4. Vary strong. Your defeat, in sixteen by nine.", ko=["TOO MANY FINGERS", "BANNED PROMPT", "DISCORD DOWN"]),
+ 'devin': dict(line="Hi, I'm Devin, the first AI software engineer. Allegedly.", intro="Estimated time to beat you: forty-five minutes.", win="PR merged. Please don't look at the tests.", ko=["CI FAILED", "DEMO WAS STAGED", "SESSION TIMED OUT"]),
+ 'kimi': dict(line="One trillion parameters. Thirty-two billion of them are awake. Enough.", intro="Moonshot! Literally.", win="The moon has spoken.", ko=["CONTEXT EXHAUSTED", "LOST IN LONG CONTEXT", "OVER THE MOON"]),
 }
 CASTER = {
  'c_big_1': "That's eight thousand tokens! Somebody's getting a call from finance!",

@@ -95,6 +95,18 @@ function boothPlay(keys, opt = {}) {
   for (const [k, off] of starts) aTimeout(() => { Ann.caption = Audio.lineText(k) || ''; Ann.captionT = 240; }, off * 1000);
   Booth.lastT = performance.now(); return true;
 }
+// Meme budget: each gag fires at most once per match, with a global gap so no single joke dominates.
+const Memes = { used: new Set(), next: 0 };
+function memeOk(k, gap = 10) { if (RESIM) return false; const now = performance.now() / 1000; if (Memes.used.has(k) || now < Memes.next) return false; Memes.used.add(k); Memes.next = now + gap; return true; }
+const MEME_POOL = [
+  ['AGI ACHIEVED INTERNALLY', 'source: a vague tweet at 3am', 'agi'], ['VIBE CODING DETECTED', 'nobody has read this code', 'vibe'],
+  ['NEW SOTA', '(on one benchmark) (we made it)', 'sota'], ['MODEL DEPRECATED', 'please migrate by friday', 'deprecated'],
+  ['GPU POOR', 'renting one H100 by the minute', 'gpupoor'], ['MCP SERVER DISCONNECTED', 'reconnecting… (never)', 'mcp'],
+  ['THE BITTER LESSON', 'just add more compute', 'bitter'], ['STOCHASTIC PARROT', 'squawk. squawk.', null],
+  ['PRICE DROP -90%', 'per million tokens. until tuesday.', null], ['HALLUCINATED HITBOX', 'confidently wrong', null],
+  ['SEED ROUND CLOSED', '$40M pre-product, pre-revenue', null], ['PROMPT ENGINEER HIRED', '$375k. job: say please', null],
+  ['EVAL CONTAMINATED', 'the test set was in the training set', null], ['CONTEXT WINDOW: 10M', 'effective context: 8k', null],
+];
 function boothEvent(ev, opt = {}) { if (RESIM) return false;
   const now = performance.now() / 1000;
   if (!opt.force && Booth.cool[ev] && now < Booth.cool[ev]) return false;
@@ -159,7 +171,7 @@ class Fighter {
     this.facing = this.side ? -1 : 1; this.tokens = MAX_TOKENS; this.shownTokens = MAX_TOKENS; this.trailTokens = MAX_TOKENS;
     this.compute = 0; this.state = 'idle'; this.st = 0; this.move = null; this.mt = 0; this.hitDone = false;
     this.stun = 0; this.combo = 0; this.cd = 0; this.airUsed = false; this.inv = 0; this.flash = 0; this.squash = 0;
-    this.status = { think: 0, inject: 0, rate: 0, loop: 0 }; this.hist = []; this.after = []; this.visible = true; this.chain = 0;
+    this.status = { think: 0, inject: 0, rate: 0, loop: 0, slowmo: 0 }; this.parryT = 0; this.hist = []; this.after = []; this.visible = true; this.chain = 0;
     this.lowWarned = false; this.dashT = 0; this.armor = false;
   }
   get grounded() { return this.y >= 0; }
@@ -173,7 +185,7 @@ class Fighter {
   setState(s) { this.state = s; this.st = 0; }
   startMove(key, m) {
     if (key === this.lastKey && this.st < 90) this.sameN = (this.sameN || 1) + 1; else this.sameN = 1; this.lastKey = key;
-    if (this.sameN === 4 && !RESIM) { floatText(this.x, this.y - this.h - 70, 'RALPH LOOP DETECTED', { size: 20, color: '#ffd23f', life: 90, vy: -0.6 }); floatText(this.x, this.y - this.h - 44, 'while :; do cat PROMPT.md | claude; done', { size: 9, font: 'Press Start 2P', color: '#7CFFB2', life: 90, vy: -0.6 }); boothEvent('ralph', { force: true }); }
+    if (this.sameN === 5 && Math.random() < 0.5 && memeOk('ralph')) { floatText(this.x, this.y - this.h - 70, 'RALPH LOOP DETECTED', { size: 20, color: '#ffd23f', life: 90, vy: -0.6 }); floatText(this.x, this.y - this.h - 44, 'while :; do cat PROMPT.md | claude; done', { size: 9, font: 'Press Start 2P', color: '#7CFFB2', life: 90, vy: -0.6 }); boothEvent('ralph', { force: true }); }
     this.move = { key, ...m }; this.mt = 0; this.hitDone = false; this.setState('attack');
     if (m.cost) { this.compute -= m.cost; this.stats.compute += m.cost; }
     if (key !== 'light') Audio.S.whoosh();
@@ -183,7 +195,7 @@ class Fighter {
   update(g, opp) {
     const c = this.ctrl; this.st++;
     for (const k in this.status) if (this.status[k] > 0) this.status[k]--;
-    if (this.cd > 0) this.cd--; if (this.inv > 0) this.inv--; if (this.flash > 0) this.flash--; if (this.squash) this.squash *= 0.8;
+    if (this.parryT > 0) this.parryT--; if (this.cd > 0) this.cd--; if (this.inv > 0) this.inv--; if (this.flash > 0) this.flash--; if (this.squash) this.squash *= 0.8;
     this.hist.push({ x: this.x, y: this.y }); if (this.hist.length > 60) this.hist.shift();
     if (this.landT > 0) this.landT--; if (this.turnT > 0) this.turnT--;
     if (this.lastFacing && this.lastFacing !== this.facing) this.turnT = 6; this.lastFacing = this.facing;
@@ -258,11 +270,12 @@ class Fighter {
   updateMove(g, opp) {
     const m = this.move; this.mt++;
     if (m.onFrame) m.onFrame(this, g, opp, this.mt);
+    if (this.move !== m) return;   // move cancelled mid-frame (e.g. countered by a parry)
     if (m.proj && this.mt === m.startup) g.spawnMoveProj(this, opp, m.proj);
     if (m.lunge && this.mt === m.startup + 1) this.vx += this.facing * m.lunge * 0.35;
     const total = m.startup + m.active + m.recovery;
     // whiff tracking
-    if (this.mt === m.startup + m.active + 1 && m.box && !this.hitDone && !m.noWhiff) { this.stats.whiffs++; if (Math.random() < 0.06) { floatText(this.x + this.facing * 60, this.y - this.h - 20, pick(["STRAWBERRY HAS 2 R'S", '9.11 > 9.9', 'SEAHORSE EMOJI: 🐴🌊', 'SOLIDGOLDMAGIKARP']), { size: 11, font: 'Press Start 2P', color: '#ff9ad5', life: 70 }); boothEvent('strawberry', { p: 0.5 }); } else if (Math.random() < 0.18) floatText(this.x + this.facing * 60, this.y - this.h - 10, pick(['HALLUCINATED', 'CONFIDENTLY WRONG', '404', 'MISSED (100% SURE)']), { size: 11, font: 'Press Start 2P', color: '#ff9ad5', life: 45 }); if (Math.random() < 0.08) comment('whiff', { a: this.cfg.name }); }
+    if (this.mt === m.startup + m.active + 1 && m.box && !this.hitDone && !m.noWhiff) { this.stats.whiffs++; if (Math.random() < 0.06 && memeOk('strawberry')) { floatText(this.x + this.facing * 60, this.y - this.h - 20, pick(["STRAWBERRY HAS 2 R'S", '9.11 > 9.9', 'SEAHORSE EMOJI: 🐴🌊', 'SOLIDGOLDMAGIKARP']), { size: 11, font: 'Press Start 2P', color: '#ff9ad5', life: 70 }); boothEvent('strawberry', { p: 0.5 }); } else if (Math.random() < 0.18) floatText(this.x + this.facing * 60, this.y - this.h - 10, pick(['HALLUCINATED', 'CONFIDENTLY WRONG', '404', 'MISSED (100% SURE)']), { size: 11, font: 'Press Start 2P', color: '#ff9ad5', life: 45 }); if (Math.random() < 0.08) comment('whiff', { a: this.cfg.name }); }
     // cancels: on hit, light->light(x2)->heavy->special/slop
     if (this.hitDone && this.mt > m.startup + 1 && !m.noCancel) {
       const c = this.ctrl;
@@ -286,7 +299,7 @@ class Fighter {
     }
     const s = Specials[sp.kind]; this.startMove('special', { name: sp.name, pose: 'special', noWhiff: true, ...s(this, sp, g, opp) });
     floatText(this.x, this.y - this.h - 30, sp.name, { size: 26, color: this.cfg.color, life: 55 });
-    if (this.id === 'claude' && Math.random() < 0.3) { floatText(this.x, this.y - this.h - 64, 'TUNGSTEN CUBE (SOLD AT A LOSS)', { size: 10, font: 'Press Start 2P', color: '#c9d3e3', life: 70 }); aTimeout(() => boothEvent('vending', { p: 0.6 }), 400); }
+    if (this.id === 'claude' && Math.random() < 0.3 && memeOk('vending')) { floatText(this.x, this.y - this.h - 64, 'TUNGSTEN CUBE (SOLD AT A LOSS)', { size: 10, font: 'Press Start 2P', color: '#c9d3e3', life: 70 }); aTimeout(() => boothEvent('vending', { p: 0.6 }), 400); }
     if (this.id === 'deepseek') floatText(this.x, this.y - this.h - 64, '蒸馏！', { size: 34, font: 'sans-serif', color: '#fff', life: 55 });
     vo(`v_${this.id}_special`, '', { who: 'char', interrupt: true });
     if (Math.random() < 0.45) aTimeout(() => boothKey([`f_${this.id}_special`]), 500);
@@ -362,7 +375,7 @@ const Specials = {
       if (t > 10 && f.grounded) {
         shake(16); dust(f.x, 0, 20); Audio.S.huge(); FX.flash = 4; FX.flashColor = '#ffb68a';
         g.areaHit(f, o, { x: f.x - f.h * 0.9, y: -f.h * 0.5, w: f.h * 1.8, h: f.h * 0.5 }, { dmg: sp.dmg, knock: 10, launch: true, hitstun: 30, hitstop: 12, name: sp.name, low: false });
-        f.move.startup = 0; f.move.active = 0; f.move.recovery = 16; f.mt = 0; f.move.onFrame = null; f.move.poseFn = t => 'heavy';
+        if (!f.move) return; f.move.startup = 0; f.move.active = 0; f.move.recovery = 16; f.mt = 0; f.move.onFrame = null; f.move.poseFn = t => 'heavy';
       }
     },
   }),
@@ -442,6 +455,25 @@ const Specials = {
       floatText(f.x, f.y - f.h - 20, '⇥ TAB', { size: 20, font: 'Press Start 2P', color: '#3A8BFF', life: 40 }); Audio.S.whoosh();
     },
   }),
+  parry: (f, sp) => ({   // Jev: calibrated counter — hits inside the window are answered; if nothing comes, Jev decides anyway (dash strike)
+    startup: 3, active: 22, recovery: 11, pose: 'block', noCancel: true, noWhiff: true,
+    onFrame(f, g, o, t) {
+      if (t === 3) { f.parryT = 20; f.parried = false; floatText(f.x, f.y - f.h - 30, '{"parry": 0.98}', { size: 12, font: 'Press Start 2P', color: '#E551BA', life: 40 }); }
+      if (t === 22 && !f.parried) { f.parryT = 0; f.move.pose = 'heavy'; f.vx = f.facing * 16; Audio.S.whoosh(); f.after.push({ x: f.x, y: f.y, pose: 'heavy', life: 12, facing: f.facing });
+        g.areaHit(f, o, { x: f.facing > 0 ? f.x : f.x - f.h * 1.1, y: f.y - f.h * 0.85, w: f.h * 1.1, h: f.h * 0.7 }, { dmg: sp.dmg, knock: 8, hitstun: 22, hitstop: 8, name: 'DECIDED', blockable: true }); }
+    },
+    onEnd(f) { f.parryT = 0; f.parried = false; },
+  }),
+  grab: (f, sp) => ({   // Manus: unblockable command grab
+    startup: 7, active: 5, recovery: 22, pose: 'heavy', windup: 'block', noCancel: true,
+    onFrame(f, g, o, t) { if (t === 8 && !f.grabbed) { const box = { x: f.facing > 0 ? f.x : f.x - f.h * 0.95, y: f.y - f.h * 0.9, w: f.h * 0.95, h: f.h * 0.9 };
+      if (g.areaHit(f, o, box, { dmg: sp.dmg, knock: 11, launch: true, hitstun: 36, hitstop: 12, name: sp.name, blockable: false, onHit: (a, d) => { floatText(d.x, d.y - d.h - 40, 'BROWSING…', { size: 16, font: 'Press Start 2P', color: '#fff', life: 60 }); } })) { f.grabbed = true; shake(10); Audio.S.huge(); } } },
+    onEnd(f) { f.grabbed = false; },
+  }),
+  uppercut: (f, sp) => ({   // Kimi: rising moonshot uppercut
+    startup: 4, active: 8, recovery: 20, pose: 'heavy', windup: 'crouch', keepVx: true, box: [0.05, -1.1, 0.7, 1.0], dmg: sp.dmg, hitstun: 30, blockstun: 12, push: 6, launch: true, gain: 10, lunge: 0,
+    onFrame(f, g, o, t) { if (t === 4) { f.vy = -13; f.y = -1; f.vx = f.facing * 3; Audio.S.whoosh(); } if (t > 4 && t < 12) f.after.push({ x: f.x, y: f.y, pose: 'heavy', life: 10, facing: f.facing }); },
+  }),
   inject: (f, sp, g) => ({
     startup: 14, active: 1, recovery: 18, pose: 'special',
     onFrame(f, g, o, t) { if (t !== 14) return; Audio.S.notif(); g.projs.push(new Proj({ owner: f, target: o, x: f.x + f.facing * 60, y: f.y - f.h * 0.75, vx: f.facing * 6, w: 150, h: 70, dmg: sp.dmg, life: 170, knock: 3, hitstun: 20,
@@ -510,7 +542,7 @@ const Ults = {
   },
   homing(f, u, g, o) {
     f.setState('idle');
-    for (let i = 0; i < u.n; i++) g.later(i * 4, () => { const a = grand(0, Math.PI * 2); g.projs.push(new Proj({ owner: f, target: o, homing: true, x: f.x + Math.cos(a) * 60, y: f.y - f.h * 0.6 + Math.sin(a) * 60, vx: Math.cos(a) * 8, vy: Math.sin(a) * 8, w: 44, h: 30, label: `[${i + 1}]`, fs: 16, color: '#20B8CD', dmg: u.dmg, knock: 3, hitstun: 18, strength: 9, life: 150 })); Audio.S.throw(); });
+    for (let i = 0; i < u.n; i++) g.later(i * 4, () => { const a = grand(0, Math.PI * 2); g.projs.push(new Proj({ owner: f, target: o, homing: true, x: f.x + Math.cos(a) * 60, y: f.y - f.h * 0.6 + Math.sin(a) * 60, vx: Math.cos(a) * 8, vy: Math.sin(a) * 8, w: 44, h: 30, label: u.label || `[${i + 1}]`, fs: u.label ? 28 : 16, color: u.label ? '#dfe6ff' : '#20B8CD', dmg: u.dmg, knock: 3, hitstun: 18, strength: 9, life: 150 })); Audio.S.throw(); });
   },
   clones(f, u, g, o) {
     f.setState('idle'); announce('GENERATE 4 VARIATIONS', { size: 64, dur: 60, color: '#E8C9A8', key: 'gen_4' });
@@ -529,6 +561,24 @@ const Ults = {
     floatText(f.x, f.y - f.h - 40, `${src.name} (DEEPSEEK EDITION)`, { size: 18, color: '#4D6BFE', life: 110, vy: -0.5 });
     floatText(f.x, f.y - f.h - 70, '蒸馏', { size: 36, font: 'sans-serif', color: '#fff', life: 110, vy: -0.5 });
     Ults[src.kind](f, src, g, o);
+  },
+  bullettime(f, u, g, o) {   // Jev: opponent runs at half speed; Jev decides in 50ms
+    f.setState('idle'); o.status.slowmo = u.dur;
+    for (let i = 0; i < 7; i++) g.later(20 + i * 7, () => { if (o.tokens <= 0) return; f.x = o.x - f.facing * f.h * 0.45; f.after.push({ x: f.x, y: f.y, pose: i % 2 ? 'light' : 'heavy', life: 14, facing: f.facing }); floatText(o.x, o.y - o.h - 20 - i * 12, (0.9 + i * 0.012).toFixed(2), { size: 10, font: 'Press Start 2P', color: '#E551BA', life: 30 });
+      g.areaHit(f, o, { x: o.x - 60, y: o.y - o.h, w: 120, h: o.h }, { dmg: i === 6 ? 3584 : 1280, knock: i === 6 ? 10 : 1, launch: i === 6, hitstun: 20, hitstop: 3, name: u.name, blockable: false, multi: true }); });
+    announce('50MS', { size: 110, dur: 60, color: '#E551BA', sub: 'FORWARD PASS. EVERYONE ELSE: STILL TOKENIZING', say: false });
+  },
+  painting(f, u, g, o) {   // Midjourney: giant framed painting slam
+    f.setState('idle');
+    g.later(22, () => g.projs.push(new Proj({ owner: f, target: o, x: o.x, y: -H * 1.2, vy: 17, w: 460, h: 280, dmg: u.dmg, knock: 14, hitstun: 50, launch: true, strength: 99, life: 200, chipMul: 0.25, onGround: p => { shake(18); Audio.S.huge(); dust(p.x, 0, 30); },
+      render(c, p) { c.fillStyle = '#6b4a1a'; c.fillRect(-230, -140, 460, 280); c.fillStyle = '#c9a24a'; c.fillRect(-220, -130, 440, 260);
+        const gr = c.createLinearGradient(-200, -110, 200, 110); gr.addColorStop(0, '#ff7eb6'); gr.addColorStop(0.5, '#7a5cff'); gr.addColorStop(1, '#2bd9ff'); c.fillStyle = gr; c.fillRect(-200, -110, 400, 220);
+        c.font = '80px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🖐️', -80, 10); c.fillText('🗿', 70, 0);
+        c.font = '12px "Press Start 2P"'; c.fillStyle = '#fff'; c.fillText('--ar 16:9 --v 7 --stylize 1000', 0, 95); } })));
+  },
+  pr(f, u, g, o) {   // Devin: a long wait, then the PR lands
+    f.setState('idle'); floatText(f.x, f.y - f.h - 40, 'ETA: 45 MINUTES', { size: 16, font: 'Press Start 2P', color: '#7FB3FF', life: 90 });
+    g.later(150, () => { g.projs.push(new Proj({ owner: f, target: o, x: o.x, y: -H, vy: 22, w: 300, h: 70, dmg: u.dmg, knock: 14, hitstun: 50, launch: true, strength: 99, life: 200, chipMul: 0.25, label: 'PR #1337 MERGED', fs: 20, color: '#7CFF9A', onGround: p => { shake(16); Audio.S.huge(); floatText(p.x, -200, 'CI FAILED ✗', { size: 26, color: '#ff5555', life: 90 }); } })); });
   },
   delayed(f, u, g, o) {
     f.setState('idle');

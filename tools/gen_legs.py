@@ -15,7 +15,7 @@ SPECIAL_POSES = {
   'muse': ["its tiny LEFT foot stepped forward out from under the fur, RIGHT foot back", "both tiny feet together under the fur, body slightly raised", "its tiny RIGHT foot stepped forward out from under the fur, LEFT foot back", "both tiny feet together under the fur, body slightly raised"],
   'deepseek': ["its curled tail fin COMPRESSED and bent under it, crouching to spring", "its tail fin STRETCHED straight, pushing off the ground, body springing up", "its tail fin curled forward, landing", "its tail fin flat on the ground, upright"],
 }
-HIP = {'muse': 0.8, 'deepseek': 0.58, 'claude': 0.55, 'clippy': 0.6, 'codex': 0.66, 'gemini': 0.6, 'grok': 0.6, 'llama': 0.62, 'dolphin': 0.6, 'mistral': 0.58, 'perplexity': 0.62, 'qwen': 0.62, 'cursor': 0.6}
+HIP = {'muse': 0.8, 'deepseek': 0.58, 'claude': 0.55, 'clippy': 0.6, 'codex': 0.66, 'gemini': 0.6, 'grok': 0.6, 'llama': 0.62, 'dolphin': 0.6, 'mistral': 0.58, 'perplexity': 0.62, 'qwen': 0.62, 'cursor': 0.6, 'jev': 0.6, 'alexa': 0.7, 'midjourney': 0.66, 'devin': 0.62, 'kimi': 0.6}
 def canvas(fid):
   im = Image.open(f'{SP}/{fid}/idle.png').convert('RGBA'); s = 720 / im.height; im = im.resize((int(im.width * s), int(im.height * s)), Image.NEAREST)
   c = Image.new('RGBA', (1024, 1024), (0, 0, 0, 0)); x = (1024 - im.width) // 2; y = 960 - im.height; c.alpha_composite(im, (x, y)); return c, s

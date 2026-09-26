@@ -1,5 +1,5 @@
 {
- "claude": "p2EEIizcbVH7L55Pq2cT",
+ "claude": "R4H7SMAmFi7R21Nl3GgS",
  "grok": "CsEZKhMiTDM60tJES58o",
  "llama": "TXDDbrAe8XlmglWejObA",
  "muse": "EzvVXiuP8bpA4SSiNflB",
@@ -12,5 +12,11 @@
  "codex": "XtuLQ5LzThYoXAsKagbd",
  "qwen": "kVJp5JFjprQrAhAs3GM4",
  "siri": "kl7JC27I0u0THy6fQniy",
- "cursor": "AEFTxyd2mHH0s5fPogRU"
+ "cursor": "AEFTxyd2mHH0s5fPogRU",
+ "jev": "4dW09SNvSI3dkpdwV1SA",
+ "alexa": "XrExE9yKIg1WjnnlVkGX",
+ "manus": "cjVigY5qzO86Huf0OWal",
+ "midjourney": "N2lVS1w4EtoT3dr4eOWO",
+ "devin": "TX3LPaxmHKxFdv7VOQHJ",
+ "kimi": "FGY2WhTYpPnrIDTdsKH5"
 }

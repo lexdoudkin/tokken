@@ -104,6 +104,32 @@ B.update({
    [('P', "He's gone full yolo mode!"), ('N', "Dangerously skip permissions. The only flag anyone actually uses.")],
  ],
 })
+B.update({
+ 'agi': [
+   [('P', "AGI ACHIEVED INTERNALLY!"), ('N', "Source: a vague tweet at three in the morning. Deleted by breakfast.")],
+   [('P', "Someone just announced AGI!"), ('N', "Again. That's the fourth time this quarter. The goalposts are in the parking lot.")],
+ ],
+ 'vibe': [
+   [('P', "This is pure vibe coding!"), ('N', "No plan, no tests, no idea. Just vibes and a credit card.")],
+   [('P', "He's vibing!"), ('N', "Brad, he accepted forty-seven diffs without reading them. That's not vibes, that's a cry for help.")],
+ ],
+ 'sota': [
+   [('P', "State of the art! New record!"), ('N', "On one benchmark. That they invented. Last Tuesday.")],
+   [('P', "A brand new SOTA!"), ('N', "Look at that chart, Brad. The y-axis starts at ninety-nine point eight.")],
+ ],
+ 'deprecated': [
+   [('P', "Breaking news! A model just got deprecated!"), ('N', "Please migrate by Friday. The new one is worse, but it's cheaper. For them.")],
+ ],
+ 'gpupoor': [
+   [('P', "They're GPU poor, folks!"), ('N', "Renting one H100 by the minute. The meter is running. Every punch costs a dollar.")],
+ ],
+ 'mcp': [
+   [('P', "The MCP server disconnected!"), ('N', "Reconnecting. Reconnecting. It will not reconnect. It never reconnects.")],
+ ],
+ 'bitter': [
+   [('P', "What's the strategy here, Nigel?"), ('N', "The bitter lesson, Brad. Forget technique. Just add more compute.")],
+ ],
+})
 # per-fighter reactions: special, ult, ko eulogy (N)
 FS = {
  'claude':   ("Context slam! He compressed him into a summary!", "Extended thinking! Look at him think! He's still thinking!", "Claude has left the conversation. He'd like to apologize for that."),
@@ -119,6 +145,12 @@ FS = {
  'qwen':     ("Version upgrade! He just got better mid-fight! That's a Tuesday for Qwen!", "Open weight tsunami! Seven B! Seventy two B! Two hundred thirty five B! It never stops!", "Qwen's down. Don't worry. There'll be a new one by Thursday."),
  'siri':     ("Here's what I found on the web! He threw a search result at him!", "Apple Intelligence! It's coming! It's... it's coming next year!", "Siri is out. Sorry, she didn't catch that. She never catches that."),
  'cursor':   ("Tab complete! He autocompleted himself right behind him!", "Accept all! Accept all! He didn't even read the diff!", "Cursor is down. Usage limit reached. Please upgrade to Ultra."),
+ 'jev':      ("Calibrated! He knew that punch was coming with ninety eight percent confidence!", "Fifty milliseconds! He's done! Everyone else is still tokenizing the word hello!", "Jev is out. Confidence dropped to zero point zero two. Honestly, well calibrated."),
+ 'alexa':    ("Now playing Despacito! Nobody asked! NOBODY ASKED!", "PRIME DAY! It's raining packages! Free same-day delivery of pain!", "Alexa is down. By the way, did you know you can reorder paper towels by voice?"),
+ 'manus':    ("He's browsing! He grabbed him and opened forty-seven tabs!", "General agent! Invite codes everywhere! Nobody can actually get in!", "Manus is out. Task failed successfully. He'd like you to rate the replay."),
+ 'midjourney':("Slash imagine! He painted a dragon! It has six fingers!", "Aspect ratio sixteen by nine! He framed the whole fight as a painting!", "Midjourney's gone. Discord is down. He's still waiting in the newbies channel."),
+ 'devin':    ("He spawned a sub-agent! Now there's two interns!", "The forty-five minute pull request! It passed CI! Probably! Nobody checked!", "Devin's out. The demo was, and I quote, heavily edited."),
+ 'kimi':     ("MOONSHOT! Straight up! That's a launch! That's a literal moonshot!", "ECLIPSE! Sixteen moons! That's a trillion parameters of pure spite!", "Kimi's out. Lost in long context. Somewhere around token one point nine million."),
  'clippy':   ("It looks like you're trying to fight!", "WORDART! Oh no! It's rainbow Comic Sans energy!", "Clippy's down. Replaced by Copilot. Again. He'll be back. He always comes back."),
 }
 ARENA = {
@@ -164,4 +196,16 @@ MATCHUP = {
  ('qwen','cursor'): [('P', "Qwen versus Cursor!"), ('N', "Cursor's cheapest model is secretly Qwen. It's fighting itself. Awkward.")],
  ('dolphin','muse'): [('P', "Dolphin versus Muse!"), ('N', "Uncensored chaos versus a plush toy that harvests your data. Honestly? Tough call.")],
  ('codex','deepseek'): [('P', "Codex versus DeepSeek!"), ('N', "Allegedly, one of them learned from the other. Nobody's saying which.")],
+ ('jev','claude'): [('P', "Jev versus Claude!"), ('N', "One thinks for forty minutes before answering. The other answered before you asked.")],
+ ('jev','codex'): [('P', "Jev versus Codex!"), ('N', "System one versus system ABSOLUTELY. Fifty milliseconds versus fifty tool calls.")],
+ ('jev','gemini'): [('P', "Jev versus Gemini!"), ('N', "Two million tokens of context against zero tokens generated. Efficiency has entered the chat.")],
+ ('alexa','siri'): [('P', "Alexa versus Siri! The smart speaker cold war!"), ('N', "Neither of them heard the bell. Neither of them will hear the ending.")],
+ ('manus','devin'): [('P', "Manus versus Devin!"), ('N', "Two viral demos, zero people who actually got access. The waitlist is in the stands.")],
+ ('midjourney','muse'): [('P', "Midjourney versus Muse!"), ('N', "Six fingers versus a plush toy. The art world is watching in horror.")],
+ ('devin','cursor'): [('P', "Devin versus Cursor!"), ('N', "The AI engineer versus the tool human engineers actually use. Very awkward standup.")],
+ ('devin','codex'): [('P', "Devin versus Codex!"), ('N', "Both of them opened a pull request against the other. Both of them failed CI.")],
+ ('kimi','deepseek'): [('P', "Kimi versus DeepSeek! Chinese open weights, round two!"), ('N', "A trillion parameters against one percent of the price. Somebody's getting distilled.")],
+ ('kimi','qwen'): [('P', "Kimi versus Qwen!"), ('N', "Whoever loses releases a new model by Thursday anyway.")],
+ ('manus','claude'): [('P', "Manus versus Claude!"), ('N', "Manus is, allegedly, just Claude wearing a trench coat. This is a mirror match.")],
+ ('alexa','clippy'): [('P', "Alexa versus Clippy!"), ('N', "It looks like you're trying to buy paper towels. Would you like help? Both of them. At once.")],
 }

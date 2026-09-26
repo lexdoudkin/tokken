@@ -85,5 +85,42 @@
   "refs": [
    "/Users/alexander/tokken/assets/refs/cursor.png"
   ]
+ },
+ "jev": {
+  "desc": "JEV, TypeSafe AI's 'System One' decision model come to life, based on its logo (a black isometric chain of interlocking cubes on a hot-magenta #E04FC2 disc): a sleek geometric robot fighter whose body and head are built from black isometric wireframe cubes, glowing hot-magenta core and visor eyes, with tiny floating probability readouts like '0.98'. Precise, ultra-fast, minimal-tech vibe.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/jev.png"
+  ]
+ },
+ "alexa": {
+  "desc": "ALEXA, the Amazon Echo smart speaker come to life: a dark charcoal fabric-covered cylinder body with a glowing cyan-blue (#00CAFF) light ring around its top edge acting as its 'face/halo', two small cute eyes on the fabric, short stubby arms and legs, an Amazon-smile-shaped mouth. Friendly but slightly confused expression.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/alexa.png",
+   "/Users/alexander/tokken/assets/refs/alexa_2.png"
+  ]
+ },
+ "manus": {
+  "desc": "MANUS, the Manus general AI agent come to life as a giant floating white cartoon GLOVED HAND fighter (like a boss hand), four fingers and thumb, with a small friendly face on the palm (two dot eyes), matching the hand mark in the reference; it fights by pointing, pinching, flicking, grabbing and making fists; it hovers with a faint shadow instead of legs.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/manus.png"
+  ]
+ },
+ "midjourney": {
+  "desc": "MIDJOURNEY, the Midjourney sailboat logo come to life as a pirate captain: a small sailboat hull body with a big white sail as its chest/cape (matching the sailboat mark in the reference), a pirate tricorn hat, two eyes on the sail, stubby arms holding a paintbrush like a cutlass, small legs. Painterly swashbuckler vibe, black and white with a hint of pastel paint splashes.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/midjourney.png"
+  ]
+ },
+ "devin": {
+  "desc": "DEVIN, Cognition's 'first AI software engineer', based on its logo (a black hexagon cluster mark): a small earnest robot intern whose head is built from three black rounded hexagons with two friendly light-blue eyes, wearing a grey hoodie and a company lanyard badge, carrying a sticker-covered laptop under one arm.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/devin.png"
+  ]
+ },
+ "kimi": {
+  "desc": "KIMI (Moonshot AI), based on its logo (a black square tile with a bold white 'K' and a small bright-blue dot): an agile ninja whose head is the black tile with the white 'K' forming its face and the blue dot as a glowing eye, dark navy ninja gi with white trim and a long flowing scarf, a small crescent-moon emblem on the belt.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/kimi.png"
+  ]
  }
 }

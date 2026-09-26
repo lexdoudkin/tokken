@@ -555,6 +555,7 @@ function drawSelect(c) {
     // name plate
     c.save(); c.translate(x, 505); c.fillStyle = L ? '#b30000' : '#0a3ab0'; c.beginPath(); c.moveTo(-180, 0); c.lineTo(190, 0); c.lineTo(175, 44); c.lineTo(-195, 44); c.fill(); c.fillStyle = '#000'; c.fillRect(-195, 44, 370, 4); c.restore();
     chrome(c, f.name, x, 543, 36, { maxW: 340 });
+    if (f.isNew) { c.save(); c.translate(x + 150, 500); c.rotate(-0.12); c.fillStyle = '#ff2a55'; c.fillRect(-34, -14, 68, 22); c.font = '11px "Press Start 2P"'; c.fillStyle = '#fff'; c.textAlign = 'center'; c.fillText('NEW!', 0, 2); c.restore(); }
     txt(c, sel.cpu && !L ? 'CPU' : sel.online ? (i === me() ? 'YOU' : 'RIVAL') : `${i + 1}P`, L ? 40 : W - 40, 110, 22, L ? '#ff3a3a' : '#3ab4ff', 'Bungee', L ? 'left' : 'right');
     bevel(c, x - 190, 560, 380, 118);
     c.font = '10px "Press Start 2P"'; c.fillStyle = f.color; wrapText(c, f.title, x, 580, 360, 14);
@@ -570,7 +571,8 @@ function drawSelect(c) {
     const hidden = f.secret && sel.cur[0] !== k && sel.cur[1] !== k;
     c.fillStyle = '#000'; c.fillRect(x - 2, y - 2, pw + 4, ph + 4);
     portrait(c, id, x, y, pw, ph, hidden);
-    c.fillStyle = 'rgba(0,0,0,0.7)'; c.fillRect(x, y + ph - 14, pw, 14); txt(c, hidden ? '???' : f.name, x + pw / 2, y + ph - 3, 7, '#fff', 'Press Start 2P', 'center', false);
+    c.fillStyle = 'rgba(0,0,0,0.7)'; c.fillRect(x, y + ph - 14, pw, 14); txt(c, hidden ? '???' : f.name, x + pw / 2, y + ph - 3, f.name.length > 8 ? 6 : 7, '#fff', 'Press Start 2P', 'center', false);
+    if (f.isNew) { c.save(); c.translate(x + pw - 2, y + 2); c.rotate(0.6); c.fillStyle = frame % 30 < 20 ? '#ff2a55' : '#ffd23f'; c.fillRect(-26, 6, 52, 13); c.font = '8px "Press Start 2P"'; c.fillStyle = '#fff'; c.textAlign = 'center'; c.fillText('NEW!', 0, 16); c.restore(); }
     [0, 1].forEach(i => { if (sel.cur[i] !== k) return; const col = i ? '#3ab4ff' : '#ff3a3a'; c.lineWidth = 4; c.strokeStyle = col; if (frame % 16 < 11 || sel.done[i]) c.strokeRect(x - 2 + i * 3, y - 2 + i * 3, pw + 4 - i * 6, ph + 4 - i * 6); c.fillStyle = col; c.fillRect(x + (i ? pw - 26 : 0), y, 26, 14); txt(c, sel.cpu && i ? 'CPU' : `${i + 1}P`, x + (i ? pw - 13 : 13), y + 11, 8, '#fff', 'Press Start 2P', 'center', false); });
   });
   if (sel.stage) {
@@ -579,7 +581,7 @@ function drawSelect(c) {
       if (img) c.drawImage(img, x, y, 218, 76); c.lineWidth = on ? 4 : 1; c.strokeStyle = on ? '#FFD23F' : '#555'; c.strokeRect(x, y, 218, 76); if (!on) { c.fillStyle = 'rgba(0,0,0,0.35)'; c.fillRect(x, y, 218, 76); } txt(c, a.name, x + 109, y + 90, 7, on ? '#FFD23F' : '#aaa', 'Press Start 2P'); });
   }
   ticker(c, frame);
-  txt(c, sel.stage ? '←→↑↓ CHOOSE STAGE · START / Ⓐ CONFIRM' : sel.cpu ? (sel.done[0] ? 'NOW CHOOSE YOUR OPPONENT' : 'START / Ⓐ TO SELECT · ESC BACK') : 'BOTH PLAYERS SELECT', W / 2, sel.stage ? 204 : 300, 9, '#bbb', 'Press Start 2P');
+  txt(c, sel.stage ? '←→↑↓ CHOOSE STAGE · START / Ⓐ CONFIRM' : sel.cpu ? (sel.done[0] ? 'NOW CHOOSE YOUR OPPONENT' : 'START / Ⓐ TO SELECT · ESC BACK') : 'BOTH PLAYERS SELECT', W / 2, sel.stage ? 204 : 382, 9, '#bbb', 'Press Start 2P');
 }
 function drawStage(c) {
   const a = ARENAS[sel.arena], img = ASSETS.arenas[a.id]; sel.stageT = (sel.stageT || 0) + 1;

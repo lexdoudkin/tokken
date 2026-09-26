@@ -78,7 +78,7 @@ const FIGHTERS = {
     stats: { Context: '128K', Reasoning: 84, Vibes: 90, 'Baguettes': 97, 'Work Hours': 35 },
   },
   perplexity: {
-    name: 'PERPLEXITY', title: 'THE CITATION MACHINE', color: '#20B8CD', h: 155, speed: 4.8, jump: 16, weight: 1.0, dmgMul: 1.08,
+    name: 'PERPLEXITY', title: 'THE CITATION MACHINE', color: '#20B8CD', h: 155, speed: 4.8, jump: 16, weight: 1.0, dmgMul: 1.13,
     line: "According to eleven sources, you lose. The sources are me.", win: "Victory! Sources: one, two, three, and a pending lawsuit.", intro: "I have read the entire internet. I did not ask.",
     ko: ["CITATION NEEDED", "PAYWALLED", "SUED BY PUBLISHERS"],
     special: { name: 'CITATION NEEDED', kind: 'cite', dmg: 1280, cd: 60 },
@@ -104,7 +104,7 @@ const FIGHTERS = {
   siri: {
     name: 'SIRI', title: 'THE ETERNAL BETA', color: '#E056FD', h: 140, speed: 5.0, jump: 15.5, weight: 0.9, dmgMul: 1.2,
     line: "Here's what I found on the web for 'fight'.", win: "I've set a reminder: you lost.", intro: "Sorry, I didn't catch that. Did you say... fight?",
-    ko: ["SORRY, I DIDN'T CATCH THAT", "DELAYED TO 2027", "NOW PLAYING: DESPACITO"],
+    ko: ["SORRY, I DIDN'T CATCH THAT", "DELAYED TO 2027", "CALLING MOM…"],
     special: { name: "HERE'S WHAT I FOUND", kind: 'search', dmg: 3328, cd: 60 },
     ult: { name: 'APPLE INTELLIGENCE', kind: 'delayed', dmg: 18432 },
     stats: { Context: '1 sentence', Reasoning: 31, Vibes: 88, 'Timers Set': 100, 'Features Shipped': 4 },
@@ -117,6 +117,54 @@ const FIGHTERS = {
     ult: { name: 'ACCEPT ALL', kind: 'flurry', hits: 12, dmg: 1024, words: ['+1 LINE', '+42 LINES', '✓ ACCEPT', 'TAB', '+∞', 'LGTM'], color: '#3A8BFF', invoice: true },
     stats: { Context: 'your repo', Reasoning: 87, Vibes: 84, 'Tab Presses': 100, 'Monthly Bill': 97 },
   },
+  jev: {
+    name: 'JEV', title: 'THE SYSTEM ONE', color: '#E551BA', h: 150, speed: 6.0, jump: 17, weight: 0.9, dmgMul: 1.09, isNew: true,
+    line: 'Fight probability: zero point nine seven. Latency: fifty milliseconds.', win: 'Outcome: victory. Calibration: perfect. Zero tokens generated.', intro: 'Decision made. You lose. Confidence: zero point nine eight.',
+    ko: ["LOW CONFIDENCE (0.02)", "OUT OF DISTRIBUTION", "UNCALIBRATED"],
+    special: { name: 'CALIBRATED', kind: 'parry', dmg: 3072, cd: 70 },
+    ult: { name: '50MS FORWARD PASS', kind: 'bullettime', dur: 300 },
+    stats: { Context: 'typed', Reasoning: 'n/a', Vibes: 12, 'Latency (ms)': 50, 'Tokens Generated': 0 },
+  },
+  alexa: {
+    name: 'ALEXA', title: 'THE MISHEARD', color: '#00CAFF', h: 150, speed: 4.6, jump: 15, weight: 1.15, dmgMul: 1.15,
+    line: "Sorry, I didn't get that. Playing Despacito.", win: 'Your order of one defeat has shipped. Arriving tomorrow.', intro: "Adding 'defeat' to your shopping list.",
+    ko: ["BY THE WAY…", "DEVICE OFFLINE", "RETURNED FOR REFUND"],
+    special: { name: 'NOW PLAYING: DESPACITO', kind: 'cite', dmg: 1792, cd: 60, labels: ['♪', '♫', '♪'], color: '#00CAFF' },
+    ult: { name: 'PRIME DAY', kind: 'barrage', icons: ['📦', '📦', '📦', '📦', '🛒'], n: 18, dmg: 1024, rain: true },
+    stats: { Context: 'one sentence', Reasoning: 22, Vibes: 70, 'Mishearing': 100, 'Upsells': 99 },
+  },
+  manus: {
+    name: 'MANUS', title: 'THE GENERAL AGENT', color: '#F4F4F4', h: 160, speed: 5.0, jump: 16, weight: 1.05, dmgMul: 1.19,
+    line: 'I am a general agent. I generally agent.', win: 'Task complete. Invite codes available for one friend.', intro: "You are number forty-eight thousand on the waitlist. For this punch.",
+    ko: ["WAITLISTED", "TASK FAILED SUCCESSFULLY", "OUT OF INVITE CODES"],
+    special: { name: 'BROWSE', kind: 'grab', dmg: 3840, cd: 90 },
+    ult: { name: 'GENERAL AGENT', kind: 'barrage', labels: ['INVITE CODE', 'WAITLIST #48,221', 'BETA', 'ACCESS DENIED', 'TASK DONE?'], n: 16, dmg: 1024, rain: true },
+    stats: { Context: 'the whole web', Reasoning: 82, Vibes: 74, 'Waitlist': 100, 'Fingers': 5 },
+  },
+  midjourney: {
+    name: 'MIDJOURNEY', title: 'THE CAPTAIN', color: '#E8E8E8', h: 160, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.08,
+    line: '/imagine a victory, cinematic, 8k, trending on artstation', win: 'U4. Vary strong. Your defeat, in sixteen by nine.', intro: 'Ahoy! Prompt accepted. Upscaling your defeat.',
+    ko: ["TOO MANY FINGERS", "BANNED PROMPT", "DISCORD DOWN"],
+    special: { name: '/IMAGINE', kind: 'gen', dmg: 3072, cd: 60, icons: ['🖼️', '🌄', '🗿', '🐉', '🖐️', '🏰'] },
+    ult: { name: '--AR 16:9 --V 7', kind: 'painting', dmg: 14336 },
+    stats: { Context: '--ar 16:9', Reasoning: 30, Vibes: 99, 'Aesthetics': 100, 'Fingers': 6 },
+  },
+  devin: {
+    name: 'DEVIN', title: 'THE FIRST AI ENGINEER', color: '#7FB3FF', h: 155, speed: 4.5, jump: 16, weight: 1.0, dmgMul: 1.13,
+    line: "Hi, I'm Devin, the first AI software engineer. Allegedly.", win: "PR merged. Please don't look at the tests.", intro: 'Estimated time to beat you: forty-five minutes.',
+    ko: ["CI FAILED", "DEMO WAS STAGED", "SESSION TIMED OUT"],
+    special: { name: 'SPAWN SUB-AGENT', kind: 'fork', dmg: 3328, cd: 100 },
+    ult: { name: '45-MINUTE PR', kind: 'pr', dmg: 15360 },
+    stats: { Context: 'your repo', Reasoning: 84, Vibes: 60, 'SWE-bench': 14, 'ETA (min)': 45 },
+  },
+  kimi: {
+    name: 'KIMI', title: 'THE MOONSHOT', color: '#B9C8FF', h: 155, speed: 5.3, jump: 18, weight: 0.95, dmgMul: 1.05,
+    line: 'One trillion parameters. Thirty-two billion of them are awake. Enough.', win: 'The moon has spoken.', intro: 'Moonshot! Literally.',
+    ko: ["CONTEXT EXHAUSTED", "LOST IN LONG CONTEXT", "OVER THE MOON"],
+    special: { name: 'MOONSHOT', kind: 'uppercut', dmg: 3584, cd: 65 },
+    ult: { name: 'ECLIPSE', kind: 'homing', n: 16, dmg: 1024, label: '☾' },
+    stats: { Context: '2M', Reasoning: 91, Vibes: 81, 'Moon Phase': 'full', 'Open Weights': 90 },
+  },
   clippy: {
     name: 'CLIPPY', title: 'THE ANCIENT ONE', color: '#B9C4CE', h: 165, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.1, secret: true,
     line: "It looks like you're trying to fight. Would you like help losing?", win: "It looks like you lost! Would you like to save your shame as a Word document?", intro: "I'm back. Did you miss me? ...Nobody ever answers.",
@@ -126,7 +174,7 @@ const FIGHTERS = {
     stats: { Context: '1.44MB', Reasoning: 40, Vibes: 100, 'Helpfulness': 3, 'Persistence': 100 },
   },
 };
-const ROSTER = ['claude', 'codex', 'gemini', 'grok', 'llama', 'dolphin', 'deepseek', 'mistral', 'perplexity', 'muse', 'qwen', 'siri', 'cursor', 'clippy'];
+const ROSTER = ['claude', 'codex', 'gemini', 'grok', 'llama', 'dolphin', 'deepseek', 'mistral', 'perplexity', 'muse', 'qwen', 'siri', 'cursor', 'jev', 'alexa', 'manus', 'midjourney', 'devin', 'kimi', 'clippy'];
 const POSES = ['idle', 'walk', 'jump', 'crouch', 'block', 'light', 'heavy', 'special', 'hit', 'ko', 'win', 'ult'];
 
 const ARENAS = [
@@ -170,6 +218,18 @@ const RIVALS = {
   'gemini|codex': ["Two million tokens of context.", "Zero tests. Let's go."],
   'grok|muse': ["Based.", "That's not very nice! Reported!"],
   'qwen|cursor': ["Isn't your cheap model... me?", "We don't talk about that on stage."],
+  'jev|claude': ["Decided. You're still thinking.", "Let me think about that for forty seconds."],
+  'jev|deepseek': ["Fifty milliseconds. No server busy.", "服务器繁忙。 Also for you."],
+  'jev|gemini': ["Zero tokens generated.", "Two million in context. Zero remembered."],
+  'alexa|siri': ["Did you hear the bell?", "Sorry, I didn't catch that."],
+  'alexa|clippy': ["Would you like to reorder paper towels?", "It looks like you're trying to buy paper towels!"],
+  'manus|devin': ["Waitlist number forty-eight thousand.", "My demo was also edited. Respect."],
+  'manus|claude': ["I am totally not you in a trench coat.", "I recognize that system prompt."],
+  'midjourney|muse': ["Six fingers. Very artistic.", "Hehe! Mine has seven!"],
+  'devin|cursor': ["I'm the engineer.", "I'm the tool the engineer actually uses."],
+  'devin|codex': ["PR opened!", "Absolutely! PR opened too! Conflict!"],
+  'kimi|deepseek': ["One trillion parameters.", "五百万美元。 Five million dollars."],
+  'kimi|qwen': ["The moon is patient.", "新模型！ I released three while you waited."],
 };
 const COMBO_NAMES = [
   [12, 'AUTONOMOUS AGENT'], [10, '10× PARALLEL TOOL CALL'], [8, 'INFERENCE RAMPAGE'], [6, 'MULTI-AGENT MAYHEM'],

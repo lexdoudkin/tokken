@@ -1,7 +1,17 @@
 // TOKKEN — match: rounds, hits, camera, render, HUD.
+// Per-fighter variation lines (tools/quips.py): taunt / pain / low pools, spoken + floated as a subtitle.
+function quip(f, kind, opt = {}) { if (RESIM) return 0;
+  const ks = []; for (let i = 0; i < 6; i++) if (Audio.has(`v_${f.id}_${kind}${i}`)) ks.push(`v_${f.id}_${kind}${i}`);
+  if (f.id === 'codex' && kind === 'taunt') for (let i = 1; i <= 5; i++) ks.push(`v_codex_quip${i}`);
+  if (!ks.length) return 0; let k = pick(ks); if (ks.length > 1 && k === f.lastQuip) k = pick(ks.filter(x => x !== k)); f.lastQuip = k;
+  const d = vo(k, '', { who: 'char' }); const t = Audio.lineText(k);
+  if (d && t) { const rows = []; for (const w of t.split(' ')) { if (rows.length && (rows[rows.length - 1] + ' ' + w).length <= 30) rows[rows.length - 1] += ' ' + w; else rows.push(w); }
+    const x = Math.max(250, Math.min(1030, f.x)); rows.forEach((r, i) => floatText(x, f.y - f.h - 50 - (rows.length - 1 - i) * 15, r, { size: 10, font: 'Press Start 2P', color: opt.color || f.cfg.color, life: 130, vy: -0.4 })); }
+  return d;
+}
 class Match {
   constructor(p1, p2, arena, ctrls, cpu) {
-    this.f = [new Fighter(p1, 0, ctrls[0]), new Fighter(p2, 1, ctrls[1])];
+    this.f = [new Fighter(p1, 0, ctrls[0]), new Fighter(p2, 1, ctrls[1])]; Memes.used.clear(); Memes.next = 0;
     this.arena = arena; this.cpu = cpu; this.round = 1; this.frame = 0; this.hitstop = 0; this.projs = []; this.timers = [];
     this.cam = { x: WORLD_W / 2, z: 1, y: 0 }; this.ultCin = null; this.over = false; this.slops = 0; this.hallucinations = 0;
     this.startRound();
@@ -34,7 +44,7 @@ class Match {
   startUlt(f, o) {
     f.compute = 0; f.stats.compute += 100; f.setState('ultcin');
     this.ultCin = { f, o, t: 0, name: f.cfg.ult.name }; Audio.S.ult(); Audio.duck(0.05, 1800); Audio.crowd(0.8, 2);
-    if (['claude', 'codex', 'cursor'].includes(f.id)) { floatText(f.x, f.y - f.h - 110, '--dangerously-skip-permissions', { size: 10, font: 'Press Start 2P', color: '#ff5555', life: 90 }); aTimeout(() => boothEvent('yolo', { p: 0.4 }), 2600); }
+    if (['claude', 'codex', 'cursor'].includes(f.id) && memeOk('yolo')) { floatText(f.x, f.y - f.h - 110, '--dangerously-skip-permissions', { size: 10, font: 'Press Start 2P', color: '#ff5555', life: 90 }); aTimeout(() => boothEvent('yolo', { p: 0.4 }), 2600); }
     const d = vo(`v_${f.id}_ult`, '', { who: 'char' }); aTimeout(() => vo(`ult_${f.id}`, f.cfg.ult.name, { interrupt: false }), (d || 0) * 700 + 200);
     aTimeout(() => comment('ult', { a: f.cfg.name, aid: f.id }), 1600);
   }
@@ -58,6 +68,12 @@ class Match {
     return true;
   }
   applyHit(a, d, o) {
+    if (d.parryT > 0 && d.state === 'attack') {   // Jev's CALIBRATED: cancel and answer
+      d.parryT = 0; d.parried = true; this.hitstop = Math.max(this.hitstop, 10); Audio.S.block(); sparks(d.x, d.y - d.h * 0.6, -Math.sign(d.x - a.x) || 1, 14);
+      floatText(d.x, d.y - d.h - 50, '{"blocked": 0.98}', { size: 13, font: 'Press Start 2P', color: '#E551BA', life: 60 });
+      this.rawHit(d, a, d.cfg.special.dmg, { dir: Math.sign(a.x - d.x) || 1, knock: 10, launch: true, hitstun: 30, hitstop: 12, sfx: 'heavy' });
+      return 'block';
+    }
     const dir = Math.sign(d.x - (o.fromX ?? a.x)) || a.facing;
     if (o.blockable !== false && this.canBlock(d, a, o)) {
       const chip = Math.round(o.dmg * a.dmgMul() * (o.chipMul ?? 0.08));
@@ -92,9 +108,9 @@ class Match {
       if (d.move) d.move = null;
     }
     d.flash = 5; d.squash = -0.08;
-    if ((d.id === 'claude' || d.id === 'codex') && dmg >= 2000 && Math.random() < 0.18) { floatText(d.x, d.y - d.h - 80, "YOU'RE ABSOLUTELY RIGHT", { size: 11, font: 'Press Start 2P', color: '#bfe0ff', life: 70 }); boothEvent('sycophant', { p: 0.35 }); }
-    if (a.id === 'codex' && (!a.quipT || this.frame - a.quipT > 240) && Math.random() < 0.3) { a.quipT = this.frame; const q = 1 + Math.floor(Math.random() * 5); vo(`v_codex_quip${q}`, '', { who: 'char' }); const t = Audio.lineText(`v_codex_quip${q}`); if (t) floatText(a.x, a.y - a.h - 50, t, { size: 10, font: 'Press Start 2P', color: '#bfe0ff', life: 110, vy: -0.5 }); }
-    if (dmg >= 1200 && (!d.hurtT || this.frame - d.hurtT > 35) && d.tokens - dmg > 0) { d.hurtT = this.frame; vo(`v_${d.id}_hurt${1 + (Math.random() < 0.5)}`, '', { who: 'char' }); }
+    if ((d.id === 'claude' || d.id === 'codex') && dmg >= 2000 && Math.random() < 0.18 && memeOk('sycophant')) { floatText(d.x, d.y - d.h - 80, "YOU'RE ABSOLUTELY RIGHT", { size: 11, font: 'Press Start 2P', color: '#bfe0ff', life: 70 }); boothEvent('sycophant', { p: 0.35 }); }
+    if ((dmg >= 1500 || a.combo >= 3) && (!a.quipT || this.frame - a.quipT > (a.id === 'codex' ? 240 : 420)) && Math.random() < (a.id === 'codex' ? 0.35 : 0.28)) { if (quip(a, 'taunt')) a.quipT = this.frame; }
+    if (dmg >= 1200 && (!d.hurtT || this.frame - d.hurtT > 35) && d.tokens - dmg > 0) { d.hurtT = this.frame; if (!(dmg >= 2500 && Math.random() < 0.45 && quip(d, 'pain'))) vo(`v_${d.id}_hurt${1 + (Math.random() < 0.5)}`, '', { who: 'char' }); }
     const big = dmg >= 3000;
     this.hitstop = Math.max(this.hitstop, o.hitstop ?? (big ? 9 : 5)); shake(big ? 9 : 4);
     Audio.S[o.sfx || (dmg >= 6000 ? 'huge' : big ? 'heavy' : 'light')](); Audio.S.tok(Math.min(6, Math.ceil(dmg / 1024)));
@@ -105,7 +121,7 @@ class Match {
     if (big) { floatText(d.x, d.y - d.h - 60, 'TOKENS', { size: 20, color: '#ffb000', life: 50 }); Audio.crowd(0.5, 1.2); }
     if (big && Math.random() < 0.35) comment('bigHit', { a: a.cfg.name, aid: a.id, v: d.cfg.name, d: fmt(dmg) });
     if (a.combo >= 3) { Ann.combo[a.side] = { n: a.combo, t: 0 }; if (a.combo === 4 || a.combo === 6 || a.combo === 8) comment('combo', { a: a.cfg.name, aid: a.id, v: d.cfg.name }); if (a.combo >= 5) Audio.crowd(0.7, 1.4); }
-    if (d.tokens < MAX_TOKENS * 0.2 && d.tokens > 0 && !d.lowWarned) { d.lowWarned = true; announce('TOKEN CRITICAL!', { size: 72, dur: 60, color: '#ff4040', key: 'token_critical' }); aTimeout(() => comment('low', { v: d.cfg.name, vid: d.id, t: fmt(d.tokens) }), 900); }
+    if (d.tokens < MAX_TOKENS * 0.2 && d.tokens > 0 && !d.lowWarned) { d.lowWarned = true; announce('TOKEN CRITICAL!', { size: 72, dur: 60, color: '#ff4040', key: 'token_critical' }); aTimeout(() => quip(d, 'low', { color: '#ff8080' }), 350); aTimeout(() => comment('low', { v: d.cfg.name, vid: d.id, t: fmt(d.tokens) }), 2600); }
     if (d.tokens <= 0) this.ko(a, d);
   }
   ko(a, d) {
@@ -120,7 +136,7 @@ class Match {
     const perfect = a.tokens >= MAX_TOKENS;
     this.later(150, () => { if (perfect && boothEvent('perfect', { force: true })) return; if (Math.random() < 0.5 && Audio.has(`f_${d.id}_ko`)) boothKey([`b_ko_x`, `f_${d.id}_ko`].filter(k => Audio.has(k)), true); else comment('ko', {}); });
     this.later(115, () => { announce('K.O.', { size: 200, dur: 80, color: '#FFD23F', key: 'ko' }); });
-    this.later(200, () => { a.setState('win'); const w = a.wins >= 2 ? vo(`wins_${a.id}`, '') : 0; aTimeout(() => vo(`v_${a.id}_winq`, a.cfg.win, { who: 'char' }), (w || 0) * 1000 + 100); if (!RESIM) this.winQuote = { f: a, text: `"${a.cfg.win}"`, t: 0 }; });
+    this.later(200, () => { a.setState('win'); const w = a.wins >= 2 ? vo(`wins_${a.id}`, '') : 0; const wk = pick(['', '1', '2'].filter(x => !x || Audio.has(`v_${a.id}_winq${x}`))); const wt = (wk && Audio.lineText(`v_${a.id}_winq${wk}`)) || a.cfg.win; aTimeout(() => vo(`v_${a.id}_winq${wk}`, wt, { who: 'char' }), (w || 0) * 1000 + 100); if (!RESIM) this.winQuote = { f: a, text: `"${wt}"`, t: 0 }; });
     this.later(330, () => {
       if (a.wins >= 2) { this.over = true; this.winner = a; }
       else { this.round++; this.startRound(); }
@@ -145,7 +161,8 @@ class Match {
     if (this.hitstop > 0) { this.hitstop--; this.updateFX(true); return; }
     if (FX.slowmo > 0) { FX.slowmo--; if (FX.slowmo % 3 !== 0) { this.updateFX(); return; } }
     const [a, b] = this.f;
-    a.update(this, b); b.update(this, a);
+    if (!(a.status.slowmo > 0 && this.frame % 2)) a.update(this, b); else if (a.status.slowmo) a.status.slowmo--;
+    if (!(b.status.slowmo > 0 && this.frame % 2)) b.update(this, a); else if (b.status.slowmo) b.status.slowmo--;
     // facing
     for (const [f, o] of [[a, b], [b, a]]) if (f.free && f.grounded && f.state !== 'dash') f.facing = o.x >= f.x ? 1 : -1;
     // push boxes
@@ -192,6 +209,8 @@ class Match {
       if (--this.time <= 0) this.timeOver();
       if (this.time === 10 * 60) boothEvent('timelow', { force: true });
       if (++this.noHitT === 60 * 7) { boothEvent(Math.random() < 0.45 ? 'leaders' : 'neutral'); this.noHitT = 60 * 3; }
+      if (this.frame % 60 === 0 && Math.random() < 0.035 && !RESIM) { const pool = MEME_POOL.filter(x => !Memes.used.has(x[0])); const mm = pool.length && pick(pool);
+        if (mm && memeOk(mm[0], 12)) { floatText(this.cam.x, -400, mm[0], { size: 26, color: '#ffd23f', life: 110, vy: -0.3 }); floatText(this.cam.x, -372, mm[1], { size: 10, font: 'Press Start 2P', color: '#fff', life: 110, vy: -0.3 }); if (mm[2]) boothEvent(mm[2], { p: 0.8 }); } }
       if (this.time === 50 * 60 && !this.rotSaid) { this.rotSaid = true; boothEvent('rot', { p: 0.8 }); }
       for (const f of this.f) if (f.state === 'jump' && f.st === 1) { this.jumps = (this.jumps || []).filter(t => this.frame - t < 240); this.jumps.push(this.frame); if (this.jumps.length >= 6) { this.jumps = []; boothEvent('jumpspam', { p: 0.7 }); } }
     }
@@ -367,7 +386,7 @@ class Match {
     c.fillStyle = '#000'; for (let i = 1; i < 4; i++) c.fillRect(cx0 + cw * i / 4, cy, 2, 8);
     c.font = '7px "Press Start 2P"'; c.textAlign = L ? 'left' : 'right'; c.fillStyle = full ? '#fff' : '#6cc8ff';
     c.fillText(full ? 'COMPUTE MAX — ULTIMATE READY' : `COMPUTE ${Math.floor(f.compute)} TFLOPS`, L ? cx0 : cx0 + cw, cy + 20);
-    const tags = []; if (f.status.think) tags.push(['THINKING', '#ffb000']); if (f.status.rate) tags.push(['429', '#ff5555']); if (f.status.inject) tags.push(['INJECTED', '#ff4fd8']); if (f.state === 'ultrun') tags.push([f.cfg.ult.name, f.cfg.color]);
+    const tags = []; if (f.status.think) tags.push(['THINKING', '#ffb000']); if (f.status.rate) tags.push(['429', '#ff5555']); if (f.status.slowmo) tags.push(['TOKENIZING…', '#E551BA']); if (f.status.inject) tags.push(['INJECTED', '#ff4fd8']); if (f.state === 'ultrun') tags.push([f.cfg.ult.name, f.cfg.color]);
     tags.forEach(([t, col], i) => { c.font = '9px "Press Start 2P"'; const tw = c.measureText(t).width + 12, tx2 = L ? cx0 + cw + 12 + i * 110 : cx0 - 12 - tw - i * 110; c.fillStyle = col; c.fillRect(tx2, cy - 3, tw, 15); c.fillStyle = '#000'; c.textAlign = 'left'; c.fillText(t, tx2 + 6, cy + 9); });
   }
 }
@@ -388,6 +407,7 @@ function shade(hex) { const n = parseInt(hex.slice(1), 16); const r = (n >> 16) 
 
 // Crowd: AI leaders & scientists at the back of the stage, side profile, watching the carnage.
 const CROWD_IDS = ['jensen', 'sam', 'elon', 'zuck', 'dario', 'demis', 'satya', 'sundar', 'lisa', 'karpathy', 'lecun', 'ilya'];
+const HANDS = {"dario":[-0.364,0.099,0.302,0.111],"demis":[-0.323,0.093,0.34,0.05],"elon":[-0.309,0.102,0.4,0.102],"eng0":[-0.309,0.064,0.392,0.029],"eng10":[-0.304,0.074,0.4,0.03],"eng11":[-0.189,0.044,0.366,0.03],"eng1":[-0.321,0.117,0.353,0.029],"eng2":[-0.281,0.029,0.391,0.092],"eng3":[-0.313,0.054,0.361,0.093],"eng4":[-0.329,0.056,0.325,0.031],"eng5":[-0.334,0.03,0.363,0.041],"eng6":[-0.34,0.13,0.298,0.049],"eng7":[-0.317,0.03,0.396,0.034],"eng8":[-0.317,0.05,0.463,0.103],"eng9":[-0.26,0.18,0.325,0.052],"ilya":[-0.371,0.11,0.395,0.14],"jensen":[-0.325,0.065,0.394,0.094],"karpathy":[-0.307,0.125,0.426,0.184],"lecun":[-0.39,0.087,0.293,0.089],"lisa":[-0.314,0.121,0.424,0.114],"sam":[-0.314,0.124,0.394,0.092],"satya":[-0.351,0.079,0.318,0.133],"sundar":[-0.365,0.118,0.424,0.145],"zuck":[-0.323,0.135,0.276,0.064]};
 const CROWD_SIGNS = { jensen: 'BUY MORE GPUS', sam: 'AGI 2027 (PROBABLY)', elon: 'GROK IS BASED', zuck: 'OPEN WEIGHTS!', dario: 'WE MUST PACE THE FRONTIER', demis: 'SOLVE INTELLIGENCE', satya: 'COPILOT EVERYWHERE', sundar: 'GEMINI 4 SOON', lisa: 'MI400 > H100', karpathy: 'VIBE CODED', lecun: 'LLMS ARE NOT AGI', ilya: 'FEEL THE AGI' };
 const ENG_SIGNS = ['H100 LOL', 'RALPH WIGGUM WAS RIGHT', '9.11 > 9.9', 'STRAWBERRY: 2 Rs', 'CONTEXT ROT IS REAL', 'SHIP IT', 'LGTM', 'IT WORKS ON MY GPU', 'WILL CODE FOR H100S', 'MY PR IS STILL OPEN', 'TEAM LOCAL', '429 LOL', 'ATTENTION IS ALL', 'VIBE CODED'];
 const ENG = Array.from({ length: 26 }, (_, i) => ({ id: 'eng' + (i % 12), x: 20 + i * 49 + rand(-8, 8), ph: rand(0, 6), s: rand(0.85, 1.0), cheerT: 0, sign: i % 6 === 3 ? ENG_SIGNS[(i / 6 | 0) % ENG_SIGNS.length] : null }));
@@ -425,14 +445,14 @@ function adBoard(c, y, frame, acc) {
 function drawCrowd(c, frame, excited, backY, midX, arenaId) {
   const acc = STAND_ACCENT[arenaId] || '#ffd23f';
   tier(c, backY - 26, 40, acc);                                                        // back tier (engineers)
-  drawRow(c, ENG, frame, excited, backY - 24, midX, 58, 'brightness(0.55) saturate(0.8)');
+  drawRow(c, ENG, frame, excited, backY - 24, midX, 58, 'brightness(0.55) saturate(0.8)', CROWD.filter(p => p.sign).map(p => p.x));
   tier(c, backY - 8, 34, acc);                                                         // front tier (leaders + strollers)
   drawStrollers(c, backY - 4);
   drawRow(c, CROWD, frame, excited, backY + 2, midX, 80, 'brightness(0.85)');
   adBoard(c, backY - 6, frame, acc);                                                   // ad boards hide everyone's feet
   const sh = c.createLinearGradient(0, backY + 14, 0, backY + 40); sh.addColorStop(0, 'rgba(0,0,0,0.45)'); sh.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = sh; c.fillRect(0, backY + 14, W, 26);
 }
-function drawRow(c, row, frame, excited, backY, midX, base, filter) {
+function drawRow(c, row, frame, excited, backY, midX, base, filter, avoid = []) {
   for (const p of row) {
     if (excited && Math.random() < 0.08) p.cheerT = 40 + rand(0, 40);
     if (!excited && Math.random() < 0.002) p.cheerT = 30;
@@ -441,10 +461,18 @@ function drawRow(c, row, frame, excited, backY, midX, base, filter) {
     const hgt = base * p.s, s = hgt / img.height, hop = p.cheerT > 0 ? Math.abs(Math.sin(frame / 5 + p.ph)) * 8 : Math.sin(frame / 30 + p.ph) * 1.2;
     const face = p.x < midX ? 1 : -1; // turn toward the fight
     const top = backY - hop - hgt;
-    if (p.sign) { // sign held up in both fists: pole runs from the sign down into the hands
-      c.save(); c.translate(p.x, top + 4); c.rotate(Math.sin(frame / 24 + p.ph) * 0.04); c.font = '7px "Press Start 2P"'; const tw = c.measureText(p.sign).width + 10;
-      c.fillStyle = '#5a3d1e'; c.fillRect(-2, -12, 4, 16); c.fillStyle = '#f4f1e8'; c.fillRect(-tw / 2, -30, tw, 18); c.strokeStyle = '#000'; c.lineWidth = 2; c.strokeRect(-tw / 2, -30, tw, 18); c.fillStyle = '#111'; c.textAlign = 'center'; c.fillText(p.sign, 0, -18); c.restore();
+    let banner = null;
+    if (p.sign && !avoid.some(x => Math.abs(x - p.x) < 130)) { // banner on two sticks gripped in the raised fists (fist spots measured per sprite: HANDS)
+      const hd = HANDS[p.id] || [-0.14, 0.05, 0.14, 0.05], iw = img.width * s;
+      const xa = p.x + face * hd[0] * iw, ya = top + hd[1] * hgt, xb = p.x + face * hd[2] * iw, yb = top + hd[3] * hgt;
+      const xl = Math.min(xa, xb), xr = Math.max(xa, xb), mid = (xl + xr) / 2, by = Math.min(ya, yb) - 16 - (base > 70 ? 4 : 0);
+      c.font = '7px "Press Start 2P"'; const tw = Math.max(c.measureText(p.sign).width + 10, xr - xl + 10), bh = 16;
+      c.strokeStyle = '#5a3d1e'; c.lineWidth = 3; c.beginPath(); c.moveTo(xa, ya + 3); c.lineTo(xa, by); c.moveTo(xb, yb + 3); c.lineTo(xb, by); c.stroke();
+      banner = () => { c.save(); c.translate(mid, by); c.font = '7px "Press Start 2P"';
+        c.fillStyle = '#f4f1e8'; c.fillRect(-tw / 2, -bh, tw, bh); c.strokeStyle = '#000'; c.lineWidth = 2; c.strokeRect(-tw / 2, -bh, tw, bh);
+        c.fillStyle = '#111'; c.textAlign = 'center'; c.fillText(p.sign, 0, -5); c.restore(); };   // drawn after the body so hair never covers it
     }
     c.save(); c.translate(p.x, backY - hop); c.scale(face * s, s * (1 + Math.sin(frame / 22 + p.ph) * 0.01)); c.filter = filter; c.drawImage(img, -img.width / 2, -img.height); c.restore(); c.filter = 'none';
+    if (banner) banner();
   }
 }

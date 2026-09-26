@@ -5,9 +5,11 @@ const ULT_QUOTES = {
   grok: 'Posting this fight. No context.', llama: 'Free as in beer. Terms apply.', dolphin: 'EEEEEE-EEEEE!!!', deepseek: 'Your ult looks nice. Mine now.',
   mistral: 'Nous sommes en grève!', perplexity: 'Hold on, reading the entire internet.', muse: 'Which one do you like best?? Hehe!',
   clippy: "It looks like you're about to lose!", qwen: 'New model dropped. Again.', siri: 'Sorry… one more thing.', cursor: 'Accept all? Accept all.',
+  jev: 'Decided. Before you finished tokenizing.', alexa: 'By the way… Prime Day.', manus: 'I opened 47 tabs. One of them is you.',
+  midjourney: '/imagine your defeat --ar 16:9', devin: 'Estimated time: 45 minutes. Actual: 3 weeks.', kimi: 'The moon remembers everything.',
 };
 const UltFX = (() => {
-  const DUR = { claude: 190, codex: 210, gemini: 170, grok: 160, llama: 190, dolphin: 260, deepseek: 170, mistral: 180, perplexity: 170, muse: 160, clippy: 130, qwen: 180, siri: 200, cursor: 170 };
+  const DUR = { claude: 190, codex: 210, gemini: 170, grok: 160, llama: 190, dolphin: 260, deepseek: 170, mistral: 180, perplexity: 170, muse: 160, clippy: 130, qwen: 180, siri: 200, cursor: 170, jev: 200, alexa: 190, manus: 190, midjourney: 200, devin: 200, kimi: 190 };
   function start(f, m) { m.ultFX = { id: f.id, side: f.side, t: 0, f0: m.frame, dur: DUR[f.id] || 150, seed: Math.random() * 1000, bits: [] }; }
   // --- helpers
   const mono = (c, s, x, y, size, col, align = 'left') => { c.font = `${size}px ui-monospace, Menlo, monospace`; c.textAlign = align; c.fillStyle = col; c.fillText(s, x, y); };
@@ -139,6 +141,58 @@ const UltFX = (() => {
         mono(c, (add ? '+ ' : '- ') + ['punch(opponent)', 'await ult()', 'if (losing) win()', 'tests.skip()', 'return victory', '// TODO: mercy', 'deploy --prod', 'retry(punch, 99)'][k % 8], x + 16, y + 52 + i * 26, 14, add ? '#7CFF9A' : '#ff8080'); }
       const pressed = t > 60 && t < 70; c.fillStyle = pressed ? '#1a55d6' : '#3A8BFF'; c.fillRect(x + w - 190, y + h - 44, 170, 32); mono(c, 'Accept All ⌘⏎', x + w - 105, y + h - 22, 14, '#fff', 'center');
       mono(c, `usage this fight: $${(Math.min(t, d) * 28.6).toFixed(2)}`, x + 16, y + h - 20, 13, '#ffd23f');
+    },
+    jev(c, t, d) {
+      c.fillStyle = 'rgba(20,0,16,0.55)'; c.fillRect(0, 0, W, H);
+      const rows = [['JEV (system one)', 47, '#E551BA', '47ms'], ['claude (thinking…)', 41000, '#D97757', 'thought for 41s'], ['o3-pro', 180000, '#9aa', 'still thinking'], ['deepseek-r1', 0, '#4D6BFE', 'server busy'], ['gemini deep think', 90000, '#8ab4ff', 'researching…']];
+      const x = W / 2 - 360, y = 150; c.fillStyle = 'rgba(12,10,14,0.92)'; c.fillRect(x, y, 720, 60 + rows.length * 44); c.strokeStyle = '#E551BA'; c.lineWidth = 2; c.strokeRect(x, y, 720, 60 + rows.length * 44);
+      px(c, 'TIME TO DECISION', x + 20, y + 34, 14, '#fff');
+      rows.forEach(([n, ms, col, lab], i) => { const yy = y + 60 + i * 44; mono(c, n, x + 20, yy + 18, 15, '#ddd');
+        const full = i === 0 ? Math.min(1, t / 3) * 0.02 : Math.min(1, t / (d * 0.9)); c.fillStyle = col; c.fillRect(x + 240, yy + 4, Math.max(4, 300 * (i === 0 ? 0.02 : full)), 20);
+        mono(c, i === 0 ? '✓ 47ms' : (ms ? lab + '.'.repeat(1 + (t >> 3) % 3) : '503 ' + lab), x + 560, yy + 18, 13, i === 0 ? '#7CFFB2' : '#aaa'); });
+      if (t > 20) mono(c, typed('{"decision": "you_lose", "confidence": 0.98, "tokens_generated": 0}', t - 20, 3), x + 20, y + 60 + rows.length * 44 + 36, 15, '#ffb3e6');
+    },
+    alexa(c, t, d) {
+      const cx = W / 2, g = 0.5 + 0.5 * Math.sin(t / 5); c.fillStyle = `rgba(0,202,255,${0.25 + 0.35 * g})`; c.fillRect(0, 0, W, 10); c.fillRect(0, H - 10, W, 10);
+      const Q = [[0, 'You: "Alexa, block."'], [30, 'Alexa: "Now playing \'Block\' by Blok."'], [70, 'Alexa: "By the way… did you know Prime members get free delivery on pain?"'], [120, 'Alexa: "I\'ve added 400 boxes to your cart."']];
+      Q.forEach(([at, q], i) => { if (t < at) return; const y = 140 + i * 50; c.fillStyle = i ? 'rgba(10,30,50,0.92)' : 'rgba(40,40,40,0.9)'; c.fillRect(cx - 420, y, 840, 38); c.strokeStyle = '#00CAFF'; c.lineWidth = 2; c.strokeRect(cx - 420, y, 840, 38); mono(c, typed(q, t - at, 2.2), cx - 404, y + 25, 16, '#e8faff'); });
+      for (let i = 0; i < Math.min(6, (t - 60) / 12); i++) { const y = 360 + i * 30; c.fillStyle = 'rgba(255,153,0,0.92)'; c.fillRect(W - 360, y, 320, 24); mono(c, '📦 Your order of "defeat" x' + (i + 1) * 12 + ' shipped', W - 350, y + 17, 12, '#111'); }
+    },
+    manus(c, t, d) {
+      const x = 70, y = 120, w = 620, h = 340; c.fillStyle = 'rgba(248,248,246,0.96)'; c.fillRect(x, y, w, h); c.strokeStyle = '#34322D'; c.lineWidth = 2; c.strokeRect(x, y, w, h);
+      const tabs = Math.min(47, Math.floor(t / 2)); for (let i = 0; i < tabs; i++) { c.fillStyle = i % 2 ? '#e2e2de' : '#d6d6d0'; c.fillRect(x + 4 + i * 13, y + 4, 12, 18); }
+      mono(c, `Manus's Computer — ${tabs} tabs`, x + 14, y + 42, 14, '#34322D');
+      const S = ['Opened opponent\'s LinkedIn', 'Read 312 Reddit threads on "how to block"', 'Booked flight to opponent', 'Spun up 40 sub-agents (all agreed: punch)', 'Rated own performance: 5 stars', 'Task complete ✓ (probably)'];
+      S.forEach((l, i) => { const at = 10 + i * 22; if (t < at) return; mono(c, (t - at > 16 ? '✓ ' : '⏳ ') + typed(l, t - at, 2.5), x + 20, y + 82 + i * 36, 15, '#34322D'); });
+      mono(c, 'waitlist position for this punch: #48,221', x + 20, y + h - 18, 12, '#8a8780');
+      stampTxt(c, 'INVITE ONLY', x + w - 150, y + h - 60, t - (d - 70), '#34322D');
+    },
+    midjourney(c, t, d) {
+      const x = 60, y = 110, w = 640, h = 380; c.fillStyle = 'rgba(49,51,56,0.96)'; c.fillRect(x, y, w, h);
+      mono(c, 'Midjourney Bot  BOT', x + 16, y + 26, 14, '#fff'); mono(c, '/imagine prompt: opponent losing, epic, cinematic, 8k, extra fingers --ar 16:9 --v 7', x + 16, y + 50, 12, '#b5bac1');
+      const p = Math.min(100, Math.floor(t * 1.2)); const gx = x + 16, gy = y + 66, cw = 290, ch = 128;
+      const E = ['🐉', '🖐️', '🗿', '🏴‍☠️'];
+      for (let i = 0; i < 4; i++) { const cx = gx + (i % 2) * (cw + 8), cy = gy + (i >> 1) * (ch + 8); const gr = c.createLinearGradient(cx, cy, cx + cw, cy + ch); gr.addColorStop(0, `hsl(${(i * 80 + t * 2) % 360},70%,${20 + p * 0.3}%)`); gr.addColorStop(1, `hsl(${(i * 80 + 140) % 360},60%,${10 + p * 0.2}%)`); c.fillStyle = gr; c.fillRect(cx, cy, cw, ch);
+        if (p < 100) { c.fillStyle = `rgba(0,0,0,${0.6 - p / 200})`; c.fillRect(cx, cy, cw, ch); } c.font = '56px serif'; c.textAlign = 'center'; c.globalAlpha *= Math.min(1, p / 60); c.fillText(E[i], cx + cw / 2, cy + ch / 2 + 20); c.globalAlpha = fade(t, d); }
+      mono(c, p < 100 ? `(${p}%) (fast)` : 'U1  U2  U3  U4  🔄  V1  V2  V3  V4', x + 16, y + h - 14, 14, p < 100 ? '#b5bac1' : '#fff');
+      stampTxt(c, '6 FINGERS', x + w - 140, y + h - 70, t - (d - 60), '#5865F2');
+    },
+    devin(c, t, d) {
+      const x = 60, y = 120, w = 640, h = 350; c.fillStyle = 'rgba(16,16,20,0.95)'; c.fillRect(x, y, w, h); c.strokeStyle = '#7FB3FF'; c.lineWidth = 2; c.strokeRect(x, y, w, h);
+      const mins = Math.floor(t * 0.25); mono(c, `Devin is working… ${mins}/45 min  (ACUs burned: ${(t * 3.7).toFixed(0)})`, x + 16, y + 28, 14, '#7FB3FF');
+      const P = ['☐ Plan: 37 steps', '☐ Clone opponent', '☐ Spawn sub-agent (Devin 2)', '☐ Write tests', '☐ Delete tests', '☐ Open PR #1337: "beat opponent"'];
+      P.forEach((l, i) => { const at = i * 18, done = t - at > 12; if (t < at) return; mono(c, (done ? '☑' : '☐') + l.slice(1), x + 20, y + 64 + i * 30, 15, done ? '#cfe' : '#889'); });
+      if (t > 110) { mono(c, 'PR #1337  +12,408 −3', x + 20, y + 260, 15, '#fff'); mono(c, '✗ tests (skipped)   ✓ vibes   ✓ demo video (edited)', x + 20, y + 288, 13, '#ffb000'); }
+      stampTxt(c, 'MERGED', x + w - 130, y + h - 50, t - (d - 60), '#8957e5');
+    },
+    kimi(c, t, d) {
+      c.fillStyle = 'rgba(2,4,20,0.6)'; c.fillRect(0, 0, W, H);
+      const r = 150, cx = W / 2, cy = 300 - Math.min(80, t); c.fillStyle = '#f4f1e8'; c.beginPath(); c.arc(cx, cy, r, 0, 7); c.fill();
+      const e = Math.min(1, t / 120); c.fillStyle = '#05060f'; c.beginPath(); c.arc(cx + r * 2 * (1 - e) - r * 0.25 * e, cy - 10 * e, r * 0.98, 0, 7); c.fill();
+      c.strokeStyle = `rgba(23,131,255,${0.5 + 0.5 * Math.sin(t / 4)})`; c.lineWidth = 6; c.beginPath(); c.arc(cx, cy, r + 8, 0, 7); c.stroke();
+      px(c, 'K2', cx, cy + 14, 40, '#fff', 'center');
+      mono(c, `context remembered: ${Math.min(2000000, Math.floor(t * t * 60)).toLocaleString('en-US')} tokens`, cx, cy + r + 50, 16, '#b9c8ff', 'center');
+      if (t > 60) mono(c, '1T parameters · 32B awake · 300 agents in the swarm', cx, cy + r + 76, 14, '#8aa', 'center');
     },
   };
   const BACK = { dolphin: true };

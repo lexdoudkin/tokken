@@ -12,6 +12,7 @@ if 'deepseek_zh' not in CV:
   g=r.json()['previews'][0]['generated_voice_id']
   r2=requests.post('https://api.elevenlabs.io/v1/text-to-voice',headers=H,json={'voice_name':'TOKKEN deepseek zh','voice_description':desc,'generated_voice_id':g},timeout=120)
   CV['deepseek_zh']=r2.json()['voice_id']; CV['deepseek']=CV['deepseek_zh']; json.dump(CV,open('voices/char_voices.json','w'),indent=1); print('deepseek voice',CV['deepseek'])
+TAG={'mistral':'[French accent] ','midjourney':'[pirate voice] ','claude':'[playful] ','deepseek':'[excited] ','jev':'[fast] ','kimi':'[confident] '}
 jobs=[]  # key, voice, text(with tags), subtitle
 for k,t in CASTER.items(): jobs.append((k,V['caster']['voice_id'],'[excited] '+t,t))
 for fid,f in F.items():
@@ -23,13 +24,13 @@ for fid,f in F.items():
     jobs.append((key,V['announcer']['voice_id'],'[shouting] '+spoken,r))
   if fid in ('dolphin','codex'): continue  # codex uses the OpenAI ChatGPT voice (codex_voice.py)
   for k in ('line','intro','win'):
-    jobs.append((f'v_{fid}_{"winq" if k=="win" else k}',CV[fid],('[French accent] ' if fid=='mistral' else '[excited] ' if fid=='deepseek' else '')+c[k],c[k]))
+    jobs.append((f'v_{fid}_{"winq" if k=="win" else k}',CV[fid],TAG.get(fid,'')+c[k],c[k]))
   if fid=='deepseek':
     jobs.append(('v_deepseek_special',CV[fid],'[shouting] '+c['special'],c['special'])); jobs.append(('v_deepseek_ult',CV[fid],'[shouting] '+c['ult'],c['ult']))
     for k,t in [('atk1','[grunts] 哈！'),('atk2','[shouting] 喝啊！'),('hurt1','[pained] 哎哟！'),('hurt2','[pained] 啊！'),('ko','[screams] 不——！')]: jobs.append((f'v_deepseek_{k}',CV[fid],t,t))
   else:
-    pre='[French accent] ' if fid=='mistral' else ''
-    for k,t in [('special','[shouting] '+f['special'].title()+'!'),('ult','[shouting] '+f['ult'].title()+'!'),('atk1','[grunts] Hah!'),('atk2','[shouting] Hyaaah!'),('hurt1','[pained] Ugh!'),('hurt2','[pained] Argh!'),('ko','[screams] Noooooo!')]:
+    pre=TAG.get(fid,'')
+    for k,t in [('special','[shouting] '+f.get('say_special',f['special'].title())+'!'),('ult','[shouting] '+f.get('say_ult',f['ult'].title())+'!'),('atk1','[grunts] Hah!'),('atk2','[shouting] Hyaaah!'),('hurt1','[pained] Ugh!'),('hurt2','[pained] Argh!'),('ko','[screams] Noooooo!')]:
       key=f'v_{fid}_{k}'
       if os.path.exists(f'{OUT}/{key}.mp3'): continue   # already rendered with this fighter's voice
       jobs.append((key,CV[fid],pre+t,re.sub(r'^\[[a-z ]+\] ','',t)))

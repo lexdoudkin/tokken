@@ -5,7 +5,7 @@ OUT='/Users/alexander/tokken/assets/voice'; ANN=json.load(open('voices/cast.json
 jobs=[]
 for fid,f in F.items():
   n=f['name'].title()
-  for k,t,sub in [(f'name_{fid}',n+'!',f['name']),(f'wins_{fid}',n+' wins!',f['name']+' WINS'),(f'ult_{fid}',f['ult'].title().replace('*','')+'!',f['ult'])]:
+  for k,t,sub in [(f'name_{fid}',n+'!',f['name']),(f'wins_{fid}',n+' wins!',f['name']+' WINS'),(f'ult_{fid}',f.get('say_ult',f['ult'].title().replace('*',''))+'!',f['ult'])]:
     if not os.path.exists(f'{OUT}/{k}.mp3'): jobs.append((k,'[shouting] '+t,sub))
 def tts(j):
   k,t,_=j
