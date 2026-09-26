@@ -134,14 +134,14 @@ const Audio = (() => {
   const CORE = k => /^(round_|final_round|prompt$|ko$|time_over|versus|select$|arena$|slop_hit|token_critical|prompt_injection|thinking|title|perfect|game_over|gen_4|sfx_|b_|music_title)/.test(k);
   function fetchKey(k) {
     if (bank[k] || pending[k]) return pending[k] || Promise.resolve();
-    return pending[k] = fetch(`assets/voice/${k}.mp3`).then(r => r.ok ? r.arrayBuffer() : null).then(b => b && dec.decodeAudioData(b)).then(buf => { if (buf) bank[k] = buf; loaded++; }).catch(() => { loaded++; });
+    return pending[k] = fetch(`assets/voice/${k}.mp3${window.VQ || ''}`).then(r => r.ok ? r.arrayBuffer() : null).then(b => b && dec.decodeAudioData(b)).then(buf => { if (buf) bank[k] = buf; loaded++; }).catch(() => { loaded++; });
   }
   // Load a group of clips (by predicate or key list) — used when fighters/stage are chosen.
   function ensure(sel) { const keys = typeof sel === 'function' ? ALL.filter(sel) : sel.filter(k => ALL.includes(k)); return Promise.all(keys.map(fetchKey)); }
   async function loadVoices2() {
     try {
-      ALL = (await fetch('assets/voice/manifest.json').then(r => r.json())).concat(['music_battle', 'music_title']);
-      lines = await fetch('assets/voice/lines.json').then(r => r.json()).catch(() => ({}));
+      ALL = (await fetch('assets/voice/manifest.json' + (window.VQ || '')).then(r => r.json())).concat(['music_battle', 'music_title']);
+      lines = await fetch('assets/voice/lines.json' + (window.VQ || '')).then(r => r.json()).catch(() => ({}));
       dec = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, 44100, 44100);
       const core = ALL.filter(CORE); total = core.length;
       await ensure(core);

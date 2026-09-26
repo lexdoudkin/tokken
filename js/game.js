@@ -26,18 +26,18 @@ const rectHit = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h 
 
 // ---------------- Assets ----------------
 const ASSETS = { sprites: {}, meta: {}, arenas: {}, flash: {}, crowd: {} };
-function loadImg(src) { return new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; }); }
+function loadImg(src) { return new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src + (window.VQ || ''); }); }
 async function loadAll(progress) {
   const jobs = [];
   for (const f of ROSTER) {
     ASSETS.sprites[f] = {};
-    jobs.push(fetch(`assets/sprites/${f}/meta.json`).then(r => r.json()).then(m => { ASSETS.meta[f] = m; }).catch(() => { ASSETS.meta[f] = {}; }));
+    jobs.push(fetch(`assets/sprites/${f}/meta.json${window.VQ || ''}`).then(r => r.json()).then(m => { ASSETS.meta[f] = m; }).catch(() => { ASSETS.meta[f] = {}; }));
     for (const p of POSES) jobs.push(loadImg(`assets/sprites/${f}/${p}.webp`).then(i => { ASSETS.sprites[f][p] = i; }));
   }
   for (const id of ['jensen', 'sam', 'elon', 'zuck', 'dario', 'demis', 'satya', 'sundar', 'lisa', 'karpathy', 'lecun', 'ilya']) for (const p of [0, 1]) jobs.push(loadImg(`assets/crowd/${id}_${p}.webp`).then(i => { ASSETS.crowd[id + '_' + p] = i; }));
   for (const e of [0, 2, 5, 7]) for (let w = 0; w < 4; w++) jobs.push(loadImg(`assets/crowd/eng${e}_w${w}.webp`).then(i => { ASSETS.crowd[`eng${e}_w${w}`] = i; }));
   for (let e = 0; e < 12; e++) for (const p of [0, 1]) jobs.push(loadImg(`assets/crowd/eng${e}_${p}.webp`).then(i => { ASSETS.crowd['eng' + e + '_' + p] = i; }));
-  for (const f of ROSTER) jobs.push(fetch(`assets/sprites/${f}/motion.json`).then(r => r.ok ? r.json() : null).then(mm => {
+  for (const f of ROSTER) jobs.push(fetch(`assets/sprites/${f}/motion.json${window.VQ || ''}`).then(r => r.ok ? r.json() : null).then(mm => {
     if (!mm) return; const js = [];
     for (const k in mm) js.push(loadImg(`assets/sprites/${f}/${k}.webp`).then(i => { if (i) { ASSETS.sprites[f][k] = i; ASSETS.meta[f][k] = mm[k]; } }));
     return Promise.all(js);
