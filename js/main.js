@@ -466,6 +466,9 @@ function drawParade(c) {
 function drawTitle(c) {
   drawBG(c, 'colosseum', true, 0.55);
   c.fillStyle = 'rgba(0,0,0,0.35)'; c.fillRect(0, 0, W, H); drawCRT(c);
+  // the fight-night grandstand (signs included) behind the parade, dimmed so logo + menu stay readable
+  c.save(); c.filter = 'brightness(0.7)'; drawCrowd(c, frame, titleArmed && frame % 600 < 40, 628, W / 2, 'colosseum'); c.restore(); c.filter = 'none';
+  const fade = c.createLinearGradient(0, 470, 0, 560); fade.addColorStop(0, 'rgba(5,5,15,0)'); fade.addColorStop(1, 'rgba(5,5,15,0.35)'); c.fillStyle = fade; c.fillRect(0, 470, W, 250);
   drawParade(c);
   drawLogo(c, W / 2, 196, 0.9 + Math.sin(frame / 40) * 0.01);
   txt(c, TAGLINES[Math.floor(frame / 240) % TAGLINES.length], W / 2, 256, 13, '#fff', 'Press Start 2P');
@@ -480,11 +483,10 @@ function drawTitle(c) {
     });
   }
   const pads = Input.padNames(); const vp = Audio.voiceProgress;
-  txt(c, pads.length ? `CONTROLLER ${pads.length > 1 ? '1+2' : '1'} CONNECTED` : 'KEYBOARD / XBOX / PLAYSTATION SUPPORTED', W / 2, 556, 10, pads.length ? '#7CFFB2' : '#999', 'Press Start 2P');
-  txt(c, '© 1997-2026 TOKKEN ENTERTAINMENT INC.  ALL RIGHTS RESERVED (ISH)', W / 2, 578, 8, '#aaa', 'Press Start 2P', 'center', false);
+  txt(c, pads.length ? `CONTROLLER ${pads.length > 1 ? '1+2' : '1'} CONNECTED` : 'KEYBOARD / XBOX / PLAYSTATION SUPPORTED', 20, 24, 9, pads.length ? '#7CFFB2' : '#777', 'Press Start 2P', 'left', false);
   ticker(c, frame);
   txt(c, 'M = MUTE', W - 20, 24, 9, '#666', 'Press Start 2P', 'right', false);
-  if (vp < 1) txt(c, `WARMING UP THE ANNOUNCER… ${Math.round(vp * 100)}%`, 20, 24, 9, '#888', 'Press Start 2P', 'left', false);
+  if (vp < 1) txt(c, `WARMING UP THE ANNOUNCER… ${Math.round(vp * 100)}%`, 20, 42, 9, '#888', 'Press Start 2P', 'left', false);
 }
 function drawControls(c) {
   bevel(c, 130, 340, W - 260, 340, { border: '#ffd23f' });

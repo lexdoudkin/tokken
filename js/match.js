@@ -427,7 +427,7 @@ function drawStrollers(c, backY) {
 }
 // Stadium grandstand: two tiers (engineers back/up, leaders front) + scrolling LED ad boards hiding everyone's feet.
 const STAND_ACCENT = { colosseum: '#7CFF3A', distillation: '#ffb000', feed: '#3ab4ff', basement: '#ff3af0', hackerhouse: '#ffd23f', goldengate: '#ff6a2a', singularity: '#b06aff', hearing: '#d9b35a', boardroom: '#9ad8ff', leaderboard: '#ffd23f', tesla: '#ff3a3a', h100: '#76b900', graveyard: '#7CFFB2', demoday: '#ff8a00', waitlist: '#ff3a3a', burningman: '#ff9a3a' };
-const ADS = '  TOKKEN.WIN  ✦  H100s IN STOCK (NOT REALLY)  ✦  POWERED BY AN UNSUSTAINABLE BURN RATE  ✦  YOUR DATA MAY BE USED FOR TRAINING  ✦  NOW WITH 40% MORE HALLUCINATIONS  ✦  BUY MORE GPUS  ✦  AGI: 6 MONTHS AWAY  ✦  ';
+const ADS = '  TOKKEN.WIN  ✦  © 1997-2026 TOKKEN ENTERTAINMENT INC. ALL RIGHTS RESERVED (ISH)  ✦  H100s IN STOCK (NOT REALLY)  ✦  POWERED BY AN UNSUSTAINABLE BURN RATE  ✦  YOUR DATA MAY BE USED FOR TRAINING  ✦  NOW WITH 40% MORE HALLUCINATIONS  ✦  BUY MORE GPUS  ✦  AGI: 6 MONTHS AWAY  ✦  ';
 function tier(c, y, h, acc) {
   const g = c.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, '#5a6078'); g.addColorStop(0.15, '#343a52'); g.addColorStop(1, '#10121c'); c.fillStyle = g; c.fillRect(0, y, W, h);
   c.fillStyle = acc; c.globalAlpha = 0.85; c.fillRect(0, y, W, 2); c.globalAlpha = 0.25; c.fillRect(0, y + 2, W, 3); c.globalAlpha = 1;   // glowing step lip
