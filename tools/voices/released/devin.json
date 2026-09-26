@@ -1,0 +1,24 @@
+{
+ "brief": "Over-caffeinated nervous young male junior engineer live on a demo stream, very fast Californian speech, voice cracks when excited, nervous laughter, overselling everything",
+ "tag": "[nervously] ",
+ "lines": {
+  "v_devin_line": "Hi, I'm Devin, the first AI software engineer. Allegedly.",
+  "v_devin_intro": "Estimated time to beat you: forty-five minutes.",
+  "v_devin_winq": "PR merged. Please don't look at the tests.",
+  "v_devin_atk1": "Committing!",
+  "v_devin_atk2": "Force push! Force push!",
+  "v_devin_hurt1": "Merge conflict!",
+  "v_devin_hurt2": "CI is red! CI is RED!",
+  "v_devin_ko": "I need a senior engineer! Anyone!",
+  "v_devin_special": "Spawning a sub-agent! He's also me!",
+  "v_devin_ult": "Forty-five minute pull request!",
+  "v_devin_taunt0": "I've planned this fight. It has thirty seven steps. I'm on step two.",
+  "v_devin_taunt1": "Don't worry, I'll open a pull request to fix your guard.",
+  "v_devin_taunt2": "My sub-agent is also punching you. Parallelism!",
+  "v_devin_pain0": "Ouch! Logging that as a known issue!",
+  "v_devin_pain1": "Unexpected error! Retrying!",
+  "v_devin_low0": "Asking for human review! Please! Anyone! Senior engineer!",
+  "v_devin_winq1": "Ticket closed. Won't fix: your defense.",
+  "v_devin_winq2": "Five hundred dollars per month. Worth it. Allegedly."
+ }
+}

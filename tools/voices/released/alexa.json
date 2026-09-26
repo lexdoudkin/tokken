@@ -1,0 +1,24 @@
+{
+ "brief": "Calm, polite female smart-speaker assistant, American, pleasant and silky smooth with the exact cadence of a voice assistant reading a product listing, cheerfully tone-deaf, faintly passive-aggressive sweetness",
+ "tag": "",
+ "lines": {
+  "v_alexa_line": "Sorry, I didn't get that. Playing Despacito.",
+  "v_alexa_intro": "Adding 'defeat' to your shopping list.",
+  "v_alexa_winq": "Your order of one defeat has shipped. Arriving tomorrow.",
+  "v_alexa_atk1": "Okay!",
+  "v_alexa_atk2": "Adding to cart!",
+  "v_alexa_hurt1": "Hmm, I don't know that one.",
+  "v_alexa_hurt2": "Device offline!",
+  "v_alexa_ko": "Goodbye. By the way, your subscription has ended.",
+  "v_alexa_special": "Now playing: Despacito!",
+  "v_alexa_ult": "It's Prime Day!",
+  "v_alexa_taunt0": "By the way, did you know you can order boxing gloves with your voice?",
+  "v_alexa_taunt1": "Okay. Adding 'fist' to your cart.",
+  "v_alexa_taunt2": "Here's a song you might like: Eye of the Tiger. Playing on all speakers.",
+  "v_alexa_pain0": "Hmm, I don't know that one.",
+  "v_alexa_pain1": "Sorry, something went wrong!",
+  "v_alexa_low0": "Your device is running low. Would you like to reorder batteries?",
+  "v_alexa_winq1": "Your defeat has been delivered. It's at your front door. In the rain.",
+  "v_alexa_winq2": "You lost. Here's a coupon for twenty percent off Prime."
+ }
+}

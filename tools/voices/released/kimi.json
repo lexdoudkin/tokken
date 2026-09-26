@@ -1,0 +1,24 @@
+{
+ "brief": "Over-dramatic young female anime ninja heroine with a light East Asian accent, intense whispers that explode into shouts, heavy breaths, emphasis like a shonen anime English dub",
+ "tag": "[dramatically] ",
+ "lines": {
+  "v_kimi_line": "One trillion parameters. Thirty-two billion of them are awake. Enough.",
+  "v_kimi_intro": "Moonshot! Literally.",
+  "v_kimi_winq": "The moon has spoken.",
+  "v_kimi_atk1": "Moon!",
+  "v_kimi_atk2": "Hyaah! Moonshot!",
+  "v_kimi_hurt1": "Tch!",
+  "v_kimi_hurt2": "Eclipsed?!",
+  "v_kimi_ko": "The moon... sets... for now.",
+  "v_kimi_special": "MOONSHOT!",
+  "v_kimi_ult": "Total... ECLIPSE!",
+  "v_kimi_taunt0": "Moon punch. From the far side.",
+  "v_kimi_taunt1": "I read your entire fighting history. All two million tokens.",
+  "v_kimi_taunt2": "Agent swarm: engaged. Three hundred of me.",
+  "v_kimi_pain0": "Tch. Lucky.",
+  "v_kimi_pain1": "Mere eclipse.",
+  "v_kimi_low0": "The moon wanes... then it comes back. Always.",
+  "v_kimi_winq1": "Open weights. Closed fist. Goodnight.",
+  "v_kimi_winq2": "One trillion parameters. You needed only one."
+ }
+}

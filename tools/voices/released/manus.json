@@ -1,0 +1,24 @@
+{
+ "brief": "Smug, breathy Silicon Valley launch-video narrator, close-mic ASMR whisper, slow and reverent with dramatic pauses as if every sentence is a world-changing keynote reveal, tiny smug chuckles",
+ "tag": "[whispers] ",
+ "lines": {
+  "v_manus_line": "I am a general agent. I generally agent.",
+  "v_manus_intro": "You are number forty-eight thousand on the waitlist. For this punch.",
+  "v_manus_winq": "Task complete. Invite codes available for one friend.",
+  "v_manus_atk1": "Executing.",
+  "v_manus_atk2": "Step four... of forty seven.",
+  "v_manus_hurt1": "Retrying.",
+  "v_manus_hurt2": "Unexpected... outcome.",
+  "v_manus_ko": "Task failed... successfully.",
+  "v_manus_special": "Browse.",
+  "v_manus_ult": "General... agent.",
+  "v_manus_taunt0": "I'm opening a browser to look up how to punch you. Found it.",
+  "v_manus_taunt1": "This punch was executed autonomously in a sandbox.",
+  "v_manus_taunt2": "I spun up forty sub-agents. They all voted: punch.",
+  "v_manus_pain0": "Retrying task.",
+  "v_manus_pain1": "Task failed. Retrying with more confidence.",
+  "v_manus_low0": "Escalating to human in the loop! Hello? Human? Anyone?",
+  "v_manus_winq1": "Replay available. Please share it. We need more waitlist signups.",
+  "v_manus_winq2": "General purpose victory. Specifically: you lost."
+ }
+}
