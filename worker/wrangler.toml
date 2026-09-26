@@ -1,0 +1,10 @@
+name = "tokken-leaderboard"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+# IKAROS account (never the Art of X company account)
+account_id = "ecb4b473e61e57b0edf4052fb0d0963a"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tokken-leaderboard"
+database_id = "2588c2e7-9702-4848-9689-6729f807bf10"

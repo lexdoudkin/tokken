@@ -1,0 +1,2 @@
+CREATE TABLE IF NOT EXISTS players (pid TEXT PRIMARY KEY, name TEXT, points INTEGER DEFAULT 0, wins INTEGER DEFAULT 0, losses INTEGER DEFAULT 0, best_combo INTEGER DEFAULT 0, perfects INTEGER DEFAULT 0, main TEXT, mains TEXT, updated INTEGER);
+CREATE INDEX IF NOT EXISTS idx_points ON players(points DESC);

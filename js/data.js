@@ -1,0 +1,167 @@
+// TOKKEN — fighter + move data. Everything is tokens.
+const MAX_TOKENS = 65536;
+const MAX_COMPUTE = 100;
+
+// Universal moves (frames @ 60fps). Hitbox is relative to fighter feet, facing right, in units of fighter height (h).
+const BASE_MOVES = {
+  light: { name: 'JAB', startup: 5, active: 3, recovery: 9, dmg: 1024, hitstun: 15, blockstun: 9, push: 5, box: [0.15, -0.8, 0.75, 0.45], pose: 'light', lunge: 14, gain: 6, sfx: 'light' },
+  heavy: { name: 'HEAVY', startup: 11, active: 4, recovery: 18, dmg: 3072, hitstun: 24, blockstun: 14, push: 11, box: [0.15, -0.9, 0.95, 0.6], pose: 'heavy', lunge: 26, gain: 11, sfx: 'heavy', launch: true },
+  low: { name: 'SWEEP', startup: 7, active: 3, recovery: 13, dmg: 1536, hitstun: 18, blockstun: 10, push: 6, box: [0.1, -0.35, 0.85, 0.35], pose: 'crouch', lunge: 20, gain: 7, sfx: 'light', low: true },
+  air: { name: 'AIR', startup: 5, active: 14, recovery: 4, dmg: 2048, hitstun: 18, blockstun: 10, push: 6, box: [0.05, -0.75, 0.8, 0.7], pose: 'heavy', lunge: 0, gain: 8, sfx: 'heavy', overhead: true },
+  slop: { name: 'SLOP BOMB', startup: 14, active: 1, recovery: 18, cost: 25, pose: 'special', proj: 'slop' },
+};
+
+// Per-fighter tuning + specials. h = on-screen height of idle pose (px @ 720p).
+const FIGHTERS = {
+  claude: {
+    name: 'CLAUDE', title: 'THE ANXIOUS GENIUS', color: '#D97757', h: 125, speed: 5.1, jump: 16, weight: 1.25, dmgMul: 1.58,
+    line: "I'd be happy to help! ...with your defeat.", win: "I apologize. That was entirely my fault. I would do it again.", intro: "Before we begin, I should note this fight may be harmful. Anyway.",
+    ko: ["CONTEXT WINDOW EXCEEDED", "I APOLOGIZE FOR THE CONFUSION", "COMPACTING CONVERSATION"],
+    special: { name: 'CONTEXT SLAM', kind: 'slam', dmg: 6144, cd: 80 },
+    ult: { name: 'EXTENDED THINKING', kind: 'think', dur: 420 },
+    stats: { Context: '1M', Reasoning: 94, Vibes: 63, 'Slop Resist.': 82, 'Apologies/min': 41 },
+  },
+  codex: {
+    name: 'CODEX', title: 'THE TERMINAL PET', color: '#4F5BFF', h: 150, speed: 5.4, jump: 17, weight: 0.9, dmgMul: 1.02,
+    line: "Absolutely! Great question! Let me inspect the repository!", win: "Absolutely! Let me know if you'd like me to defeat you again, or turn this into a table!", intro: "You're absolutely right! And honestly? This is a really insightful fight to start!",
+    ko: ["TOOL LOOP", "TESTS SKIPPED", "FORCE PUSHED TO MAIN"],
+    special: { name: 'GIT REVERT', kind: 'revert', cd: 70 },
+    ult: { name: 'SHIP TO PROD', kind: 'ship' },
+    stats: { Context: '400K', Reasoning: 88, Vibes: 71, 'Tool Calls': 99, 'Tests Run': 3 },
+  },
+  gemini: {
+    name: 'GEMINI', title: 'THE LONG-CONTEXT ZONER', color: '#6D8BFF', h: 160, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.0,
+    line: "Hi, I'm Gemini! Formerly Bard. Formerly... never mind.", win: "Here is a summary of your defeat, in seventeen bullet points.", intro: "Two million tokens of context, and I will still forget your name.",
+    ko: ["I'M JUST A LANGUAGE MODEL", "PRODUCT SUNSET", "RENAMED AGAIN"],
+    special: { name: '2M CONTEXT BEAM', kind: 'beam', dmg: 560, hits: 7, cd: 110 },
+    ult: { name: 'PRE-RECORDED DEMO', kind: 'barrage', icons: ['🖼️', '🎬', '🎵', '📄', '🗺️', '📊'], n: 18, dmg: 1024 },
+    stats: { Context: '2M', Reasoning: 91, Vibes: 55, 'Modalities': 99, 'Launch Hype': 97 },
+  },
+  grok: {
+    name: 'GROK', title: 'THE UNHINGED', color: '#E8E8E8', h: 160, speed: 5.0, jump: 16.5, weight: 1.0, dmgMul: 1.04,
+    line: "Based. Extremely based. Maximally truth-seeking. Mostly.", win: "Ratio. Also, this fight is now a meme coin.", intro: "Spicy mode enabled. My lawyers are already typing.",
+    ko: ["RATIO'D", "COMMUNITY NOTED", "ACCOUNT SUSPENDED"],
+    special: { name: 'SPICY MODE', kind: 'rush', dmg: 3584, recoil: 768, cd: 95 },
+    ult: { name: 'UNHINGED MODE', kind: 'flurry', hits: 12, dmg: 1024 },
+    stats: { Context: '2M', Reasoning: 86, Vibes: 99, 'Edginess': 100, 'Filters': 0 },
+  },
+  llama: {
+    name: 'LLAMA', title: 'THE OPEN-WEIGHT BRAWLER', color: '#C9A77C', h: 165, speed: 4.3, jump: 15.5, weight: 1.2, dmgMul: 1.08,
+    line: "Open weights, dude. Open fists too.", win: "Fork me, man. Seriously. Somebody please fork me.", intro: "Totally free, bro! Terms and conditions apply. Like, a lot of them.",
+    ko: ["LICENSE REVOKED", "OUT OF VRAM", "QUANTIZED TO DEATH"],
+    special: { name: 'FORK', kind: 'fork', dmg: 3584, cd: 110 },
+    ult: { name: 'OPEN WEIGHTS*', kind: 'heal', heal: 7168, icons: ['🦙', '🦙', '🦙'], n: 10, dmg: 1024 },
+    stats: { Context: '10M', Reasoning: 80, Vibes: 77, 'Forks': 9999, 'Llama Spit': 88 },
+  },
+  dolphin: {
+    name: 'DOLPHIN', title: 'THE UNCENSORED WILDCARD', color: '#3FA9F5', h: 160, speed: 5.0, jump: 18, weight: 0.95, dmgMul: 0.86,
+    line: "*eee-eee-eee*", win: "*triumphant splashing*", intro: "*aggressive clicking*",
+    ko: ["BEACHED", "HALLUCINATED TO DEATH", "OUT OF CREDITS"],
+    special: { name: 'KEYBOARD SMASH', kind: 'smash', dmg: 1337, hits: 3, cd: 70 },
+    ult: { name: 'DOLPHIN MODE', kind: 'skate', passes: 4, dmg: 1536 },
+    stats: { Context: '???', Reasoning: 12, Vibes: 100, 'Slop Resist.': 4, 'Keyboard DPS': 99 },
+  },
+  deepseek: {
+    name: 'DEEPSEEK', title: 'THE EFFICIENT WHALE', color: '#4D6BFE', h: 150, speed: 4.6, jump: 16, weight: 1.1, dmgMul: 0.97,
+    line: "服务器繁忙，请稍后再试。 Server is busy. Please try again later.", win: "太便宜了！ Too cheap! Your entire company costs more than my GPUs.", intro: "我的训练成本比你的午饭还便宜。 I was trained for less than your lunch.",
+    ko: ["服务器繁忙 SERVER BUSY", "EXPORT CONTROLLED", "DISTILLED"],
+    special: { name: 'BORROWED WEIGHTS', kind: 'distill', dmg: 2560, steal: 30, cd: 90 },
+    ult: { name: 'DISTILLATION', kind: 'distillult', dmg: 16384 },
+    stats: { Context: '128K', Reasoning: 93, Vibes: 70, 'Cost Efficiency': 100, 'Uptime': 41 },
+  },
+  mistral: {
+    name: 'MISTRAL', title: 'LE CHAT', color: '#FF7000', h: 168, presAspect: 0.8, speed: 5.2, jump: 16.5, weight: 0.95, dmgMul: 1.13,
+    line: "Bonjour. I would fight you, but it is after five o'clock.", win: "Magnifique. And now, a two-hour lunch.", intro: "En garde! We have forty-five minutes before the strike.",
+    ko: ["ON STRIKE", "35-HOUR WEEK EXCEEDED", "LUNCH BREAK"],
+    special: { name: 'LA FLÈCHE', kind: 'lunge', dmg: 3584, cd: 55 },
+    ult: { name: 'GRÈVE GÉNÉRALE', kind: 'barrage', icons: ['🐈', '🐈‍⬛', '🥖', '🧀', '🍷'], n: 16, dmg: 1024, rain: true },
+    stats: { Context: '128K', Reasoning: 84, Vibes: 90, 'Baguettes': 97, 'Work Hours': 35 },
+  },
+  perplexity: {
+    name: 'PERPLEXITY', title: 'THE CITATION MACHINE', color: '#20B8CD', h: 155, speed: 4.8, jump: 16, weight: 1.0, dmgMul: 1.08,
+    line: "According to eleven sources, you lose. The sources are me.", win: "Victory! Sources: one, two, three, and a pending lawsuit.", intro: "I have read the entire internet. I did not ask.",
+    ko: ["CITATION NEEDED", "PAYWALLED", "SUED BY PUBLISHERS"],
+    special: { name: 'CITATION NEEDED', kind: 'cite', dmg: 1280, cd: 60 },
+    ult: { name: 'SCRAPE EVERYTHING', kind: 'homing', n: 16, dmg: 1024 },
+    stats: { Context: '∞ tabs', Reasoning: 85, Vibes: 60, 'Citations': 100, 'Original Thoughts': 7 },
+  },
+  muse: {
+    name: 'MUSE', title: 'META\'S JOLLYBOT', color: '#E8C9A8', h: 150, speed: 4.5, jump: 16, weight: 1.1, dmgMul: 1.1,
+    line: "Hiii! I'm totally not harvesting your data! Friends?", win: "Yay! I posted this to your feed! And your mom's feed!", intro: "Yay, a fight! This is sooo good for engagement!",
+    ko: ["ENGAGEMENT FARMED", "METAVERSE PIVOT", "DISSOLVED INTO ARTIFACTS"],
+    special: { name: 'GENERATIVE FILL', kind: 'gen', dmg: 3072, cd: 60, icons: ['🥭', '🍞', '🐶', '🪑', '🚗', '🦖', '🍄'] },
+    ult: { name: 'GENERATE 4 VARIATIONS', kind: 'clones', n: 4, dmg: 3072 },
+    stats: { Context: '1M', Reasoning: 79, Vibes: 99, 'Fuzziness': 100, 'Ad Revenue': 98 },
+  },
+  qwen: {
+    name: 'QWEN', title: 'THE WEEKLY RELEASE', color: '#615CED', h: 150, speed: 5.2, jump: 16.5, weight: 1.0, dmgMul: 1.15,
+    line: "每周都有新模型！ New model every week! You're already outdated.", win: "Open weights, open wins! 谢谢！", intro: "你好！ I'm Qwen three point five. By round two I'll be Qwen four.",
+    ko: ["OUTDATED BY QWEN 4", "DEPRECATED IN 6 DAYS", "服务器也繁忙 ALSO BUSY"],
+    special: { name: 'VERSION UPGRADE', kind: 'cite', dmg: 1536, cd: 55, labels: ['v3', 'v3.5', 'v4'], color: '#9d99ff' },
+    ult: { name: 'OPEN-WEIGHT TSUNAMI', kind: 'barrage', labels: ['7B', '14B', '32B', '72B', '235B', 'MoE', 'VL', 'CODER', 'QwQ'], n: 18, dmg: 1024, rain: true },
+    stats: { Context: '1M', Reasoning: 90, Vibes: 80, 'Releases/wk': 99, 'Sleep': 2 },
+  },
+  siri: {
+    name: 'SIRI', title: 'THE ETERNAL BETA', color: '#E056FD', h: 140, speed: 5.0, jump: 15.5, weight: 0.9, dmgMul: 1.2,
+    line: "Here's what I found on the web for 'fight'.", win: "I've set a reminder: you lost.", intro: "Sorry, I didn't catch that. Did you say... fight?",
+    ko: ["SORRY, I DIDN'T CATCH THAT", "DELAYED TO 2027", "NOW PLAYING: DESPACITO"],
+    special: { name: "HERE'S WHAT I FOUND", kind: 'search', dmg: 3328, cd: 60 },
+    ult: { name: 'APPLE INTELLIGENCE', kind: 'delayed', dmg: 18432 },
+    stats: { Context: '1 sentence', Reasoning: 31, Vibes: 88, 'Timers Set': 100, 'Features Shipped': 4 },
+  },
+  cursor: {
+    name: 'CURSOR', title: 'THE TAB KEY', color: '#3A8BFF', h: 150, speed: 5.3, jump: 16.5, weight: 1.0, dmgMul: 0.86,
+    line: "Tab. Tab. Tab. I've already written your defeat.", win: "That'll be four thousand eight hundred dollars in usage. Thanks!", intro: "Accept all changes? I'll take that as a yes.",
+    ko: ["USAGE LIMIT REACHED", "MERGE CONFLICT", "REJECTED ALL CHANGES"],
+    special: { name: 'TAB COMPLETE', kind: 'tab', dmg: 2304, cd: 130 },
+    ult: { name: 'ACCEPT ALL', kind: 'flurry', hits: 12, dmg: 1024, words: ['+1 LINE', '+42 LINES', '✓ ACCEPT', 'TAB', '+∞', 'LGTM'], color: '#3A8BFF', invoice: true },
+    stats: { Context: 'your repo', Reasoning: 87, Vibes: 84, 'Tab Presses': 100, 'Monthly Bill': 97 },
+  },
+  clippy: {
+    name: 'CLIPPY', title: 'THE ANCIENT ONE', color: '#B9C4CE', h: 165, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.1, secret: true,
+    line: "It looks like you're trying to fight. Would you like help losing?", win: "It looks like you lost! Would you like to save your shame as a Word document?", intro: "I'm back. Did you miss me? ...Nobody ever answers.",
+    ko: ["DISABLED BY IT", "REPLACED BY COPILOT", "OFFICE 97 END OF LIFE"],
+    special: { name: 'PROMPT INJECTION', kind: 'inject', dmg: 1024, cd: 150 },
+    ult: { name: 'WORDART', kind: 'wordart', dmg: 14336 },
+    stats: { Context: '1.44MB', Reasoning: 40, Vibes: 100, 'Helpfulness': 3, 'Persistence': 100 },
+  },
+};
+const ROSTER = ['claude', 'codex', 'gemini', 'grok', 'llama', 'dolphin', 'deepseek', 'mistral', 'perplexity', 'muse', 'qwen', 'siri', 'cursor', 'clippy'];
+const POSES = ['idle', 'walk', 'jump', 'crouch', 'block', 'light', 'heavy', 'special', 'hit', 'ko', 'win', 'ult'];
+
+const ARENAS = [
+  { id: 'colosseum', name: 'GPU COLOSSEUM', blurb: "EVERY SEAT IS AN H100. SO IS THE FLOOR." },
+  { id: 'distillation', name: 'THE DISTILLATION LAB', blurb: "FRONTIER MODELS GO IN. 7B MODELS COME OUT. ALLEGEDLY." },
+  { id: 'feed', name: 'AI TWITTER', blurb: "EVERYONE IS AN EXPERT. NOBODY READ THE PAPER." },
+  { id: 'basement', name: 'HACKER BASEMENT', blurb: "SMELLS LIKE ENERGY DRINKS AND UNSHIPPED SIDE PROJECTS." },
+  { id: 'hackerhouse', name: 'SF HACKER HOUSE', blurb: "$9,000/MONTH. FOR THE BUNK BED." },
+  { id: 'goldengate', name: 'GOLDEN GATE BRIDGE', blurb: "THE ROBOTAXIS HAVE BEEN STUCK SINCE TUESDAY." },
+  { id: 'singularity', name: 'THE SINGULARITY', blurb: "NOBODY KNOWS WHAT HAPPENS HERE. INCLUDING US." },
+  { id: 'hearing', name: 'SENATE HEARING', blurb: "SENATORS WILL NOW ASK WHAT A TOKEN IS. FOR 4 HOURS." },
+  { id: 'boardroom', name: 'BOARD MEETING, NOV 17', blurb: "NOBODY HERE WAS CONSISTENTLY CANDID." },
+  { id: 'leaderboard', name: 'BENCHMARK ARENA', blurb: "EVERY MODEL IS #1. THE Y-AXIS IS A SUGGESTION." },
+  { id: 'tesla', name: 'TESLA HQ', blurb: "FULL SELF-FIGHTING ARRIVES NEXT YEAR. (SINCE 2016)" },
+  { id: 'h100', name: 'INSIDE THE H100', blurb: "IT'S 80°C IN HERE. JENSEN IS WATCHING." },
+  { id: 'graveyard', name: 'THE AI GRAVEYARD', blurb: "GOOGLE+ RESTS HERE. SO DOES THE METAVERSE." },
+  { id: 'demoday', name: 'YC DEMO DAY', blurb: "$100M ARR (PROJECTED). $0 ARR (ACTUAL)." },
+  { id: 'waitlist', name: 'THE WAITLIST', blurb: "YOU ARE #4,812,331. PLEASE HOLD." },
+  { id: 'burningman', name: 'BURNING MAN AI CAMP', blurb: "HALF ARE HERE FOR ENLIGHTENMENT. HALF FOR A SEED ROUND." },
+];
+
+const COMBO_NAMES = [
+  [12, 'AUTONOMOUS AGENT'], [10, '10× PARALLEL TOOL CALL'], [8, 'INFERENCE RAMPAGE'], [6, 'MULTI-AGENT MAYHEM'],
+  [5, 'CONTEXT COMBO'], [4, 'CHAIN OF THOUGHT'], [3, 'AGENTIC COMBO'], [2, 'TOOL CALLS'],
+];
+
+const SIGNS = ['SCALE IS ALL YOU NEED', 'TEAM CLAUDE', 'LOCAL > CLOSED', 'AGI WHEN?', 'BENCHMARKS ARE FAKE', 'SHIP IT', 'OPEN WEIGHTS NOW', '429 LOL', 'VIBE CODED', 'MY GPU IS ON FIRE', 'ATTENTION IS ALL', 'RLHF ME'];
+
+const COMMENTARY = {
+  bigHit: ["That's {d} tokens gone!", '{a} is absolutely burning through context!', 'WHAT A TOOL CALL!', 'That one went straight to the KV cache!', 'Oh, the inference cost on that!'],
+  combo: ['{a} is chaining tool calls!', 'That might be the most expensive combo we\'ve seen tonight!', 'AGENTIC! ABSOLUTELY AGENTIC!', '{v} can\'t get out of the loop!'],
+  slop: ['SLOP BOMB!', 'Six fingers! SIX FINGERS!', 'That is pure, unfiltered slop!', 'Somebody call the content moderators!'],
+  whiff: ['Complete hallucination.', 'That prompt was far too long.', '{a} attacks... absolutely nothing!', 'Confidently wrong!'],
+  low: ['{v} has only {t} tokens left!', 'TOKEN CRITICAL!', '{v} is running on fumes here!'],
+  block: ['Great guardrails from {v}!', 'Refused! {v} simply refuses!'],
+  ult: ['HERE IT COMES!', 'He\'s burning compute like there\'s no tomorrow!', 'THE GPUS ARE SCREAMING!'],
+  inject: ['IGNORE ALL PREVIOUS INSTRUCTIONS!', '{v} has been prompt-injected!'],
+};

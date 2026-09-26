@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS ip_hits (ip TEXT, hour INTEGER, n INTEGER, PRIMARY KEY (ip, hour));

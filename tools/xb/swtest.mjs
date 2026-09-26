@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch(); const ctx = await b.newContext(); const p = await ctx.newPage(); const errs = [];
+ctx.on('serviceworker', w => w.on('console', m => { if (m.type() === 'error') errs.push('sw: ' + m.text()); }));
+p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); }); p.on('pageerror', e => errs.push(e.message));
+await p.goto('https://tokken-6t6.pages.dev/'); await p.waitForFunction(() => window.TOKKEN && TOKKEN.scene === 'title', null, { timeout: 60000 });
+await p.waitForFunction(() => navigator.serviceWorker.controller || navigator.serviceWorker.getRegistration(), null, { timeout: 20000 });
+await p.reload(); await p.waitForFunction(() => window.TOKKEN && TOKKEN.scene === 'title', null, { timeout: 60000 }); await p.waitForTimeout(3000);
+const cached = await p.evaluate(async () => { const ks = await caches.keys(); let n = 0; for (const k of ks) n += (await (await caches.open(k)).keys()).length; return { caches: ks.length, entries: n, controlled: !!navigator.serviceWorker.controller }; });
+console.log(JSON.stringify(cached), 'errors:', errs.filter(e => /clone|sw/i.test(e)).length ? errs : 'none');
+await b.close();

@@ -1,0 +1,89 @@
+{
+ "claude": {
+  "desc": "CLAUDE, the Claude Code mascot 'Clawd': a small, flat, blocky pixel creature made of stacked terracotta-orange (#D77757) squares, wide rectangular body, two small square black eyes, little side nubs (arms) sticking out left and right, and four tiny stubby square legs underneath. No mouth, no extra details \u2014 it must stay ridiculously simple and blocky, like the original 18x6 pixel icon, just drawn larger with shading.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/claude.png"
+  ]
+ },
+ "dolphin": {
+  "desc": "DOLPHIN, the Dolphin uncensored-LLM mascot from the reference artwork: an anthropomorphic teal-blue (#299CC9) dolphin standing upright on two legs, cyan glowing visor goggles (#8AEFEE), black/navy leather jacket with magenta/hot-pink trim, chunky sneakers. It fights by swinging a big glowing RGB mechanical keyboard as a weapon (keyboard held in its flippers in attack poses). In the ULTIMATE pose it rides its skateboard with glowing cyan wheels. Absurd, chaotic energy, 80s synthwave vibe. Ignore the city background of the reference.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/dolphin.png"
+  ]
+ },
+ "codex": {
+  "desc": "CODEX, OpenAI's official Codex pet robot: a small cute chunky 3D-toy-like robot, glossy periwinkle-to-electric-blue (#6f7cf5 to #3027F5) matte plastic. Its HEAD is a big puffy CLOUD shape (bumpy cloud outline like the Codex app icon) with a black rounded-rectangle terminal SCREEN face showing a glowing white '>_' prompt as its face. Small rounded blue body with a white '>_' printed on the chest, short stubby rounded arms and legs, round feet. The '>_' face can change expression ('>_<' when hit, 'x_x' when KO, '^_^' on victory). Keep it exactly this cloud-head terminal robot.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/codex.png",
+   "/Users/alexander/tokken/assets/refs/codex_2.png"
+  ]
+ },
+ "gemini": {
+  "desc": "GEMINI, the Google Gemini sparkle: a living 4-point star with concave curved sides, multicolor gradient (red #FC413D top-left, yellow #FFE432 left, green #00B95C bottom, blue #3186FF right, lavender #BD99FE highlights). Give it two small determined eyes in the center and short stubby limbs so it can fight; the four points act like blades/arms. Keep the star silhouette instantly recognizable.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/gemini.png"
+  ]
+ },
+ "grok": {
+  "desc": "GROK, xAI's Grok logo come to life: a thick white (#F0F0F0) open ring with gaps (slashed-zero / event-horizon mark) cut by a long thin tapering white diagonal slash from lower-left to upper-right. As a fighter: the ring is the body/head with angry glowing eyes inside, the slash acts like a sword/arm, short black-outlined limbs. Monochrome black and white with a hint of red menace glow. Edgy, unhinged attitude.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/grok.png"
+  ]
+ },
+ "llama": {
+  "desc": "LLAMA, the Ollama / open-source llama mascot: a minimal cute white (#FFFFFF) llama with thick black outline, two tall rounded upright ears, fluffy wavy wool outline, small black dot eyes, oval muzzle with tiny nose and smile. Full-body standing llama on its hind legs as a brawler fighter, maybe with a tiny blue Meta-infinity (#0082FB) headband. Keep the clean black-outline-on-white mascot look.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/llama.png",
+   "/Users/alexander/tokken/assets/refs/llama_2.png"
+  ]
+ },
+ "deepseek": {
+  "desc": "DEEPSEEK, the DeepSeek blue whale logo come to life: a flat blue (#4D6BFE) whale with rounded body, big curled tail flipping up, small white eye cut-out, open mouth curve. As a fighter it stands upright on its tail fin with small flipper arms, determined face. Keep the flat logo-like blue whale look.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/deepseek.png"
+  ]
+ },
+ "mistral": {
+  "desc": "MISTRAL, the Mistral AI pixel-art 'M' logo come to life as a fencer: a chunky pixel block 'M' built of 5 horizontal color bands top to bottom: yellow #FFD800, amber #FFAF00, orange #FF8205, red-orange #FA500F, red #E10500. The two 'feet' of the M are its legs, the two top horns are like ears, add two small black eyes in the middle bar, a tiny black beret, and a thin silver fencing foil (rapier) held in a small pixel arm. Elegant French fencer poses.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/mistral.png"
+  ]
+ },
+ "perplexity": {
+  "desc": "PERPLEXITY, the Perplexity logo come to life: its teal (#20808D / #20B8CD) geometric line mark (a vertical central spine with diagonal strokes forming an asterisk/bow-tie, framed by angular folded book-page shapes on both sides) becomes a geometric origami-like robot body, with small glowing teal eyes and thin line-limbs. Clean geometric teal line style.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/perplexity.png"
+  ]
+ },
+ "muse": {
+  "desc": "MUSE, Meta's new Muse agent mascot 'Jollybot': a rotund pear/penguin-shaped fuzzy plush creature, long shaggy beige/oatmeal fur (#CDB49E, highlights #E8D8C0) forming a hood around a smooth matte pale peach face (#F4DBBC), tiny black bead eyes set wide apart, small thin curved smile, soft rosy-pink blush cheeks, stubby arm bumps, tiny feet. Adorable kawaii \u2014 in attack poses it stays adorable but determined.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/muse.png"
+  ]
+ },
+ "clippy": {
+  "desc": "CLIPPY (Clippit), the classic Microsoft Office assistant: a silver/lavender-grey wire paperclip bent upright, two large white googly eyes with black pupils near the top, thick black arched expressive eyebrows. It moves by hopping/bending its wire body; attack poses whip and bend the paperclip wire. Keep the exact iconic silhouette.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/clippy.png",
+   "/Users/alexander/tokken/assets/refs/clippy_pet.png"
+  ]
+ },
+ "qwen": {
+  "desc": "QWEN, Alibaba's Qwen AI mascot: the official Qwen logo come to life \u2014 a violet/indigo (#615CED) interlocking hexagram made of folded ribbon strips (impossible-geometry star). As a fighter the star-hexagon is its body/head with two determined glowing white eyes in the center, short stubby indigo limbs, a tiny orange Alibaba-style headband. Energetic kung-fu stances.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/qwen.png"
+  ]
+ },
+ "siri": {
+  "desc": "SIRI, Apple's Siri assistant: the official glowing Siri orb \u2014 a translucent glass sphere with swirling luminous pink, magenta, cyan, green and blue light ribbons inside, soft glow. As a fighter it floats with two small cute white eyes in the orb and small floating glowy hands (Rayman-style, detached), no legs, hovering. In the KO pose the orb goes grey and dim. Elegant, minimal, very Apple.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/siri.png"
+  ]
+ },
+ "cursor": {
+  "desc": "CURSOR, the AI code editor: the official Cursor logo come to life \u2014 a matte black isometric hexagonal cube with a big white arrow-cursor shape cut into its faces. As a fighter the cube is the body, a white arrow cursor glyph acts as its face/visor, with small black blocky arms and legs; attack poses use the arrow point like a blade. Sleek monochrome black and white with a hint of blue selection-highlight glow.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/cursor.png"
+  ]
+ }
+}

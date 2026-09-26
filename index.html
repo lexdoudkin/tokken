@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="TOKKEN">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/icon-180.png"><link rel="icon" type="image/png" sizes="64x64" href="icons/icon-64.png"><link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#000000">
+<title>TOKKEN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#000}
+  html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
+  body{display:flex;align-items:center;justify-content:center}
+  canvas{display:block;image-rendering:pixelated;background:#07070d}
+</style></head>
+<body><canvas id="game"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/input.js"></script>
+<script src="js/game.js"></script>
+<script src="js/snap.js"></script>
+<script src="js/retro.js"></script>
+<script src="js/match.js"></script>
+<script src="js/net.js"></script>
+<script src="js/board.js"></script>
+<script src="js/main.js"></script>
+<script src="js/touch.js"></script>
+<script>if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
+</body></html>

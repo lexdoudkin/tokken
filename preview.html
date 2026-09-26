@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Tokken preview</title>
+<style>body{margin:0;background:#0b0b14;color:#fff;font:700 16px system-ui;display:flex;flex-direction:column;align-items:center}h1{font-size:64px;letter-spacing:.1em;margin:20px 0 0;background:linear-gradient(#ffd23f,#ff5e1f);-webkit-background-clip:text;color:transparent;font-style:italic}canvas{image-rendering:pixelated;border:1px solid #333;margin-top:12px}.row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:1100px;margin:16px}.row div{text-align:center;font-size:12px;opacity:.8}.row img{height:110px;image-rendering:pixelated;display:block}</style></head><body>
+<h1>TOKKEN</h1><div>THE ROSTER, live sprite loop (Mistral regenerating)</div><canvas id=c width=1300 height=560></canvas>
+<div class=row id=r></div>
+<script>
+const P=['idle','walk','jump','crouch','block','light','heavy','special','hit','ko','win','ult'];
+const F=['claude','codex','gemini','grok','llama','dolphin','deepseek','perplexity','muse','clippy'],im={},meta={};Promise.all(F.map(f=>fetch(`assets/sprites/${f}/meta.json`).then(r=>r.json()).then(m=>{meta[f]=m;im[f]={};P.forEach(p=>{const i=new Image();i.src=`assets/sprites/${f}/${p}.png`;im[f][p]=i;if(0)r.insertAdjacentHTML('beforeend',`<div><img src="${i.src}">${p}</div>`)})}))).then(()=>requestAnimationFrame(loop));
+const seq=[['idle',40],['walk',8],['idle',8],['walk',8],['idle',8],['light',12],['idle',10],['heavy',18],['idle',10],['jump',24],['crouch',16],['special',20],['hit',14],['ult',40],['win',40],['ko',40]];
+let t=0,si=0,st=0,x=450;const c=document.getElementById('c').getContext('2d');c.imageSmoothingEnabled=false;
+function loop(){t++;st++;if(st>seq[si][1]){st=0;si=(si+1)%seq.length}const p=seq[si][0];
+c.fillStyle='#0b0b14';c.fillRect(0,0,1300,560);c.fillStyle='#1c1c2e';c.fillRect(0,250,1300,14);c.fillRect(0,530,1300,14);
+F.forEach((f,k)=>{const m=meta[f][p]||meta[f].idle,i=im[f][p],s=130/meta[f].idle[1],X=130+(k%5)*260,Y=k<5?250:530;
+const bob=p=='idle'?Math.sin(t/8)*3:0,jy=p=='jump'?-Math.sin(st/24*Math.PI)*90:0,sq=p=='idle'?1+Math.sin(t/8)*0.03:1;
+c.save();c.translate(X,Y+jy);c.scale(s/sq,s*sq);if(p=='ult'){c.shadowColor=k?'#0ff':'#ffb000';c.shadowBlur=40}c.drawImage(i,-m[3],-m[2]+bob);c.restore()});
+c.fillStyle='#ffd23f';c.font='900 28px system-ui';c.fillText(p.toUpperCase(),20,40);
+
+requestAnimationFrame(loop)}
+</script></body></html>

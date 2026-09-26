@@ -1,0 +1,3 @@
+.env.tokken
+node_modules/
+.wrangler/

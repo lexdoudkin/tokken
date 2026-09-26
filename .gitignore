@@ -1,0 +1,19 @@
+# secrets — never commit
+worker/.env.tokken
+tools/.secrets/
+# build output + deps
+dist/
+node_modules/
+**/node_modules/
+.wrangler/
+**/.wrangler/
+# regenerable / large working files
+assets/gen/
+assets/raw/
+assets/refs/raw/
+assets/voice_src/
+assets/voice_archive/
+assets/audition/
+tools/xb/*.png
+tools/balance_last.json
+.DS_Store

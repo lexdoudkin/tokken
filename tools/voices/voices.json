@@ -1,0 +1,20 @@
+{
+ "announcer": {
+  "voice_id": "iPMRK4FxagSXo6ZSFJb7",
+  "previews": 3,
+  "gids": [
+   "iPMRK4FxagSXo6ZSFJb7",
+   "gtmMTs9CrDp5XrPLUOYh",
+   "YAmkycrmV4bhSMSGfJIi"
+  ]
+ },
+ "caster": {
+  "voice_id": "tCUyT7eOJKi6O9Ar439G",
+  "previews": 3,
+  "gids": [
+   "tCUyT7eOJKi6O9Ar439G",
+   "az09KsJuYJxpKYDEzNQP",
+   "1MtQ2uEDysIF6ys0Bkcp"
+  ]
+ }
+}
