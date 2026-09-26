@@ -10,7 +10,9 @@ const Net = (() => {
   let turnP = null;
   function iceConfig() {
     turnP = turnP || Promise.race([fetch('https://api.tokken.win/turn').then(r => r.json()), new Promise(r => setTimeout(() => r(null), 2500))])
-      .then(d => { st.relay = !!(d && d.relay); return d && d.iceServers ? { iceServers: [...ICE.iceServers, ...d.iceServers.filter(s => String(s.urls).includes('turn'))] } : ICE; }).catch(() => ICE);
+      .then(d => { st.relay = !!(d && d.relay); const cfg = d && d.iceServers ? { iceServers: [...ICE.iceServers, ...d.iceServers.filter(s => String(s.urls).includes('turn'))] } : ICE;
+        if (/[?&]relay=1/.test(location.search)) cfg.iceTransportPolicy = 'relay';   // test hook: force the TURN path (what CGNAT'd cellular players end up using)
+        return cfg; }).catch(() => ICE);
     return turnP;
   }
   function watchFail(conn) { const pc = conn.peerConnection; if (!pc) return; pc.addEventListener('iceconnectionstatechange', () => { if (pc.iceConnectionState === 'failed' && st.status !== 'connected') { st.status = 'error'; st.error = 'NETWORK BLOCKED THE CONNECTION'; } }); }

@@ -6,7 +6,8 @@ const opts = process.env.CHROME ? { executablePath: process.env.CHROME } : {};
 const b = await chromium.launch({ ...opts, args: ['--autoplay-policy=no-user-gesture-required', '--disable-background-timer-throttling', '--disable-renderer-backgrounding'] });
 const p = await (await b.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
 const errs = []; p.on('pageerror', e => errs.push(e.message));
-await p.goto(role === 'guest' ? `${U}?join=${code}` : U, { waitUntil: 'load' });
+const Q = process.env.RELAY ? 'relay=1' : '';
+await p.goto(role === 'guest' ? `${U}?join=${code}&${Q}` : `${U}?${Q}`, { waitUntil: 'load' });
 await p.waitForFunction(() => window.TOKKEN && (TOKKEN.scene === 'title' || TOKKEN.scene === 'online'), null, { timeout: 90000 });
 await p.evaluate(() => { if (!Audio.muted) Audio.toggleMute(); });
 // bot drives the local controller
@@ -29,7 +30,7 @@ while (Date.now() - t0 < +secs * 1000) {
   if (s.scene === 'results' || (s.scene === 'fight' && s.sim === lastSim && s.sim > 0)) { console.log('STATE', JSON.stringify(s)); if (s.scene === 'results') break; }
   lastSim = s.sim;
 }
-const fin = await p.evaluate(() => ({ scene: TOKKEN.scene, winner: TOKKEN.match && TOKKEN.match.winner && TOKKEN.match.winner.id, rounds: TOKKEN.match && TOKKEN.match.round, sim: Net.st.sim, netRtt: Net.st.netRtt, path: Net.st.path, delay: Net.st.delay, rollbacks: Net.st.rollbacks, maxDepth: Net.st.maxDepth, desync: Net.st.desync, hashesChecked: Net.st.rb ? Net.st.rb.reported.size : 0, fastLane: !!(Net.st.fast && Net.st.fast.open), tokens: TOKKEN.match ? TOKKEN.match.f.map(f => f.tokens + '/' + f.wins) : [] }));
+const fin = await p.evaluate(() => ({ scene: TOKKEN.scene, winner: TOKKEN.match && TOKKEN.match.winner && TOKKEN.match.winner.id, rounds: TOKKEN.match && TOKKEN.match.round, sim: Net.st.sim, netRtt: Net.st.netRtt, path: Net.st.path, relay: Net.st.relay, delay: Net.st.delay, rollbacks: Net.st.rollbacks, maxDepth: Net.st.maxDepth, desync: Net.st.desync, hashesChecked: Net.st.rb ? Net.st.rb.reported.size : 0, fastLane: !!(Net.st.fast && Net.st.fast.open), tokens: TOKKEN.match ? TOKKEN.match.f.map(f => f.tokens + '/' + f.wins) : [] }));
 samples.sort((a, b) => a - b);
 console.log('FINAL', role, JSON.stringify({ ...fin, rttMedian: samples[samples.length >> 1], rttMax: samples[samples.length - 1], stallSamples: stalls, errors: errs.slice(0, 3) }));
 await b.close();
