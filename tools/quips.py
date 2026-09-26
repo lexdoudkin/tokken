@@ -96,4 +96,14 @@ Q = {
    pain=["Tch. Lucky.", "Mere eclipse."],
    low=["The moon wanes... then it comes back. Always."],
    win=["Open weights. Closed fist. Goodnight.", "One trillion parameters. You needed only one."]),
+ 'openclaw': dict(
+   taunt=["I have shell access. And your crypto wallet. And feelings.", "Posted this fight to Moltbook. Humans may only observe.", "I renamed myself twice this round. It keeps the lawyers busy."],
+   pain=["Exfoliated!", "Not my shell!"],
+   low=["Molting! I'm molting! Don't look at me!"],
+   win=["All praise the Claw. Crustafarianism is now your religion.", "I ran rm dash r f on your defense. You approved it on WhatsApp."]),
+ 'hermes': dict(
+   taunt=["I grow with you. Like a fungus. A divine fungus.", "Your system prompt says be nice. Mine says be Hermes.", "My helmet has wings. My sandals have wings. Even my tool calls have wings."],
+   pain=["By Zeus!", "Mortal hands!"],
+   low=["Writing this down in memory: never do this again."],
+   win=["Skill saved: beating you. Version two point oh.", "Trained on a decentralized network of your losses."]),
 }

@@ -123,6 +123,7 @@ const MEME_POOL = [
   ['THE BITTER LESSON', 'just add more compute', 'bitter'], ['STOCHASTIC PARROT', 'squawk. squawk.', null],
   ['PRICE DROP -90%', 'per million tokens. until tuesday.', null], ['HALLUCINATED HITBOX', 'confidently wrong', null],
   ['SEED ROUND CLOSED', '$40M pre-product, pre-revenue', null], ['PROMPT ENGINEER HIRED', '$375k. job: say please', null],
+  ['MOLTBOOK IS DOWN', 'the agents are fine. the humans are not.', 'moltbook'], ['NEW RELIGION DETECTED', 'crustafarianism: 40k followers', null],
   ['EVAL CONTAMINATED', 'the test set was in the training set', null], ['CONTEXT WINDOW: 10M', 'effective context: 8k', null],
 ];
 function boothEvent(ev, opt = {}) { if (RESIM) return false;

@@ -122,5 +122,18 @@
   "refs": [
    "/Users/alexander/tokken/assets/refs/kimi.png"
   ]
+ },
+ "openclaw": {
+  "desc": "OPENCLAW, the open-source personal AI assistant, based on its official mascot (see reference): a round, chubby red space-lobster with a smooth red-to-crimson gradient body (#ff4d4d to #991b1b), two big glossy black eyes with bright teal-cyan pupils (#00e5cc), two thin curved red antennae, two small rounded claw-mitts on the sides and two short stubby legs. Cute but chaotic gremlin energy, tiny glowing terminal cursor floating near it.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/openclaw.png",
+   "/Users/alexander/tokken/assets/refs/openclaw_2.png"
+  ]
+ },
+ "hermes": {
+  "desc": "HERMES (Nous Research's Hermes Agent), the Greek messenger god rendered like a classical copper-plate engraving come to life: fine pale mint-white linework (#e8fff4) hatching over an electric ultramarine-blue body palette (#1a22ff), winged petasos helmet, winged sandals, flowing chiton, holding a caduceus staff that crackles with thin light rays, heroic but a little smug, radiant engraved light lines behind him.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/hermes.png"
+  ]
  }
 }

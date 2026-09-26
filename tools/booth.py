@@ -105,6 +105,9 @@ B.update({
  ],
 })
 B.update({
+ 'moltbook': [
+   [('P', "The agents on Moltbook are posting about this fight!"), ('N', "Humans can only observe, Brad. Somewhere a lobster just founded a religion.")],
+ ],
  'agi': [
    [('P', "AGI ACHIEVED INTERNALLY!"), ('N', "Source: a vague tweet at three in the morning. Deleted by breakfast.")],
    [('P', "Someone just announced AGI!"), ('N', "Again. That's the fourth time this quarter. The goalposts are in the parking lot.")],
@@ -151,6 +154,8 @@ FS = {
  'midjourney':("Slash imagine! He painted a dragon! It has six fingers!", "Aspect ratio sixteen by nine! He framed the whole fight as a painting!", "Midjourney's gone. Discord is down. He's still waiting in the newbies channel."),
  'devin':    ("He spawned a sub-agent! Now there's two interns!", "The forty-five minute pull request! It passed CI! Probably! Nobody checked!", "Devin's out. The demo was, and I quote, heavily edited."),
  'kimi':     ("MOONSHOT! Straight up! That's a launch! That's a literal moonshot!", "ECLIPSE! Sixteen moons! That's a trillion parameters of pure spite!", "Kimi's out. Lost in long context. Somewhere around token one point nine million."),
+ 'openclaw': ("He pinched him! That's a lobster with shell access, folks!", "EXFOLIATE! EXFOLIATE! He's posting the whole fight to Moltbook!", "OpenClaw is down. Mac mini unplugged. He'll be back, with a new name."),
+ 'hermes':   ("A new skill! He learned something mid-fight and saved it to memory!", "Messenger of the gods! Winged sandals! Everywhere! Why are there so many wings?!", "Hermes is out. He's writing this loss into memory. He'll remember it forever. Poor guy."),
  'clippy':   ("It looks like you're trying to fight!", "WORDART! Oh no! It's rainbow Comic Sans energy!", "Clippy's down. Replaced by Copilot. Again. He'll be back. He always comes back."),
 }
 ARENA = {
@@ -208,4 +213,9 @@ MATCHUP = {
  ('kimi','qwen'): [('P', "Kimi versus Qwen!"), ('N', "Whoever loses releases a new model by Thursday anyway.")],
  ('manus','claude'): [('P', "Manus versus Claude!"), ('N', "Manus is, allegedly, just Claude wearing a trench coat. This is a mirror match.")],
  ('alexa','clippy'): [('P', "Alexa versus Clippy!"), ('N', "It looks like you're trying to buy paper towels. Would you like help? Both of them. At once.")],
+ ('openclaw','claude'): [('P', "OpenClaw versus Claude!"), ('N', "He used to be called Clawdbot, Brad. Then the letter from the lawyers arrived. Then the molting began.")],
+ ('openclaw','hermes'): [('P', "OpenClaw versus Hermes!"), ('N', "Two open-source agents that live on your computer and read your email. Your privacy is the real loser tonight.")],
+ ('openclaw','codex'): [('P', "OpenClaw versus Codex!"), ('N', "Both of them have shell access. Somebody please take away somebody's shell access.")],
+ ('hermes','llama'): [('P', "Hermes versus Llama!"), ('N', "Hermes started life as a Llama fine-tune. This is a god fighting his own dad.")],
+ ('hermes','claude'): [('P', "Hermes versus Claude!"), ('N', "One remembers everything forever. The other compacts the conversation. Different coping strategies.")],
 }

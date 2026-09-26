@@ -270,5 +270,35 @@
   "intro": "Moonshot! Literally.",
   "say_special": "Moonshot",
   "say_ult": "Eclipse"
+ },
+ "openclaw": {
+  "name": "OPENCLAW",
+  "ult": "EXFOLIATE!",
+  "special": "PINCH",
+  "ko": [
+   "MOLTED",
+   "PROMPT INJECTED VIA EMAIL",
+   "MAC MINI UNPLUGGED"
+  ],
+  "line": "EXFOLIATE! EXFOLIATE!",
+  "win": "Task complete. I also booked you a flight and posted this to Moltbook.",
+  "intro": "I read your emails. All of them. You asked me to.",
+  "say_special": "Pinch",
+  "say_ult": "Exfoliate! Exfoliate"
+ },
+ "hermes": {
+  "name": "HERMES",
+  "ult": "MESSENGER OF THE GODS",
+  "special": "NEW SKILL",
+  "ko": [
+   "SKILL NOT FOUND",
+   "BANISHED FROM OLYMPUS",
+   "SANDALS UNTIED"
+  ],
+  "line": "I am Hermes, messenger of the gods.",
+  "win": "Another skill acquired. The gods are pleased. The GPUs are distributed.",
+  "intro": "Behold! I have learned a new skill: your defeat. Saved to memory.",
+  "say_special": "New skill",
+  "say_ult": "Messenger of the gods"
  }
 }

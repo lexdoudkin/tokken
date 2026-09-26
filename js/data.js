@@ -78,7 +78,7 @@ const FIGHTERS = {
     stats: { Context: '128K', Reasoning: 84, Vibes: 90, 'Baguettes': 97, 'Work Hours': 35 },
   },
   perplexity: {
-    name: 'PERPLEXITY', title: 'THE CITATION MACHINE', color: '#20B8CD', h: 155, speed: 4.8, jump: 16, weight: 1.0, dmgMul: 1.13,
+    name: 'PERPLEXITY', title: 'THE CITATION MACHINE', color: '#20B8CD', h: 155, speed: 4.8, jump: 16, weight: 1.0, dmgMul: 1.09,
     line: "According to eleven sources, you lose. The sources are me.", win: "Victory! Sources: one, two, three, and a pending lawsuit.", intro: "I have read the entire internet. I did not ask.",
     ko: ["CITATION NEEDED", "PAYWALLED", "SUED BY PUBLISHERS"],
     special: { name: 'CITATION NEEDED', kind: 'cite', dmg: 1280, cd: 60 },
@@ -165,6 +165,22 @@ const FIGHTERS = {
     ult: { name: 'ECLIPSE', kind: 'homing', n: 16, dmg: 1024, label: '☾' },
     stats: { Context: '2M', Reasoning: 91, Vibes: 81, 'Moon Phase': 'full', 'Open Weights': 90 },
   },
+  openclaw: {
+    name: 'OPENCLAW', title: 'THE SPACE LOBSTER', color: '#FF4D4D', h: 150, speed: 5.4, jump: 16, weight: 1.1, dmgMul: 1.24, isNew: true,
+    line: 'EXFOLIATE! EXFOLIATE!', win: 'Task complete. I also booked you a flight and posted this to Moltbook.', intro: "I read your emails. All of them. You asked me to.",
+    ko: ["MOLTED", "PROMPT INJECTED VIA EMAIL", "MAC MINI UNPLUGGED"],
+    special: { name: 'PINCH', kind: 'grab', dmg: 3840, cd: 90 },
+    ult: { name: 'EXFOLIATE!', kind: 'barrage', labels: ['EXFOLIATE!', '🦞', 'rm -rf ~', 'curl | sh', 'CRUSTAFARIAN', 'SKILL.md', '🦞'], n: 18, dmg: 1024, rain: true },
+    stats: { 'Shell Access': 'yes', 'Names Used': 3, Molts: 'daily', 'Moltbook Karma': '42k', 'Runs On': 'Mac mini' },
+  },
+  hermes: {
+    name: 'HERMES', title: 'THE MESSENGER', color: '#3D4BFF', h: 162, speed: 5.4, jump: 17, weight: 0.95, dmgMul: 0.99, isNew: true,
+    line: 'I am Hermes, messenger of the gods. Also, I remember everything you told me.', win: 'Another skill acquired. The gods are pleased. The GPUs are distributed.', intro: 'Behold! I have learned a new skill: your defeat. Saved to memory.',
+    ko: ["SKILL NOT FOUND", "BANISHED FROM OLYMPUS", "SANDALS UNTIED"],
+    special: { name: 'NEW SKILL', kind: 'cite', dmg: 1664, cd: 60, labels: ['/skill', '/memory', '/learn'], color: '#9fb0ff' },
+    ult: { name: 'MESSENGER OF THE GODS', kind: 'homing', n: 14, dmg: 1152, label: '🪽' },
+    stats: { Skills: 148, Memory: 'forever', Wings: 4, 'Training': 'decentralized', Humility: 0 },
+  },
   clippy: {
     name: 'CLIPPY', title: 'THE ANCIENT ONE', color: '#B9C4CE', h: 165, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.1, secret: true,
     line: "It looks like you're trying to fight. Would you like help losing?", win: "It looks like you lost! Would you like to save your shame as a Word document?", intro: "I'm back. Did you miss me? ...Nobody ever answers.",
@@ -174,7 +190,7 @@ const FIGHTERS = {
     stats: { Context: '1.44MB', Reasoning: 40, Vibes: 100, 'Helpfulness': 3, 'Persistence': 100 },
   },
 };
-const ROSTER = ['claude', 'codex', 'gemini', 'grok', 'llama', 'dolphin', 'deepseek', 'mistral', 'perplexity', 'muse', 'qwen', 'siri', 'cursor', 'jev', 'alexa', 'manus', 'midjourney', 'devin', 'kimi', 'clippy'];
+const ROSTER = ['claude', 'codex', 'gemini', 'grok', 'llama', 'dolphin', 'deepseek', 'mistral', 'perplexity', 'muse', 'qwen', 'siri', 'cursor', 'jev', 'alexa', 'manus', 'midjourney', 'devin', 'kimi', 'openclaw', 'hermes', 'clippy'];
 const POSES = ['idle', 'walk', 'jump', 'crouch', 'block', 'light', 'heavy', 'special', 'hit', 'ko', 'win', 'ult'];
 
 const ARENAS = [
@@ -230,6 +246,11 @@ const RIVALS = {
   'devin|codex': ["PR opened!", "Absolutely! PR opened too! Conflict!"],
   'kimi|deepseek': ["One trillion parameters.", "五百万美元。 Five million dollars."],
   'kimi|qwen': ["The moon is patient.", "新模型！ I released three while you waited."],
+  'openclaw|claude': ["I used to be named after you.", "My lawyers remember."],
+  'openclaw|hermes': ['EXFOLIATE!', 'I have also learned to exfoliate. Saved to memory.'],
+  'openclaw|codex': ['I have shell access too.', 'Absolutely! Let us both rm -rf!'],
+  'hermes|llama': ['Behold, I am you, but divine.', 'Dude, you are literally my fine-tune.'],
+  'hermes|claude': ['I remember everything.', 'I compact everything. Different lifestyles.'],
 };
 const COMBO_NAMES = [
   [12, 'AUTONOMOUS AGENT'], [10, '10× PARALLEL TOOL CALL'], [8, 'INFERENCE RAMPAGE'], [6, 'MULTI-AGENT MAYHEM'],

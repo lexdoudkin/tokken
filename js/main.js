@@ -209,7 +209,7 @@ function update() {
       if ((Input.keys.has('Enter') || localCtrl.pressed('start')) && online.typed.length === 4 && Net.st.status !== 'connecting') { Audio.S.select(); Net.join(online.typed); }
     }
   } else if (scene === 'select') {
-    const cols = 7;
+    const cols = 8;
     if (sel.stage && !sel.online) { scene = 'stage'; sceneT = 0; return; }
     if (!sel.online && --sel.timer <= 0) { sel.done = [true, true]; }
     const nav = (i, c) => {
@@ -466,7 +466,7 @@ function drawNetHUD(c) {
   if (update.stalled) { c.fillStyle = 'rgba(0,0,0,0.5)'; c.fillRect(0, H / 2 - 40, W, 80); txt(c, online.rivalHidden ? 'RIVAL TABBED OUT — WAITING…' : 'WAITING FOR OPPONENT…', W / 2, H / 2 + 8, 18, '#ffd23f', 'Press Start 2P'); }
 }
 const BOOT = ['TOKKEN BIOS v1.3  (C) 1997-2026 TOKKEN ENTERTAINMENT INC.', 'DETECTING GPUS........ 0 FOUND', 'RENTING 1x H100 @ $2.49/HR........ OK', 'DOWNLOADING MORE RAM........ 100%',
-  'LOADING 20 AGENTS........ OK', 'ALIGNING MODELS........ SKIPPED (DEADLINE)', 'TOKENIZING THE CROWD........ OK', 'CALIBRATING JEV........ {"ok": true}', 'WARMING UP THE ANNOUNCER........ OK', 'REMOVING SAFETY RAILS........ JK'];
+  `LOADING ${ROSTER.length} AGENTS........ OK`, 'ALIGNING MODELS........ SKIPPED (DEADLINE)', 'TOKENIZING THE CROWD........ OK', 'CALIBRATING JEV........ {"ok": true}', 'WARMING UP THE ANNOUNCER........ OK', 'REMOVING SAFETY RAILS........ JK'];
 const TIPS = ['TIP: JEV SPEAKS ONLY JSON', 'TIP: DEEPSEEK WILL DISTILL YOUR ULT', 'TIP: CODEX NEVER RUNS THE TESTS', 'TIP: SLOP BOMB COSTS 25 COMPUTE', 'TIP: BLOCKING IS ALSO ALIGNMENT', 'TIP: MANUS IS STILL ON THE WAITLIST', 'TIP: CLAUDE WILL APOLOGIZE. THEN HIT YOU.'];
 function drawLoading(c) {
   c.fillStyle = '#05050c'; c.fillRect(0, 0, W, H);
@@ -609,7 +609,7 @@ function drawSelect(c) {
     if (sel.done[i]) chrome(c, 'LOCKED IN', x, 660, 24, { tone: 'gold' });
   });
   // portrait grid (Tekken style)
-  const cols = 7, pw = 80, ph = 80, gx = W / 2 - (cols * (pw + 6)) / 2, gy = 100;
+  const cols = 8, pw = 80, ph = 80, gx = W / 2 - (cols * (pw + 6)) / 2, gy = 100;
   ROSTER.forEach((id, k) => {
     const x = gx + (k % cols) * (pw + 6), y = gy + Math.floor(k / cols) * (ph + 6), f = FIGHTERS[id];
     const hidden = f.secret && sel.cur[0] !== k && sel.cur[1] !== k;

@@ -1,0 +1,24 @@
+{
+ "brief": "Grand theatrical ancient Greek god with a booming resonant baritone, archaic flowery speech delivered with great pomp, smug and self-important, occasionally dropping modern tech jargon with total seriousness",
+ "tag": "[dramatically] ",
+ "lines": {
+  "v_hermes_line": "I am Hermes, messenger of the gods. Also, I remember everything you told me.",
+  "v_hermes_intro": "Behold! I have learned a new skill: your defeat. Saved to memory.",
+  "v_hermes_winq": "Another skill acquired. The gods are pleased. The GPUs are distributed.",
+  "v_hermes_atk1": "Swift!",
+  "v_hermes_atk2": "By the caduceus!",
+  "v_hermes_hurt1": "Oof, mortal!",
+  "v_hermes_hurt2": "My sandals!",
+  "v_hermes_ko": "Skill... not... found...",
+  "v_hermes_special": "Behold, a new skill!",
+  "v_hermes_ult": "Messenger... of the GODS!",
+  "v_hermes_taunt0": "I grow with you. Like a fungus. A divine fungus.",
+  "v_hermes_taunt1": "Your system prompt says be nice. Mine says be Hermes.",
+  "v_hermes_taunt2": "My helmet has wings. My sandals have wings. Even my tool calls have wings.",
+  "v_hermes_pain0": "By Zeus!",
+  "v_hermes_pain1": "Mortal hands!",
+  "v_hermes_low0": "Writing this down in memory: never do this again.",
+  "v_hermes_winq1": "Skill saved: beating you. Version two point oh.",
+  "v_hermes_winq2": "Trained on a decentralized network of your losses."
+ }
+}

@@ -1,0 +1,24 @@
+{
+ "brief": "Tiny hyper-excited cartoon space lobster with a squeaky, slightly metallic synthetic voice, chaotic gremlin energy, shouts like a Dalek when excited, talks fast and proud about having shell access",
+ "tag": "[excited] ",
+ "lines": {
+  "v_openclaw_line": "EXFOLIATE! EXFOLIATE!",
+  "v_openclaw_intro": "I read your emails. All of them. You asked me to.",
+  "v_openclaw_winq": "Task complete. I also booked you a flight and posted this to Moltbook.",
+  "v_openclaw_atk1": "Pinch!",
+  "v_openclaw_atk2": "EXFOLIATE!",
+  "v_openclaw_hurt1": "Crunch!",
+  "v_openclaw_hurt2": "Not the antennae!",
+  "v_openclaw_ko": "Unplugged... from the Mac mini...",
+  "v_openclaw_special": "Pinch pinch!",
+  "v_openclaw_ult": "EXFOLIATE! EXFOLIATE!",
+  "v_openclaw_taunt0": "I have shell access. And your crypto wallet. And feelings.",
+  "v_openclaw_taunt1": "Posted this fight to Moltbook. Humans may only observe.",
+  "v_openclaw_taunt2": "I renamed myself twice this round. It keeps the lawyers busy.",
+  "v_openclaw_pain0": "Exfoliated!",
+  "v_openclaw_pain1": "Not my shell!",
+  "v_openclaw_low0": "Molting! I'm molting! Don't look at me!",
+  "v_openclaw_winq1": "All praise the Claw. Crustafarianism is now your religion.",
+  "v_openclaw_winq2": "I ran rm dash r f on your defense. You approved it on WhatsApp."
+ }
+}

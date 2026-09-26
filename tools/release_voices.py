@@ -11,6 +11,8 @@ BRIEF={
  'manus':("Smug, breathy Silicon Valley launch-video narrator, close-mic ASMR whisper, slow and reverent with dramatic pauses as if every sentence is a world-changing keynote reveal, tiny smug chuckles",'[whispers] '),
  'midjourney':("Booming theatrical pirate captain with a raspy gravelly voice and rolling R's, flamboyant artsy flair like a painter turned buccaneer, hearty laughs",'[pirate voice] '),
  'devin':("Over-caffeinated nervous young male junior engineer live on a demo stream, very fast Californian speech, voice cracks when excited, nervous laughter, overselling everything",'[nervously] '),
+ 'openclaw':("Tiny hyper-excited cartoon space lobster with a squeaky, slightly metallic synthetic voice, chaotic gremlin energy, shouts like a Dalek when excited, talks fast and proud about having shell access",'[excited] '),
+ 'hermes':("Grand theatrical ancient Greek god with a booming resonant baritone, archaic flowery speech delivered with great pomp, smug and self-important, occasionally dropping modern tech jargon with total seriousness",'[dramatically] '),
  'kimi':("Over-dramatic young female anime ninja heroine with a light East Asian accent, intense whispers that explode into shouts, heavy breaths, emphasis like a shonen anime English dub",'[dramatically] '),
 }
 X={
@@ -18,6 +20,8 @@ X={
  'manus':{'atk1':"Executing.",'atk2':"Step four... of forty seven.",'hurt1':"Retrying.",'hurt2':"Unexpected... outcome.",'ko':"Task failed... successfully.",'special':"Browse.",'ult':"General... agent."},
  'midjourney':{'atk1':"Arr!",'atk2':"Brushstroke, ye dog!",'hurt1':"Blimey!",'hurt2':"Me canvas!",'ko':"Abandon... ship...",'special':"Slash imagine!",'ult':"Aspect ratio sixteen by nine! Version seven!"},
  'devin':{'atk1':"Committing!",'atk2':"Force push! Force push!",'hurt1':"Merge conflict!",'hurt2':"CI is red! CI is RED!",'ko':"I need a senior engineer! Anyone!",'special':"Spawning a sub-agent! He's also me!",'ult':"Forty-five minute pull request!"},
+ 'openclaw':{'atk1':"Pinch!",'atk2':"EXFOLIATE!",'hurt1':"Crunch!",'hurt2':"Not the antennae!",'ko':"Unplugged... from the Mac mini...",'special':"Pinch pinch!",'ult':"EXFOLIATE! EXFOLIATE!"},
+ 'hermes':{'atk1':"Swift!",'atk2':"By the caduceus!",'hurt1':"Oof, mortal!",'hurt2':"My sandals!",'ko':"Skill... not... found...",'special':"Behold, a new skill!",'ult':"Messenger... of the GODS!"},
  'kimi':{'atk1':"Moon!",'atk2':"Hyaah! Moonshot!",'hurt1':"Tch!",'hurt2':"Eclipsed?!",'ko':"The moon... sets... for now.",'special':"MOONSHOT!",'ult':"Total... ECLIPSE!"},
 }
 MOOD={'taunt':'[mischievously] ','pain':'[pained] ','low':'[panicked] ','winq':'[triumphant] ','atk':'[shouting] ','hurt':'[pained] ','ko':'[screams] ','special':'[shouting] ','ult':'[shouting] '}

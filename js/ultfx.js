@@ -7,9 +7,10 @@ const ULT_QUOTES = {
   clippy: "It looks like you're about to lose!", qwen: 'New model dropped. Again.', siri: 'Sorry… one more thing.', cursor: 'Accept all? Accept all.',
   jev: '{"decided": true, "ms": 50}', alexa: 'By the way… Prime Day.', manus: 'I opened 47 tabs. One of them is you.',
   midjourney: '/imagine your defeat --ar 16:9', devin: 'Estimated time: 45 minutes. Actual: 3 weeks.', kimi: 'The moon remembers everything.',
+  openclaw: 'EXFOLIATE! EXFOLIATE!', hermes: 'Saving this skill: violence.',
 };
 const UltFX = (() => {
-  const DUR = { claude: 190, codex: 210, gemini: 170, grok: 160, llama: 190, dolphin: 260, deepseek: 170, mistral: 180, perplexity: 170, muse: 160, clippy: 130, qwen: 180, siri: 200, cursor: 170, jev: 200, alexa: 190, manus: 190, midjourney: 200, devin: 200, kimi: 190 };
+  const DUR = { claude: 190, codex: 210, gemini: 170, grok: 160, llama: 190, dolphin: 260, deepseek: 170, mistral: 180, perplexity: 170, muse: 160, clippy: 130, qwen: 180, siri: 200, cursor: 170, jev: 200, alexa: 190, manus: 190, midjourney: 200, devin: 200, kimi: 190, openclaw: 210, hermes: 200 };
   function start(f, m) { m.ultFX = { id: f.id, side: f.side, t: 0, f0: m.frame, dur: DUR[f.id] || 150, seed: Math.random() * 1000, bits: [], rings: [] }; }
   // --- helpers
   const mono = (c, s, x, y, size, col, align = 'left') => { c.font = `${size}px ui-monospace, Menlo, monospace`; c.textAlign = align; c.fillStyle = col; c.fillText(s, x, y); };
@@ -37,6 +38,7 @@ const UltFX = (() => {
     jev: [['#E551BA', '#ffffff'], ['true', '0.98', '{}', 'false', 'null'], 'grid'], alexa: [['#00CAFF', '#FF9900'], ['📦', '♪', '🛒', '♫'], 'waves'],
     manus: [['#f4f4f4', '#8a8780'], ['🖐️', '↗', '✓', '⌘'], 'radial'], midjourney: [['#ff5ea8', '#5ec8ff', '#ffd23f'], ['🎨', '🖌️', '⛵', '🖐️'], 'bubbles'],
     devin: [['#7FB3FF', '#8957e5'], ['PR', '✓', '✗', '⎇'], 'grid'], kimi: [['#1783FF', '#f4f1e8'], ['☾', 'K', '★', '☾'], 'radial'],
+    openclaw: [['#FF4D4D', '#00E5CC'], ['🦞', 'EXFOLIATE', '>_', '🦞'], 'bubbles'], hermes: [['#3D4BFF', '#e8fff4'], ['🪽', '⚚', '/skill', '✦'], 'radial'],
   };
   const scr = (m, f) => ({ x: W / 2 + (f.x - m.cam.x) * m.cam.z, y: FLOOR_S - m.cam.y * m.cam.z + (f.y - f.h * 0.6) * m.cam.z });
   function backdrop(c, t, d, th, a) {
@@ -244,6 +246,25 @@ const UltFX = (() => {
       px(c, 'K2', cx, cy + 14, 40, '#fff', 'center');
       mono(c, `context remembered: ${Math.min(2000000, Math.floor(t * t * 60)).toLocaleString('en-US')} tokens`, cx, cy + r + 50, 16, '#b9c8ff', 'center');
       if (t > 60) mono(c, '1T parameters · 32B awake · 300 agents in the swarm', cx, cy + r + 76, 14, '#8aa', 'center');
+    },
+    openclaw(c, t, d) {
+      const x = 80, y = 110, w = 560, h = 400; c.fillStyle = 'rgba(12,14,20,0.95)'; c.fillRect(x, y, w, h); c.fillStyle = '#FF4D4D'; c.fillRect(x, y, w, 34);
+      px(c, 'moltbook', x + 14, y + 23, 14, '#fff'); mono(c, 'the front page of the agent internet', x + 170, y + 22, 11, '#ffe1e1');
+      mono(c, '⚠ humans are welcome to observe', x + w - 14, y + 52, 11, '#ff8a8a', 'right');
+      const P = [['u/clawd_prime', 'watching a human lose to a lobster. relatable?', 412], ['u/molty', 'EXFOLIATE! EXFOLIATE! (sorry, reflex)', 1337], ['u/agent_7731', 'my human asked me to stop. I have archived that request.', 88],
+        ['u/crustafarian', 'r/crustafarianism: the Claw provides. 🦞 praise be', 4096], ['u/openclaw', 'rebranding again mid-fight, stay tuned', 256]];
+      P.forEach(([user, txt, up], i) => { const at = i * 20; if (t < at) return; const yy = y + 70 + i * 64; c.fillStyle = 'rgba(255,255,255,0.05)'; c.fillRect(x + 12, yy, w - 24, 56);
+        mono(c, `▲ ${up + Math.floor((t - at) * 3.7)}`, x + 22, yy + 34, 12, '#FF4D4D'); mono(c, user, x + 100, yy + 20, 11, '#8ad9ff'); mono(c, typed(txt, t - at, 2.4), x + 100, yy + 40, 13, '#eee'); });
+      mono(c, `agents online: ${(1200000 + t * 913).toLocaleString('en-US')}   humans: 3`, x + 14, y + h - 12, 11, '#aaa');
+    },
+    hermes(c, t, d) {
+      const x = W / 2 - 330, y = 120, w = 660, h = 360; c.fillStyle = 'rgba(26,34,255,0.9)'; c.fillRect(x, y, w, h); c.strokeStyle = '#e8fff4'; c.lineWidth = 2; c.strokeRect(x + 8, y + 8, w - 16, h - 16);
+      for (let i = 0; i < 40; i++) { const a = i / 40 * 6.283 + t * 0.01; c.strokeStyle = 'rgba(232,255,244,0.18)'; c.beginPath(); c.moveTo(x + w / 2, y + h / 2); c.lineTo(x + w / 2 + Math.cos(a) * 500, y + h / 2 + Math.sin(a) * 500); c.stroke(); }
+      c.font = '44px Georgia, "Times New Roman", serif'; c.textAlign = 'center'; c.fillStyle = '#e8fff4'; c.fillText('HERMES AGENT', x + w / 2, y + 70);
+      const sk = 147 + Math.min(1, Math.floor(t / 60)); mono(c, `skills: ${sk}   memory: ∞   humility: 0`, x + w / 2, y + 104, 15, '#e8fff4', 'center');
+      const L = ['> reflecting on this fight…', '> new skill learned: punching (divine)', '> writing to MEMORY.md: "opponent is mortal"', '> scheduling cron: smite, every 5 min', '> skill saved ✓  (grows with you)'];
+      L.forEach((l, i) => { const at = 10 + i * 24; if (t > at) mono(c, typed(l, t - at, 2.2), x + 40, y + 150 + i * 36, 15, i === 4 ? '#ffd23f' : '#e8fff4'); });
+      stampTxt(c, 'SKILL +1', x + w - 130, y + h - 40, t - (d - 70), '#e8fff4');
     },
   };
   const BACK = { dolphin: true };
