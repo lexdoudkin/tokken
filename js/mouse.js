@@ -2,7 +2,7 @@
 // hover selects (only when the mouse actually moves, so keyboard/pad selection is never overridden) and
 // click confirms through the same virtual buttons the touch controls use.
 const Mouse = (() => {
-  const st = { x: -1, y: -1, moved: false, clicked: false, lastMove: -1e9, zones: [], hot: null, cursor: '' };
+  const st = { x: -1, y: -1, moved: false, clicked: false, zones: [], hot: null, cursor: '' };
   const VIEW = { cx: 0, oy: 0 };   // set by render(): where the logical frame starts on the backing canvas
 
   // ---- pixel cursors (drawn once, 2x-scaled 16px art: gold arrow and a pointing gauntlet)
@@ -26,8 +26,8 @@ const Mouse = (() => {
     const px = (e.clientX - r.left) * (cv.width / r.width), py = (e.clientY - r.top) * (cv.height / r.height);
     return [(px - VIEW.cx) / DPR, (py - VIEW.oy) / DPR];
   }
-  addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; [st.x, st.y] = toLogical(e); st.moved = true; st.lastMove = performance.now(); });
-  addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' || e.button !== 0) return; [st.x, st.y] = toLogical(e); st.clicked = true; st.lastMove = performance.now(); Audio.init(); });
+  addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; [st.x, st.y] = toLogical(e); st.moved = true; });
+  addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' || e.button !== 0) return; [st.x, st.y] = toLogical(e); st.clicked = true; Audio.init(); });
 
   /** register a clickable zone for this frame (logical coords of the current scene) */
   function zone(x, y, w, h, onHover, onClick) { st.zones.push({ x, y, w, h, onHover, onClick }); }
@@ -43,10 +43,7 @@ const Mouse = (() => {
   }
   /** called at the start of each render */
   function beginFrame(cx, oy) { VIEW.cx = cx; VIEW.oy = oy; st.zones = []; }
-  /** called at the end of each render: cursor shape (hidden during fights once the mouse idles) */
-  function endFrame(fighting) {
-    const idle = performance.now() - st.lastMove > 2500;
-    setCursor(fighting && idle ? 'none' : st.hot ? 'hand' : 'arrow');
-  }
+  /** called at the end of each render: cursor shape (always hidden during a live fight; pause menu brings it back) */
+  function endFrame(fighting) { setCursor(fighting ? 'none' : st.hot ? 'hand' : 'arrow'); }
   return { st, VIEW, zone, tap, process, beginFrame, endFrame };
 })();

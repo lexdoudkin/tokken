@@ -41,5 +41,5 @@ await tick(30); await click(gx + 5 * 82 + 30, gy + 86 + 30); console.log('opp', 
 console.log('stage zones', await p.evaluate(() => Mouse.st.zones.length));
 for (let i = 0; i < 6 && (await S()) !== 'fight'; i++) { const s = await S(); if (s === 'stage') { await click(640 - 4 * 144 + 144 * 2 + 60, 560); } else await click(640, 360); await tick(60); }
 console.log('final scene', await S()); await tick(200); await p.screenshot({ path: 'mouse-fight.png' });
-console.log('fight cursor after idle', await p.evaluate(() => Mouse.st.cursor));
+console.log('fight cursor', await p.evaluate(() => Mouse.st.cursor));
 console.log('errs', errs); await b.close();
