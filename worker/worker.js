@@ -75,6 +75,9 @@ export default {
       await env.DB.prepare(`INSERT INTO players (pid, name, points, wins, losses, best_combo, perfects, main, mains, updated) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
         ON CONFLICT(pid) DO UPDATE SET name = ?2, points = points + ?3, wins = wins + ?4, losses = losses + ?5, best_combo = MAX(best_combo, ?6), perfects = perfects + ?7, main = ?8, mains = ?9, updated = ?10`)
         .bind(pid, name, pts, won, 1 - won, Math.min(99, m.combo | 0), m.won && m.perfect ? 1 : 0, main, JSON.stringify(mains), now).run();
+      // per-match log (difficulty tuning / "do humans lose?"): no names, no IPs
+      await env.DB.prepare('INSERT INTO matches (ts, pid, mode, diff, fighter, opponent, won, perfect, combo, build, assist) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)')
+        .bind(now, pid, m.mode, m.diff | 0, m.fighter, FIGHTERS.includes(m.opponent) ? m.opponent : null, won, m.won && m.perfect ? 1 : 0, Math.min(99, m.combo | 0), String(m.build || '').slice(0, 16), Math.min(9, m.assist | 0)).run().catch(() => {});
       const rank = await env.DB.prepare('SELECT COUNT(*) + 1 AS r FROM players WHERE points > (SELECT points FROM players WHERE pid = ?)').bind(pid).first();
       return json({ ok: true, points: pts, rank: rank.r });
     }

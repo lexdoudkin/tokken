@@ -13,9 +13,9 @@ const optUI = { idx: 0 };
 const nameUI = { buf: '', after: null };
 function reportMatch() {
   const mode = sel.online ? 'online' : sel.cpu ? 'cpu' : 'local'; if (mode === 'local' || !match || match.reported) return; match.reported = true;
-  if (mode === 'cpu') cpuAssist = match.winner === match.f[0] ? 0 : Math.min(4, cpuAssist + 1);   // rubber band
   const i = sel.online ? me() : 0, f = match.f[i], o = match.f[1 - i];
-  const info = { fighter: f.id, opponent: o.id, mode, diff: OPT.cpu, won: match.winner === f, perfect: (match.perfects || [0, 0])[i] > 0, combo: f.stats.maxCombo };
+  const info = { fighter: f.id, opponent: o.id, mode, diff: OPT.cpu, won: match.winner === f, perfect: (match.perfects || [0, 0])[i] > 0, combo: f.stats.maxCombo, build: GAME_VER, assist: mode === 'cpu' ? cpuAssist : 0 };
+  if (mode === 'cpu') cpuAssist = match.winner === match.f[0] ? 0 : Math.min(4, cpuAssist + 1);   // rubber band
   if (!Board.st.name) { nameUI.buf = ''; nameUI.after = () => Board.submit(info); scene = 'name'; sceneT = 0; return; }
   Board.submit(info);
 }
