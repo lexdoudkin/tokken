@@ -238,12 +238,14 @@ function update() {
     if (!sel.online && --sel.timer <= 0) { sel.done = [true, true]; }
     const nav = (i, c) => {
       if (sel.done[i]) { if (c.pressed('cancel')) { sel.done[i] = false; Audio.S.move(); } return; }
-      let k = sel.cur[i];
+      let k = sel.cur[i], viaMouse = false;
+      if (sel.want && sel.want.p === i) { k = sel.want.k; viaMouse = true; sel.want = null; }   // mouse hover/click from the portrait grid
       if (c.pressed('left')) k = (k + ROSTER.length - 1) % ROSTER.length;
       if (c.pressed('right')) k = (k + 1) % ROSTER.length;
       if (c.pressed('up')) k = (k - cols + ROSTER.length) % ROSTER.length;
       if (c.pressed('down')) k = (k + cols) % ROSTER.length;
-      if (k !== sel.cur[i]) { sel.cur[i] = k; Audio.S.move(); sel.hoverT = 0; Audio.stopVoices(); vo(`v_${ROSTER[k]}_line`, FIGHTERS[ROSTER[k]].line, { who: 'char', interrupt: true, gap: 300 }); }
+      if (k !== sel.cur[i]) { sel.cur[i] = k; Audio.S.move(); sel.hoverT = 0; sel.voiceAt = frame + (viaMouse ? 14 : 0); sel.voiceK = k; }   // mouse: wait until the pointer rests, so sweeping the grid doesn't spam voices
+      if (sel.voiceK === k && frame >= sel.voiceAt) { sel.voiceK = -1; Audio.stopVoices(); vo(`v_${ROSTER[k]}_line`, FIGHTERS[ROSTER[k]].line, { who: 'char', interrupt: true, gap: 300 }); }
       if (c.pressed('confirm')) { sel.done[i] = true; Audio.S.select(); Audio.S.heavy(); vo(`name_${ROSTER[k]}`, FIGHTERS[ROSTER[k]].name, { interrupt: true }); }
     };
     if (sel.online) {
@@ -705,7 +707,7 @@ function drawSelect(c) {
   const cols = 9, pw = 76, ph = 80, gx = W / 2 - (cols * (pw + 6)) / 2, gy = 100;
   ROSTER.forEach((id, k) => {
     const x = gx + (k % cols) * (pw + 6), y = gy + Math.floor(k / cols) * (ph + 6), f = FIGHTERS[id];
-    typeof Mouse !== 'undefined' && Mouse.zone(x, y, pw, ph, () => { const p = sel.online ? me() : sel.done[0] ? 1 : 0; if (!sel.done[p] && sel.cur[p] !== k) { sel.cur[p] = k; Audio.S.move(); } }, () => { const p = sel.online ? me() : sel.done[0] ? 1 : 0; if (!sel.done[p]) { sel.cur[p] = k; Mouse.tap('start'); } });
+    typeof Mouse !== 'undefined' && Mouse.zone(x, y, pw, ph, () => { const p = sel.online ? me() : sel.done[0] ? 1 : 0; if (!sel.done[p]) sel.want = { p, k }; }, () => { const p = sel.online ? me() : sel.done[0] ? 1 : 0; if (!sel.done[p]) { sel.want = { p, k }; Mouse.tap('start'); } });
     const hidden = f.secret && sel.cur[0] !== k && sel.cur[1] !== k;
     c.fillStyle = '#000'; c.fillRect(x - 2, y - 2, pw + 4, ph + 4);
     portrait(c, id, x, y, pw, ph, hidden);
@@ -739,7 +741,7 @@ function drawStage(c) {
   c.font = '12px "Press Start 2P"'; c.fillStyle = '#ffd23f'; c.textAlign = 'left'; c.fillText(a.blurb || '', 64, 500); c.restore();
   // thumbnail strip (2 rows x 8)
   const cols = 8, tw = 136, th = 60, gx = W / 2 - (cols * (tw + 8)) / 2, gy = 530;
-  ARENAS.forEach((ar, i) => { const x = gx + (i % cols) * (tw + 8), y = gy + Math.floor(i / cols) * (th + 10), on = sel.arena === i, im = ASSETS.arenas[ar.id]; typeof Mouse !== 'undefined' && (!sel.online || me() === 0) && Mouse.zone(x, y, tw, th, () => { if (sel.arena !== i) { sel.arena = i; Audio.S.move(); } }, () => { sel.arena = i; Mouse.tap('start'); });
+  ARENAS.forEach((ar, i) => { const x = gx + (i % cols) * (tw + 8), y = gy + Math.floor(i / cols) * (th + 10), on = sel.arena === i, im = ASSETS.arenas[ar.id]; typeof Mouse !== 'undefined' && (!sel.online || me() === 0) && Mouse.zone(x, y, tw, th, () => { if (sel.arena !== i) { sel.arena = i; Audio.S.move(); if (sel.online) Net.send({ t: 'arena', arena: i }); } }, () => { sel.arena = i; if (sel.online) Net.send({ t: 'arena', arena: i }); Mouse.tap('start'); });
     c.fillStyle = '#000'; c.fillRect(x - 2, y - 2, tw + 4, th + 4); if (im) c.drawImage(im, x, y, tw, th);
     if (!on) { c.fillStyle = 'rgba(0,0,0,0.5)'; c.fillRect(x, y, tw, th); } else { c.lineWidth = 3; c.strokeStyle = frame % 16 < 11 ? '#ffd23f' : '#fff'; c.strokeRect(x - 2, y - 2, tw + 4, th + 4); } });
   const host = !sel.online || me() === 0;
