@@ -126,5 +126,11 @@
 "vo/n08.mp3": 6.08,
 "vo/n09.mp3": 3.92,
 "vo/n10.mp3": 5.76,
-"vo/v01.mp3": 4.64
+"vo/v01.mp3": 4.64,
+"audio/v_grok_atk2.mp3": 1.6,
+"audio/v_claude_hurt1.mp3": 1.04,
+"audio/v_codex_ko.mp3": 4.704,
+"audio/v_codex_atk1.mp3": 1.416,
+"audio/v_codex_hurt1.mp3": 2.808,
+"audio/v_codex_atk2.mp3": 1.464
 }
