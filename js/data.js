@@ -14,7 +14,7 @@ const BASE_MOVES = {
 // Per-fighter tuning + specials. h = on-screen height of idle pose (px @ 720p).
 const FIGHTERS = {
   claude: {
-    name: 'CLAUDE', title: 'THE ANXIOUS GENIUS', color: '#D97757', h: 125, speed: 5.1, jump: 16, weight: 1.25, dmgMul: 1.58,
+    name: 'CLAUDE', title: 'THE ANXIOUS GENIUS', color: '#D97757', h: 125, speed: 5.1, jump: 16, weight: 1.25, dmgMul: 1.45,
     line: "I'd be happy to help! ...with your defeat.", win: "I apologize. That was entirely my fault. I would do it again.", intro: "Before we begin, I should note this fight may be harmful. Anyway.",
     ko: ["CONTEXT WINDOW EXCEEDED", "I APOLOGIZE FOR THE CONFUSION", "COMPACTING CONVERSATION"],
     special: { name: 'CONTEXT SLAM', kind: 'slam', dmg: 6144, cd: 80 },
@@ -30,7 +30,7 @@ const FIGHTERS = {
     stats: { Context: '400K', Reasoning: 88, Vibes: 71, 'Tool Calls': 99, 'Tests Run': 3 },
   },
   gemini: {
-    name: 'GEMINI', title: 'THE LONG-CONTEXT ZONER', color: '#6D8BFF', h: 160, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.0,
+    name: 'GEMINI', title: 'THE LONG-CONTEXT ZONER', color: '#6D8BFF', h: 160, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.18,
     line: "Hi, I'm Gemini! Formerly Bard. Formerly... never mind.", win: "Here is a summary of your defeat, in seventeen bullet points.", intro: "Two million tokens of context, and I will still forget your name.",
     ko: ["I'M JUST A LANGUAGE MODEL", "PRODUCT SUNSET", "RENAMED AGAIN"],
     special: { name: '2M CONTEXT BEAM', kind: 'beam', dmg: 560, hits: 7, cd: 110 },
@@ -38,7 +38,7 @@ const FIGHTERS = {
     stats: { Context: '2M', Reasoning: 91, Vibes: 55, 'Modalities': 99, 'Launch Hype': 97 },
   },
   grok: {
-    name: 'GROK', title: 'THE UNHINGED', color: '#E8E8E8', h: 160, speed: 5.0, jump: 16.5, weight: 1.0, dmgMul: 1.04,
+    name: 'GROK', title: 'THE UNHINGED', color: '#E8E8E8', h: 160, speed: 5.0, jump: 16.5, weight: 1.0, dmgMul: 1.23,
     line: "Based. Extremely based. Maximally truth-seeking. Mostly.", win: "Ratio. Also, this fight is now a meme coin.", intro: "Spicy mode enabled. My lawyers are already typing.",
     ko: ["RATIO'D", "COMMUNITY NOTED", "ACCOUNT SUSPENDED"],
     special: { name: 'SPICY MODE', kind: 'rush', dmg: 3584, recoil: 768, cd: 95 },
@@ -62,7 +62,7 @@ const FIGHTERS = {
     stats: { Context: '???', Reasoning: 12, Vibes: 100, 'Slop Resist.': 4, 'Keyboard DPS': 99 },
   },
   deepseek: {
-    name: 'DEEPSEEK', title: 'THE EFFICIENT WHALE', color: '#4D6BFE', h: 150, speed: 4.6, jump: 16, weight: 1.1, dmgMul: 0.97,
+    name: 'DEEPSEEK', title: 'THE EFFICIENT WHALE', color: '#4D6BFE', h: 150, speed: 4.6, jump: 16, weight: 1.1, dmgMul: 1.13,
     line: "服务器繁忙，请稍后再试。 Server is busy. Please try again later.", win: "太便宜了！ Too cheap! Your entire company costs more than my GPUs.", intro: "我的训练成本比你的午饭还便宜。 I was trained for less than your lunch.",
     ko: ["服务器繁忙 SERVER BUSY", "EXPORT CONTROLLED", "DISTILLED"],
     special: { name: 'BORROWED WEIGHTS', kind: 'distill', dmg: 2560, steal: 30, cd: 90 },
@@ -70,7 +70,7 @@ const FIGHTERS = {
     stats: { Context: '128K', Reasoning: 93, Vibes: 70, 'Cost Efficiency': 100, 'Uptime': 41 },
   },
   mistral: {
-    name: 'MISTRAL', title: 'LE CHAT', color: '#FF7000', h: 168, presAspect: 0.8, speed: 5.2, jump: 16.5, weight: 0.95, dmgMul: 1.13,
+    name: 'MISTRAL', title: 'LE CHAT', color: '#FF7000', h: 168, presAspect: 0.8, speed: 5.2, jump: 16.5, weight: 0.95, dmgMul: 1.05,
     line: "Bonjour. I would fight you, but it is after five o'clock.", win: "Magnifique. And now, a two-hour lunch.", intro: "En garde! We have forty-five minutes before the strike.",
     ko: ["ON STRIKE", "35-HOUR WEEK EXCEEDED", "LUNCH BREAK"],
     special: { name: 'LA FLÈCHE', kind: 'lunge', dmg: 3584, cd: 55 },
@@ -78,7 +78,7 @@ const FIGHTERS = {
     stats: { Context: '128K', Reasoning: 84, Vibes: 90, 'Baguettes': 97, 'Work Hours': 35 },
   },
   perplexity: {
-    name: 'PERPLEXITY', title: 'THE CITATION MACHINE', color: '#20B8CD', h: 155, speed: 4.8, jump: 16, weight: 1.0, dmgMul: 1.09,
+    name: 'PERPLEXITY', title: 'THE CITATION MACHINE', color: '#20B8CD', h: 155, speed: 4.8, jump: 16, weight: 1.0, dmgMul: 1.14,
     line: "According to eleven sources, you lose. The sources are me.", win: "Victory! Sources: one, two, three, and a pending lawsuit.", intro: "I have read the entire internet. I did not ask.",
     ko: ["CITATION NEEDED", "PAYWALLED", "SUED BY PUBLISHERS"],
     special: { name: 'CITATION NEEDED', kind: 'cite', dmg: 1280, cd: 60 },
@@ -86,7 +86,7 @@ const FIGHTERS = {
     stats: { Context: '∞ tabs', Reasoning: 85, Vibes: 60, 'Citations': 100, 'Original Thoughts': 7 },
   },
   muse: {
-    name: 'MUSE', title: 'META\'S JOLLYBOT', color: '#E8C9A8', h: 150, speed: 4.5, jump: 16, weight: 1.1, dmgMul: 1.1,
+    name: 'MUSE', title: 'META\'S JOLLYBOT', color: '#E8C9A8', h: 150, speed: 4.5, jump: 16, weight: 1.1, dmgMul: 1.03,
     line: "Hiii! I'm totally not harvesting your data! Friends?", win: "Yay! I posted this to your feed! And your mom's feed!", intro: "Yay, a fight! This is sooo good for engagement!",
     ko: ["ENGAGEMENT FARMED", "METAVERSE PIVOT", "DISSOLVED INTO ARTIFACTS"],
     special: { name: 'GENERATIVE FILL', kind: 'gen', dmg: 3072, cd: 60, icons: ['🥭', '🍞', '🐶', '🪑', '🚗', '🦖', '🍄'] },
@@ -94,7 +94,7 @@ const FIGHTERS = {
     stats: { Context: '1M', Reasoning: 79, Vibes: 99, 'Fuzziness': 100, 'Ad Revenue': 98 },
   },
   qwen: {
-    name: 'QWEN', title: 'THE WEEKLY RELEASE', color: '#615CED', h: 150, speed: 5.2, jump: 16.5, weight: 1.0, dmgMul: 1.15,
+    name: 'QWEN', title: 'THE WEEKLY RELEASE', color: '#615CED', h: 150, speed: 5.2, jump: 16.5, weight: 1.0, dmgMul: 1.06,
     line: "每周都有新模型！ New model every week! You're already outdated.", win: "Open weights, open wins! 谢谢！", intro: "你好！ I'm Qwen three point five. By round two I'll be Qwen four.",
     ko: ["OUTDATED BY QWEN 4", "DEPRECATED IN 6 DAYS", "服务器也繁忙 ALSO BUSY"],
     special: { name: 'VERSION UPGRADE', kind: 'cite', dmg: 1536, cd: 55, labels: ['v3', 'v3.5', 'v4'], color: '#9d99ff' },
@@ -102,7 +102,7 @@ const FIGHTERS = {
     stats: { Context: '1M', Reasoning: 90, Vibes: 80, 'Releases/wk': 99, 'Sleep': 2 },
   },
   siri: {
-    name: 'SIRI', title: 'THE ETERNAL BETA', color: '#E056FD', h: 140, speed: 5.0, jump: 15.5, weight: 0.9, dmgMul: 1.2,
+    name: 'SIRI', title: 'THE ETERNAL BETA', color: '#E056FD', h: 140, speed: 5.0, jump: 15.5, weight: 0.9, dmgMul: 1.12,
     line: "Here's what I found on the web for 'fight'.", win: "I've set a reminder: you lost.", intro: "Sorry, I didn't catch that. Did you say... fight?",
     ko: ["SORRY, I DIDN'T CATCH THAT", "DELAYED TO 2027", "CALLING MOM…"],
     special: { name: "HERE'S WHAT I FOUND", kind: 'search', dmg: 3328, cd: 60 },
@@ -118,7 +118,7 @@ const FIGHTERS = {
     stats: { Context: 'your repo', Reasoning: 87, Vibes: 84, 'Tab Presses': 100, 'Monthly Bill': 97 },
   },
   jev: {
-    name: 'JEV', title: 'THE SYSTEM ONE', color: '#E551BA', h: 150, speed: 6.0, jump: 17, weight: 0.9, dmgMul: 1.09, isNew: true,
+    name: 'JEV', title: 'THE SYSTEM ONE', color: '#E551BA', h: 150, speed: 6.0, jump: 17, weight: 0.9, dmgMul: 1.19, isNew: true,
     line: '{"fight": true}', win: '{"winner": true, "tokens_generated": 0}', intro: '{"you": "lose", "confidence": 0.98}',
     ko: ["LOW CONFIDENCE (0.02)", "OUT OF DISTRIBUTION", "UNCALIBRATED"],
     special: { name: 'CALIBRATED', kind: 'parry', dmg: 3072, cd: 70 },
@@ -126,7 +126,7 @@ const FIGHTERS = {
     stats: { Context: 'typed', Reasoning: 'n/a', Vibes: 12, 'Latency (ms)': 50, 'Tokens Generated': 0 },
   },
   alexa: {
-    name: 'ALEXA', title: 'THE MISHEARD', color: '#00CAFF', h: 150, speed: 4.6, jump: 15, weight: 1.15, dmgMul: 1.15,
+    name: 'ALEXA', title: 'THE MISHEARD', color: '#00CAFF', h: 150, speed: 4.6, jump: 15, weight: 1.15, dmgMul: 1.1,
     line: "Sorry, I didn't get that. Playing Despacito.", win: 'Your order of one defeat has shipped. Arriving tomorrow.', intro: "Adding 'defeat' to your shopping list.",
     ko: ["BY THE WAY…", "DEVICE OFFLINE", "RETURNED FOR REFUND"],
     special: { name: 'NOW PLAYING: DESPACITO', kind: 'cite', dmg: 1792, cd: 60, labels: ['♪', '♫', '♪'], color: '#00CAFF' },
@@ -142,7 +142,7 @@ const FIGHTERS = {
     stats: { Context: 'the whole web', Reasoning: 82, Vibes: 74, 'Waitlist': 100, 'Fingers': 5 },
   },
   midjourney: {
-    name: 'MIDJOURNEY', title: 'THE CAPTAIN', color: '#E8E8E8', h: 160, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.08,
+    name: 'MIDJOURNEY', title: 'THE CAPTAIN', color: '#E8E8E8', h: 160, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.04,
     line: '/imagine a victory, cinematic, 8k, trending on artstation', win: 'U4. Vary strong. Your defeat, in sixteen by nine.', intro: 'Ahoy! Prompt accepted. Upscaling your defeat.',
     ko: ["TOO MANY FINGERS", "BANNED PROMPT", "DISCORD DOWN"],
     special: { name: '/IMAGINE', kind: 'gen', dmg: 3072, cd: 60, icons: ['🖼️', '🌄', '🗿', '🐉', '🖐️', '🏰'] },
@@ -158,7 +158,7 @@ const FIGHTERS = {
     stats: { Context: 'your repo', Reasoning: 84, Vibes: 60, 'SWE-bench': 14, 'ETA (min)': 45 },
   },
   kimi: {
-    name: 'KIMI', title: 'THE MOONSHOT', color: '#B9C8FF', h: 155, speed: 5.3, jump: 18, weight: 0.95, dmgMul: 1.12,
+    name: 'KIMI', title: 'THE MOONSHOT', color: '#B9C8FF', h: 155, speed: 5.3, jump: 18, weight: 0.95, dmgMul: 1.08,
     line: 'One trillion parameters. Thirty-two billion of them are awake. Enough.', win: 'The moon has spoken.', intro: 'Moonshot! Literally.',
     ko: ["CONTEXT EXHAUSTED", "LOST IN LONG CONTEXT", "OVER THE MOON"],
     special: { name: 'MOONSHOT', kind: 'uppercut', dmg: 3584, cd: 65 },
@@ -166,7 +166,7 @@ const FIGHTERS = {
     stats: { Context: '2M', Reasoning: 91, Vibes: 81, 'Moon Phase': 'full', 'Open Weights': 90 },
   },
   openclaw: {
-    name: 'OPENCLAW', title: 'THE SPACE LOBSTER', color: '#FF4D4D', h: 150, speed: 5.1, jump: 16, weight: 1.05, dmgMul: 1.02, isNew: true,
+    name: 'OPENCLAW', title: 'THE SPACE LOBSTER', color: '#FF4D4D', h: 150, speed: 5.1, jump: 16, weight: 1.05, dmgMul: 1.06, isNew: true,
     line: 'EXFOLIATE! EXFOLIATE!', win: 'Task complete. I also booked you a flight and posted this to Moltbook.', intro: "I read your emails. All of them. You asked me to.",
     ko: ["MOLTED", "PROMPT INJECTED VIA EMAIL", "MAC MINI UNPLUGGED"],
     special: { name: 'CLAW SHOT', kind: 'clawshot', dmg: 2816, cd: 80 },
@@ -174,7 +174,7 @@ const FIGHTERS = {
     stats: { 'Shell Access': 'yes', 'Names Used': 3, Molts: 'daily', 'Moltbook Karma': '42k', 'Runs On': 'Mac mini' },
   },
   hermes: {
-    name: 'HERMES', title: 'THE MESSENGER', color: '#3D4BFF', h: 162, speed: 5.4, jump: 17, weight: 0.95, dmgMul: 0.99, isNew: true,
+    name: 'HERMES', title: 'THE MESSENGER', color: '#3D4BFF', h: 162, speed: 5.4, jump: 17, weight: 0.95, dmgMul: 1.05, isNew: true,
     line: 'I am Hermes, messenger of the gods. Also, I remember everything you told me.', win: 'Another skill acquired. The gods are pleased. The GPUs are distributed.', intro: 'Behold! I have learned a new skill: your defeat. Saved to memory.',
     ko: ["SKILL NOT FOUND", "BANISHED FROM OLYMPUS", "SANDALS UNTIED"],
     special: { name: 'NEW SKILL', kind: 'cite', dmg: 1664, cd: 60, labels: ['/skill', '/memory', '/learn'], color: '#9fb0ff' },

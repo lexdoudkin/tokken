@@ -42,7 +42,8 @@ class Match {
     else boothEvent('round2', { force: true });
   }
   startUlt(f, o) {
-    f.compute = 0; f.stats.compute += 100; f.setState('ultcin');
+    f.compute = 0; f.stats.compute += 100; f.ultLock = 330;   // no meter from your own ult (cut-in + ult + tail): kills ult loops
+    f.setState('ultcin');
     this.ultCin = { f, o, t: 0, name: f.cfg.ult.name }; Audio.S.ult(); Audio.duck(0.05, 1800); Audio.crowd(0.8, 2);
     if (['claude', 'codex', 'cursor'].includes(f.id) && memeOk('yolo')) { floatText(f.x, f.y - f.h - 110, '--dangerously-skip-permissions', { size: 10, font: 'Press Start 2P', color: '#ff5555', life: 90 }); aTimeout(() => boothEvent('yolo', { p: 0.4 }), 2600); }
     const d = vo(`v_${f.id}_ult`, '', { who: 'char', interrupt: true });   // key lines cut in over long taunts aTimeout(() => vo(`ult_${f.id}`, f.cfg.ult.name, { interrupt: false }), (d || 0) * 700 + 200);
@@ -78,7 +79,7 @@ class Match {
     if (o.blockable !== false && this.canBlock(d, a, o)) {
       const chip = Math.round(o.dmg * a.dmgMul() * (o.chipMul ?? 0.08));
       d.tokens -= chip; d.lowBlock = d.holdDown; d.setState('blockstun'); d.stun = o.blockstun ?? 10; d.vx = dir * (o.push ?? 5) * 0.8;
-      d.compute = Math.min(100, d.compute + 3); a.compute = Math.min(100, a.compute + 2);
+      d.compute = Math.min(100, d.compute + 3); if (!(a.ultLock > 0)) a.compute = Math.min(100, a.compute + 2);
       this.blocks = (this.blocks || []).filter(t => this.frame - t < 180); this.blocks.push(this.frame); if (this.blocks.length >= 4) { this.blocks = []; boothEvent('turtle', { p: 0.6 }); }
       this.hitstop = Math.max(this.hitstop, 4); Audio.S.block(); sparks(d.x - dir * d.wBody / 2, d.y - d.h * (d.lowBlock ? 0.3 : 0.6), -dir, 6);
       if (chip > 0) floatText(d.x, d.y - d.h - 10, `-${fmt(chip)}`, { size: 20, color: '#9fb3c8' });
@@ -100,7 +101,7 @@ class Match {
     d.tokens -= dmg; a.stats.dealt += dmg; a.stats.hits++; this.noHitT = 0;
     if (!this.firstHit) { this.firstHit = true; aTimeout(() => boothEvent('firsthit', { p: 0.8 }), 250); }
     if (a.tokens < MAX_TOKENS * 0.25 && a.combo === 3 && d.tokens > a.tokens) boothEvent('comeback');
-    a.compute = Math.min(100, a.compute + (o.gain ?? 6)); d.compute = Math.min(100, d.compute + 4);
+    if (!(a.ultLock > 0)) a.compute = Math.min(100, a.compute + (o.gain ?? 6)); d.compute = Math.min(100, d.compute + 4);
     const armored = d.status.think && dmg < 5000;
     if (!armored) {
       if (o.launch || !d.grounded) { d.setState('launched'); d.vy = -(o.launch ? 11 : 7); d.vx = dir * (o.knock ?? 6) * 0.9; d.y = Math.min(d.y, -1); }

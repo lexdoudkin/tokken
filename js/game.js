@@ -214,7 +214,7 @@ class Fighter {
   update(g, opp) {
     const c = this.ctrl; this.st++;
     for (const k in this.status) if (this.status[k] > 0) this.status[k]--;
-    if (this.parryT > 0) this.parryT--; if (this.cd > 0) this.cd--; if (this.inv > 0) this.inv--; if (this.flash > 0) this.flash--; if (this.squash) this.squash *= 0.8;
+    if (this.parryT > 0) this.parryT--; if (this.ultLock > 0) this.ultLock--; if (this.cd > 0) this.cd--; if (this.inv > 0) this.inv--; if (this.flash > 0) this.flash--; if (this.squash) this.squash *= 0.8;
     this.hist.push({ x: this.x, y: this.y }); if (this.hist.length > 60) this.hist.shift();
     if (this.landT > 0) this.landT--; if (this.turnT > 0) this.turnT--;
     if (this.lastFacing && this.lastFacing !== this.facing) this.turnT = 6; this.lastFacing = this.facing;
