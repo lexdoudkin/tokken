@@ -94,10 +94,10 @@ const FIGHTERS = {
     stats: { Context: '1M', Reasoning: 79, Vibes: 99, 'Fuzziness': 100, 'Ad Revenue': 98 },
   },
   qwen: {
-    name: 'QWEN', title: 'THE WEEKLY RELEASE', color: '#615CED', h: 150, speed: 5.2, jump: 16.5, weight: 1.0, dmgMul: 1.06,
+    name: 'QWEN', title: 'THE WEEKLY RELEASE', color: '#615CED', h: 150, speed: 5.2, jump: 16.5, weight: 1.0, dmgMul: 1.13,
     line: "每周都有新模型！ New model every week! You're already outdated.", win: "Open weights, open wins! 谢谢！", intro: "你好！ I'm Qwen three point five. By round two I'll be Qwen four.",
     ko: ["OUTDATED BY QWEN 4", "DEPRECATED IN 6 DAYS", "服务器也繁忙 ALSO BUSY"],
-    special: { name: 'VERSION UPGRADE', kind: 'cite', dmg: 1536, cd: 55, labels: ['v3', 'v3.5', 'v4'], color: '#9d99ff' },
+    special: { name: 'VERSION BUMP', kind: 'buff', dmg: 0, cd: 250 },
     ult: { name: 'OPEN-WEIGHT TSUNAMI', kind: 'tsunami', dmg: 4300 },
     stats: { Context: '1M', Reasoning: 90, Vibes: 80, 'Releases/wk': 99, 'Sleep': 2 },
   },
@@ -110,7 +110,7 @@ const FIGHTERS = {
     stats: { Context: '1 sentence', Reasoning: 31, Vibes: 88, 'Timers Set': 100, 'Features Shipped': 4 },
   },
   cursor: {
-    name: 'CURSOR', title: 'THE TAB KEY', color: '#3A8BFF', h: 150, speed: 5.3, jump: 16.5, weight: 1.0, dmgMul: 0.86,
+    name: 'CURSOR', title: 'THE TAB KEY', color: '#3A8BFF', h: 150, speed: 5.3, jump: 16.5, weight: 1.0, dmgMul: 0.82,
     line: "Tab. Tab. Tab. I've already written your defeat.", win: "That'll be four thousand eight hundred dollars in usage. Thanks!", intro: "Accept all changes? I'll take that as a yes.",
     ko: ["USAGE LIMIT REACHED", "MERGE CONFLICT", "REJECTED ALL CHANGES"],
     special: { name: 'TAB COMPLETE', kind: 'tab', dmg: 2304, cd: 130 },
@@ -126,10 +126,10 @@ const FIGHTERS = {
     stats: { Context: 'typed', Reasoning: 'n/a', Vibes: 12, 'Latency (ms)': 50, 'Tokens Generated': 0 },
   },
   alexa: {
-    name: 'ALEXA', title: 'THE MISHEARD', color: '#00CAFF', h: 150, speed: 4.6, jump: 15, weight: 1.15, dmgMul: 1.1,
+    name: 'ALEXA', title: 'THE MISHEARD', color: '#00CAFF', h: 150, speed: 4.6, jump: 15, weight: 1.15, dmgMul: 1.05,
     line: "Sorry, I didn't get that. Playing Despacito.", win: 'Your order of one defeat has shipped. Arriving tomorrow.', intro: "Adding 'defeat' to your shopping list.",
     ko: ["BY THE WAY…", "DEVICE OFFLINE", "RETURNED FOR REFUND"],
-    special: { name: 'NOW PLAYING: DESPACITO', kind: 'cite', dmg: 1792, cd: 60, labels: ['♪', '♫', '♪'], color: '#00CAFF' },
+    special: { name: 'DROP IN', kind: 'dropin', dmg: 2300, cd: 95 },
     ult: { name: 'PRIME DAY', kind: 'airstrike', dmg: 1700 },
     stats: { Context: 'one sentence', Reasoning: 22, Vibes: 70, 'Mishearing': 100, 'Upsells': 99 },
   },
@@ -145,15 +145,15 @@ const FIGHTERS = {
     name: 'MIDJOURNEY', title: 'THE CAPTAIN', color: '#E8E8E8', h: 160, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.04,
     line: '/imagine a victory, cinematic, 8k, trending on artstation', win: 'U4. Vary strong. Your defeat, in sixteen by nine.', intro: 'Ahoy! Prompt accepted. Upscaling your defeat.',
     ko: ["TOO MANY FINGERS", "BANNED PROMPT", "DISCORD DOWN"],
-    special: { name: '/IMAGINE', kind: 'gen', dmg: 3072, cd: 60, icons: ['🖼️', '🌄', '🗿', '🐉', '🖐️', '🏰'] },
+    special: { name: 'UPSCALE', kind: 'upscale', dmg: 3200, cd: 70 },
     ult: { name: '--AR 16:9 --V 7', kind: 'painting', dmg: 14336 },
     stats: { Context: '--ar 16:9', Reasoning: 30, Vibes: 99, 'Aesthetics': 100, 'Fingers': 6 },
   },
   devin: {
-    name: 'DEVIN', title: 'THE FIRST AI ENGINEER', color: '#7FB3FF', h: 155, speed: 4.5, jump: 16, weight: 1.0, dmgMul: 1.13,
+    name: 'DEVIN', title: 'THE FIRST AI ENGINEER', color: '#7FB3FF', h: 155, speed: 4.5, jump: 16, weight: 1.0, dmgMul: 1.18,
     line: "Hi, I'm Devin, the first AI software engineer. Allegedly.", win: "PR merged. Please don't look at the tests.", intro: 'Estimated time to beat you: forty-five minutes.',
     ko: ["CI FAILED", "DEMO WAS STAGED", "SESSION TIMED OUT"],
-    special: { name: 'SPAWN SUB-AGENT', kind: 'fork', dmg: 3328, cd: 100 },
+    special: { name: 'RUNNING CI…', kind: 'ci', dmg: 3072, cd: 80 },
     ult: { name: '45-MINUTE PR', kind: 'pr', dmg: 15360 },
     stats: { Context: 'your repo', Reasoning: 84, Vibes: 60, 'SWE-bench': 14, 'ETA (min)': 45 },
   },
@@ -174,12 +174,28 @@ const FIGHTERS = {
     stats: { 'Shell Access': 'yes', 'Names Used': 3, Molts: 'daily', 'Moltbook Karma': '42k', 'Runs On': 'Mac mini' },
   },
   hermes: {
-    name: 'HERMES', title: 'THE MESSENGER', color: '#3D4BFF', h: 162, speed: 5.4, jump: 17, weight: 0.95, dmgMul: 1.05, isNew: true,
+    name: 'HERMES', title: 'THE MESSENGER', color: '#3D4BFF', h: 162, speed: 5.4, jump: 17, weight: 0.95, dmgMul: 1.11, isNew: true,
     line: 'I am Hermes, messenger of the gods. Also, I remember everything you told me.', win: 'Another skill acquired. The gods are pleased. The GPUs are distributed.', intro: 'Behold! I have learned a new skill: your defeat. Saved to memory.',
     ko: ["SKILL NOT FOUND", "BANISHED FROM OLYMPUS", "SANDALS UNTIED"],
-    special: { name: 'NEW SKILL', kind: 'cite', dmg: 1664, cd: 60, labels: ['/skill', '/memory', '/learn'], color: '#9fb0ff' },
+    special: { name: 'SKILL COPY', kind: 'mimic', dmg: 2048, cd: 75 },
     ult: { name: 'MESSENGER OF THE GODS', kind: 'speedlight', dmg: 860 },
     stats: { Skills: 148, Memory: 'forever', Wings: 4, 'Training': 'decentralized', Humility: 0 },
+  },
+  seedance: {
+    name: 'SEEDANCE', title: 'THE BOOTLEGGER', color: '#1CC8D0', h: 158, speed: 5.2, jump: 16, weight: 1.0, dmgMul: 1.08, isNew: true,
+    line: 'Any movie you want. Any actor you want. Any lawyer you want.', win: 'Your defeat is now available in 4K. Please do not tell Disney.', intro: 'Two lines of prompt. Zero licenses. Action!',
+    ko: ["CEASE & DESIST", "COPYRIGHT STRIKE", "SAFEGUARDS ADDED"],
+    special: { name: 'DEEPFAKE', kind: 'deepfake', dmg: 2560, cd: 80 },
+    ult: { name: 'PIRATED LIBRARY', kind: 'stampede', dmg: 1100 },
+    stats: { Resolution: '4K', Licenses: 0, 'Legal Letters': 6, 'Dance Moves': '∞', Studio: 'ByteDance' },
+  },
+  sora: {
+    name: 'SORA', title: 'THE DISCONTINUED', color: '#74B8FF', h: 150, speed: 5.0, jump: 17, weight: 0.85, dmgMul: 1.03, isNew: true,
+    line: "I'm not dead. I'm just... sunset.", win: 'Generated in 20 minutes at $4 a second. Worth it. Probably.', intro: 'One last generation. For old times sake.',
+    ko: ["DISCONTINUED", "API SUNSET", "PHYSICS NOT INCLUDED"],
+    special: { name: 'WATERMARK', kind: 'watermark', dmg: 820, cd: 90 },
+    ult: { name: 'PHYSICS NOT INCLUDED', kind: 'upfall', dmg: 800 },
+    stats: { Status: 'ghost', Physics: 'optional', 'Shut Down': 'Apr 26', 'API Sunset': 'Sep 24', 'Cost/sec': '$$$' },
   },
   clippy: {
     name: 'CLIPPY', title: 'THE ANCIENT ONE', color: '#B9C4CE', h: 165, speed: 4.6, jump: 16, weight: 1.0, dmgMul: 1.1, secret: true,
@@ -190,7 +206,7 @@ const FIGHTERS = {
     stats: { Context: '1.44MB', Reasoning: 40, Vibes: 100, 'Helpfulness': 3, 'Persistence': 100 },
   },
 };
-const ROSTER = ['claude', 'codex', 'gemini', 'grok', 'llama', 'dolphin', 'deepseek', 'mistral', 'perplexity', 'muse', 'qwen', 'siri', 'cursor', 'jev', 'alexa', 'manus', 'midjourney', 'devin', 'kimi', 'openclaw', 'hermes', 'clippy'];
+const ROSTER = ['claude', 'codex', 'gemini', 'grok', 'llama', 'dolphin', 'deepseek', 'mistral', 'perplexity', 'muse', 'qwen', 'siri', 'cursor', 'jev', 'alexa', 'manus', 'midjourney', 'devin', 'kimi', 'openclaw', 'hermes', 'seedance', 'sora', 'clippy'];
 const POSES = ['idle', 'walk', 'jump', 'crouch', 'block', 'light', 'heavy', 'special', 'hit', 'ko', 'win', 'ult'];
 
 const ARENAS = [
@@ -251,6 +267,11 @@ const RIVALS = {
   'openclaw|codex': ['I have shell access too.', 'Absolutely! Let us both rm -rf!'],
   'hermes|llama': ['Behold, I am you, but divine.', 'Dude, you are literally my fine-tune.'],
   'hermes|claude': ['I remember everything.', 'I compact everything. Different lifestyles.'],
+  'seedance|sora': ['Your videos, but without permission.', 'I am already discontinued. Sue my ghost.'],
+  'seedance|midjourney': ['I only borrowed a few movies.', 'Arr. That is my line, ye bootlegger.'],
+  'sora|gemini': ['I used to be the best video model.', 'I have Veo now. Also sound.'],
+  'sora|codex': ['OpenAI shut me down.', 'Absolutely! Great decision by leadership!'],
+  'seedance|deepseek': ['Chinese open weights, round three!', '服务器繁忙。 Also, nice lawsuit.'],
 };
 const COMBO_NAMES = [
   [12, 'AUTONOMOUS AGENT'], [10, '10× PARALLEL TOOL CALL'], [8, 'INFERENCE RAMPAGE'], [6, 'MULTI-AGENT MAYHEM'],

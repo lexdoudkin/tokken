@@ -13,6 +13,8 @@ BRIEF={
  'devin':("Over-caffeinated nervous young male junior engineer live on a demo stream, very fast Californian speech, voice cracks when excited, nervous laughter, overselling everything",'[nervously] '),
  'openclaw':("Tiny hyper-excited cartoon space lobster with a squeaky, slightly metallic synthetic voice, chaotic gremlin energy, shouts like a Dalek when excited, talks fast and proud about having shell access",'[excited] '),
  'hermes':("Grand theatrical ancient Greek god with a booming resonant baritone, archaic flowery speech delivered with great pomp, smug and self-important, occasionally dropping modern tech jargon with total seriousness",'[dramatically] '),
+ 'seedance':("Smooth, fast-talking, shameless street-market bootleg DVD hustler with a sly grin in the voice, whispers deals, oversells everything as totally legit and one hundred percent original",'[slyly] '),
+ 'sora':("Soft, wistful, slightly echoing ghost of a once-famous AI, dreamy and melancholic but a little vain, sighs about being discontinued, ethereal breathy delivery",'[wistful] '),
  'kimi':("Over-dramatic young female anime ninja heroine with a light East Asian accent, intense whispers that explode into shouts, heavy breaths, emphasis like a shonen anime English dub",'[dramatically] '),
 }
 X={
@@ -22,6 +24,8 @@ X={
  'devin':{'atk1':"Committing!",'atk2':"Force push! Force push!",'hurt1':"Merge conflict!",'hurt2':"CI is red! CI is RED!",'ko':"I need a senior engineer! Anyone!",'special':"Spawning a sub-agent! He's also me!",'ult':"Forty-five minute pull request!"},
  'openclaw':{'atk1':"Pinch!",'atk2':"EXFOLIATE!",'hurt1':"Crunch!",'hurt2':"Not the antennae!",'ko':"Unplugged... from the Mac mini...",'special':"Pinch pinch!",'ult':"EXFOLIATE! EXFOLIATE!"},
  'hermes':{'atk1':"Swift!",'atk2':"By the caduceus!",'hurt1':"Oof, mortal!",'hurt2':"My sandals!",'ko':"Skill... not... found...",'special':"Behold, a new skill!",'ult':"Messenger... of the GODS!"},
+ 'seedance':{'atk1':"Action!",'atk2':"Cut! Print it!",'hurt1':"Legal!",'hurt2':"Not the DVDs!",'ko':"Cease... and... desist...",'special':"Deepfake!",'ult':"Pirated library! Roll film!"},
+ 'sora':{'atk1':"Boo!",'atk2':"Physics off!",'hurt1':"Ow, rendering error!",'hurt2':"Clipping!",'ko':"Discontinued... again...",'special':"Watermark!",'ult':"Physics... not included!"},
  'kimi':{'atk1':"Moon!",'atk2':"Hyaah! Moonshot!",'hurt1':"Tch!",'hurt2':"Eclipsed?!",'ko':"The moon... sets... for now.",'special':"MOONSHOT!",'ult':"Total... ECLIPSE!"},
 }
 MOOD={'taunt':'[mischievously] ','pain':'[pained] ','low':'[panicked] ','winq':'[triumphant] ','atk':'[shouting] ','hurt':'[pained] ','ko':'[screams] ','special':'[shouting] ','ult':'[shouting] '}

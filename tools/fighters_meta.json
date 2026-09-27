@@ -132,7 +132,7 @@
  "qwen": {
   "name": "QWEN",
   "ult": "OPEN-WEIGHT TSUNAMI",
-  "special": "VERSION UPGRADE",
+  "special": "VERSION BUMP",
   "ko": [
    "OUTDATED BY QWEN 4",
    "DEPRECATED IN 6 DAYS",
@@ -140,7 +140,8 @@
   ],
   "line": "每周都有新模型！ New model every week! You're already outdated.",
   "win": "Open weights, open wins! 谢谢！",
-  "intro": "你好！ I'm Qwen three point five. By round two I'll be Qwen four."
+  "intro": "你好！ I'm Qwen three point five. By round two I'll be Qwen four.",
+  "say_special": "Version bump"
  },
  "siri": {
   "name": "SIRI",
@@ -199,7 +200,7 @@
  "alexa": {
   "name": "ALEXA",
   "ult": "PRIME DAY",
-  "special": "NOW PLAYING: DESPACITO",
+  "special": "DROP IN",
   "ko": [
    "BY THE WAY…",
    "DEVICE OFFLINE",
@@ -208,7 +209,7 @@
   "line": "Sorry, I didn't get that. Playing Despacito.",
   "win": "Your order of one defeat has shipped. Arriving tomorrow.",
   "intro": "Adding 'defeat' to your shopping list.",
-  "say_special": "Now playing: Despacito",
+  "say_special": "Drop in",
   "say_ult": "Prime Day"
  },
  "manus": {
@@ -229,7 +230,7 @@
  "midjourney": {
   "name": "MIDJOURNEY",
   "ult": "--AR 16:9 --V 7",
-  "special": "/IMAGINE",
+  "special": "UPSCALE",
   "ko": [
    "TOO MANY FINGERS",
    "BANNED PROMPT",
@@ -238,13 +239,13 @@
   "line": "/imagine a victory, cinematic, 8k, trending on artstation",
   "win": "U4. Vary strong. Your defeat, in sixteen by nine.",
   "intro": "Ahoy! Prompt accepted. Upscaling your defeat.",
-  "say_special": "Slash imagine",
+  "say_special": "Upscale",
   "say_ult": "Aspect ratio sixteen by nine! Version seven"
  },
  "devin": {
   "name": "DEVIN",
   "ult": "45-MINUTE PR",
-  "special": "SPAWN SUB-AGENT",
+  "special": "RUNNING CI",
   "ko": [
    "CI FAILED",
    "DEMO WAS STAGED",
@@ -253,7 +254,7 @@
   "line": "Hi, I'm Devin, the first AI software engineer. Allegedly.",
   "win": "PR merged. Please don't look at the tests.",
   "intro": "Estimated time to beat you: forty-five minutes.",
-  "say_special": "Spawn sub-agent",
+  "say_special": "Running CI",
   "say_ult": "Forty-five minute pull request"
  },
  "kimi": {
@@ -289,7 +290,7 @@
  "hermes": {
   "name": "HERMES",
   "ult": "MESSENGER OF THE GODS",
-  "special": "NEW SKILL",
+  "special": "SKILL COPY",
   "ko": [
    "SKILL NOT FOUND",
    "BANISHED FROM OLYMPUS",
@@ -298,7 +299,37 @@
   "line": "I am Hermes, messenger of the gods.",
   "win": "Another skill acquired. The gods are pleased. The GPUs are distributed.",
   "intro": "Behold! I have learned a new skill: your defeat. Saved to memory.",
-  "say_special": "New skill",
+  "say_special": "Skill copy",
   "say_ult": "Messenger of the gods"
+ },
+ "seedance": {
+  "name": "SEEDANCE",
+  "ult": "PIRATED LIBRARY",
+  "special": "DEEPFAKE",
+  "ko": [
+   "CEASE & DESIST",
+   "COPYRIGHT STRIKE",
+   "SAFEGUARDS ADDED"
+  ],
+  "line": "Any movie you want. Any actor you want. Any lawyer you want.",
+  "win": "Your defeat is now available in 4K. Please do not tell Disney.",
+  "intro": "Two lines of prompt. Zero licenses. Action!",
+  "say_special": "Deepfake",
+  "say_ult": "Pirated library"
+ },
+ "sora": {
+  "name": "SORA",
+  "ult": "PHYSICS NOT INCLUDED",
+  "special": "WATERMARK",
+  "ko": [
+   "DISCONTINUED",
+   "API SUNSET",
+   "PHYSICS NOT INCLUDED"
+  ],
+  "line": "I'm not dead. I'm just... sunset.",
+  "win": "Generated in 20 minutes at $4 a second. Worth it. Probably.",
+  "intro": "One last generation. For old times sake.",
+  "say_special": "Watermark",
+  "say_ult": "Physics not included"
  }
 }

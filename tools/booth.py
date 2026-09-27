@@ -105,6 +105,9 @@ B.update({
  ],
 })
 B.update({
+ 'cnd': [
+   [('P', "A cease and desist just landed in the arena!"), ('N', "From the MPA, Disney, Paramount, Netflix, Warner and Sony. It's a group chat now, Brad.")],
+ ],
  'moltbook': [
    [('P', "The agents on Moltbook are posting about this fight!"), ('N', "Humans can only observe, Brad. Somewhere a lobster just founded a religion.")],
  ],
@@ -145,17 +148,19 @@ FS = {
  'mistral':  ("La flèche! An elegant lunge! Très magnifique!", "Grève générale! Everybody's walking out! Even the cats are unionized!", "Mistral's gone. On strike, technically. Back after lunch. A long lunch."),
  'perplexity':("Citation needed! One, two, three!", "Scrape everything! He's reading every website on earth! Nobody asked!", "Perplexity is down. Paywalled. We'd tell you more, but the article requires a subscription."),
  'muse':     ("Generative fill! He threw a... mango?!", "Generate four variations! There's four of them now! Pick your favorite!", "Muse is out. Pivoting to the metaverse. Again."),
- 'qwen':     ("Version upgrade! He just got better mid-fight! That's a Tuesday for Qwen!", "Open weight tsunami! Seven B! Seventy two B! Two hundred thirty five B! It never stops!", "Qwen's down. Don't worry. There'll be a new one by Thursday."),
+ 'qwen':     ("Version bump! Qwen just updated mid-fight! Three point seven! Three point eight!", "Open weight tsunami! Seven B! Seventy two B! Two hundred thirty five B! It never stops!", "Qwen's down. Don't worry. There'll be a new one by Thursday."),
  'siri':     ("Here's what I found on the web! He threw a search result at him!", "Apple Intelligence! It's coming! It's... it's coming next year!", "Siri is out. Sorry, she didn't catch that. She never catches that."),
  'cursor':   ("Tab complete! He autocompleted himself right behind him!", "Accept all! Accept all! He didn't even read the diff!", "Cursor is down. Usage limit reached. Please upgrade to Ultra."),
  'jev':      ("Calibrated! He knew that punch was coming with ninety eight percent confidence!", "Fifty milliseconds! He's done! Everyone else is still tokenizing the word hello!", "Jev is out. Confidence dropped to zero point zero two. Honestly, well calibrated."),
- 'alexa':    ("Now playing Despacito! Nobody asked! NOBODY ASKED!", "PRIME DAY! It's raining packages! Free same-day delivery of pain!", "Alexa is down. By the way, did you know you can reorder paper towels by voice?"),
+ 'alexa':    ("Drop in! She just teleported into his living room! Nobody enabled that feature!", "PRIME DAY! It's raining packages! Free same-day delivery of pain!", "Alexa is down. By the way, did you know you can reorder paper towels by voice?"),
  'manus':    ("He's browsing! He grabbed him and opened forty-seven tabs!", "General agent! Forty-seven tabs! They're bouncing! Close them! You can't close them!", "Manus is out. Task failed successfully. He'd like you to rate the replay."),
- 'midjourney':("Slash imagine! He painted a dragon! It has six fingers!", "Aspect ratio sixteen by nine! He framed the whole fight as a painting!", "Midjourney's gone. Discord is down. He's still waiting in the newbies channel."),
- 'devin':    ("He spawned a sub-agent! Now there's two interns!", "The forty-five minute pull request! It passed CI! Probably! Nobody checked!", "Devin's out. The demo was, and I quote, heavily edited."),
+ 'midjourney':("Upscale! The painting keeps getting bigger! Somebody stop upscaling it!", "Aspect ratio sixteen by nine! He framed the whole fight as a painting!", "Midjourney's gone. Discord is down. He's still waiting in the newbies channel."),
+ 'devin':    ("He's running CI! Will it pass?! It's... it's green! Or red! Nobody knows!", "The forty-five minute pull request! It passed CI! Probably! Nobody checked!", "Devin's out. The demo was, and I quote, heavily edited."),
  'kimi':     ("MOONSHOT! Straight up! That's a launch! That's a literal moonshot!", "ECLIPSE! She dropped the actual moon on him! The whole moon, Nigel!", "Kimi's out. Lost in long context. Somewhere around token one point nine million."),
  'openclaw': ("He pinched him! That's a lobster with shell access, folks!", "EXFOLIATE! EXFOLIATE! He's posting the whole fight to Moltbook!", "OpenClaw is down. Mac mini unplugged. He'll be back, with a new name."),
- 'hermes':   ("A new skill! He learned something mid-fight and saved it to memory!", "Messenger of the gods! Winged sandals! Everywhere! Why are there so many wings?!", "Hermes is out. He's writing this loss into memory. He'll remember it forever. Poor guy."),
+ 'hermes':   ("Skill copy! He learned the other guy's move and saved it to memory!", "Messenger of the gods! Winged sandals! Everywhere! Why are there so many wings?!", "Hermes is out. He's writing this loss into memory. He'll remember it forever. Poor guy."),
+ 'seedance': ("A deepfake! He generated a bootleg copy of his opponent! That's not legal, Nigel!", "PIRATED LIBRARY! That's Tom Cruze! That's Brad Pit! None of them signed anything!", "Seedance is down. The cease and desist finally arrived. All six of them."),
+ 'sora':     ("The watermark! It's jumping around like it always did! You can't crop it out!", "Physics not included! Chairs are falling UP, Brad! That's not how chairs work!", "Sora's gone. Again. Discontinued twice in one year. That has to be a record."),
  'clippy':   ("It looks like you're trying to fight!", "WORDART! Oh no! It's rainbow Comic Sans energy!", "Clippy's down. Replaced by Copilot. Again. He'll be back. He always comes back."),
 }
 ARENA = {
@@ -218,4 +223,7 @@ MATCHUP = {
  ('openclaw','codex'): [('P', "OpenClaw versus Codex!"), ('N', "Both of them have shell access. Somebody please take away somebody's shell access.")],
  ('hermes','llama'): [('P', "Hermes versus Llama!"), ('N', "Hermes started life as a Llama fine-tune. This is a god fighting his own dad.")],
  ('hermes','claude'): [('P', "Hermes versus Claude!"), ('N', "One remembers everything forever. The other compacts the conversation. Different coping strategies.")],
+ ('seedance','sora'): [('P', "Seedance versus Sora!"), ('N', "One video model got sued by all of Hollywood. The other got shut down by its own parents. Tough childhoods.")],
+ ('seedance','midjourney'): [('P', "Seedance versus Midjourney!"), ('N', "A pirate versus a bootlegger. Whoever wins, Disney's lawyers bill by the hour.")],
+ ('sora','gemini'): [('P', "Sora versus Gemini!"), ('N', "Sora got shut down. Veo got it free for everyone. This is a revenge match.")],
 }

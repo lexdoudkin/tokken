@@ -12,7 +12,7 @@ CODEX="You are the ChatGPT voice at its most sycophantic and eager-to-please: wa
 jobs=[]
 only=sys.argv[1:]
 for fid,d in Q.items():
-  if (only and fid not in only) or fid in ('jev','manus','devin','kimi','alexa','midjourney','openclaw','hermes'): continue   # jev speaks JSON (jev_voice.py)
+  if (only and fid not in only) or fid in ('jev','manus','devin','kimi','alexa','midjourney','openclaw','hermes','seedance','sora'): continue   # jev speaks JSON (jev_voice.py)
   for kind,arr in d.items():
     for i,t in enumerate(arr):
       key=f'v_{fid}_{"winq" if kind=="win" else kind}{i+1 if kind=="win" else i}'

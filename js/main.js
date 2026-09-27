@@ -224,7 +224,7 @@ function update() {
       if ((Input.keys.has('Enter') || localCtrl.pressed('start')) && online.typed.length === 4 && Net.st.status !== 'connecting') { Audio.S.select(); Net.join(online.typed); }
     }
   } else if (scene === 'select') {
-    const cols = 8;
+    const cols = 9;
     if (sel.stage && !sel.online) { scene = 'stage'; sceneT = 0; return; }
     if (!sel.online && --sel.timer <= 0) { sel.done = [true, true]; }
     const nav = (i, c) => {
@@ -680,7 +680,7 @@ function drawSelect(c) {
     if (sel.done[i]) chrome(c, 'LOCKED IN', x, 660, 24, { tone: 'gold' });
   });
   // portrait grid (Tekken style)
-  const cols = 8, pw = 80, ph = 80, gx = W / 2 - (cols * (pw + 6)) / 2, gy = 100;
+  const cols = 9, pw = 76, ph = 80, gx = W / 2 - (cols * (pw + 6)) / 2, gy = 100;
   ROSTER.forEach((id, k) => {
     const x = gx + (k % cols) * (pw + 6), y = gy + Math.floor(k / cols) * (ph + 6), f = FIGHTERS[id];
     const hidden = f.secret && sel.cur[0] !== k && sel.cur[1] !== k;

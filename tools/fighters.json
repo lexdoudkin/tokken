@@ -135,5 +135,18 @@
   "refs": [
    "/Users/alexander/tokken/assets/refs/hermes.png"
   ]
+ },
+ "seedance": {
+  "desc": "SEEDANCE (ByteDance's AI video generator), a slick dancing bootleg-movie robot: its head is a shiny chrome film clapperboard (like the reference thumbnail) with two glowing cyan LED eyes, a long dark trench coat whose inside lining is stuffed with pirated DVDs, the ByteDance Seed logo (four vertical rounded bars in gradient blue #2f55c8, sky blue #3a8fe0, cyan #1cc8d0, mint #74e0d0) glowing on its chest, sneakers, mid dance-move energy, sly and mischievous.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/seedance_2.png",
+   "/Users/alexander/tokken/assets/refs/seed_icon.png"
+  ]
+ },
+ "sora": {
+  "desc": "SORA, the discontinued OpenAI video model, as a GHOST of its app-icon mascot (see reference): a puffy white-to-sky-blue cloud body with two big dark-blue oval eyes containing white sparkle stars, but translucent and ghostly with a faint glow, a wispy ghost tail instead of legs (it hovers), two small cloud-puff arms, and a paper toe-tag tied to its tail reading 'DISCONTINUED'. Midnight blue #03275e and sky blue #74b8ff palette. Cute but spooky.",
+  "refs": [
+   "/Users/alexander/tokken/assets/refs/sora.png"
+  ]
  }
 }

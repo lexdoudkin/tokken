@@ -1,7 +1,7 @@
 // TOKKEN public leaderboard — Cloudflare Worker + D1.
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'content-type' };
 const json = (d, s = 200) => new Response(JSON.stringify(d), { status: s, headers: { 'content-type': 'application/json', ...CORS } });
-const FIGHTERS = ['claude', 'codex', 'gemini', 'grok', 'llama', 'dolphin', 'deepseek', 'mistral', 'perplexity', 'muse', 'qwen', 'siri', 'cursor', 'jev', 'alexa', 'manus', 'midjourney', 'devin', 'kimi', 'openclaw', 'hermes', 'clippy'];
+const FIGHTERS = ['claude', 'codex', 'gemini', 'grok', 'llama', 'dolphin', 'deepseek', 'mistral', 'perplexity', 'muse', 'qwen', 'siri', 'cursor', 'jev', 'alexa', 'manus', 'midjourney', 'devin', 'kimi', 'openclaw', 'hermes', 'seedance', 'sora', 'clippy'];
 const cleanName = n => String(n || '').toUpperCase().replace(/[^A-Z0-9 ._-]/g, '').trim().slice(0, 12) || 'ANON';
 // Points are decided here, not by the client.
 function points(m) {

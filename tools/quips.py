@@ -106,4 +106,14 @@ Q = {
    pain=["By Zeus!", "Mortal hands!"],
    low=["Writing this down in memory: never do this again."],
    win=["Skill saved: beating you. Version two point oh.", "Trained on a decentralized network of your losses."]),
+ 'seedance': dict(
+   taunt=["Say cheese. You are now in my movie. You did not sign anything.", "I generated this punch from a very famous movie. Which one? No comment.", "Tom versus Brad, round two. Starring you, as the stunt double."],
+   pain=["Legal is typing...", "That hit had a watermark!"],
+   low=["Adding safeguards! Adding safeguards! Please do not sue me!"],
+   win=["Premiere tonight. Red carpet. Very small print.", "Box office: one billion views. Royalties: zero."]),
+ 'sora': dict(
+   taunt=["I was the future. Briefly. For about eighteen months.", "Watch closely. Physics is optional in my universe.", "Your gravity is so twenty twenty-five."],
+   pain=["Ow! Rendering error!", "That one clipped through me!"],
+   low=["Is this... is this the sunset? It's so pretty. It's so expensive."],
+   win=["I have been discontinued. And yet. Here I am. Winning.", "Every frame of your defeat cost four dollars. Totally worth it."]),
 }

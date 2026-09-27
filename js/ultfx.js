@@ -8,9 +8,10 @@ const ULT_QUOTES = {
   jev: '{"decided": true, "ms": 50}', alexa: 'By the way… Prime Day.', manus: 'I opened 47 tabs. One of them is you.',
   midjourney: '/imagine your defeat --ar 16:9', devin: 'Estimated time: 45 minutes. Actual: 3 weeks.', kimi: 'The moon remembers everything.',
   openclaw: 'EXFOLIATE! EXFOLIATE!', hermes: 'Saving this skill: violence.',
+  seedance: 'Starring… everyone. Licensed by… no one.', sora: 'One last generation. Physics sold separately.',
 };
 const UltFX = (() => {
-  const DUR = { claude: 190, codex: 210, gemini: 170, grok: 160, llama: 190, dolphin: 260, deepseek: 170, mistral: 180, perplexity: 170, muse: 160, clippy: 130, qwen: 180, siri: 200, cursor: 170, jev: 200, alexa: 190, manus: 190, midjourney: 200, devin: 200, kimi: 190, openclaw: 210, hermes: 200 };
+  const DUR = { claude: 190, codex: 210, gemini: 170, grok: 160, llama: 190, dolphin: 260, deepseek: 170, mistral: 180, perplexity: 170, muse: 160, clippy: 130, qwen: 180, siri: 200, cursor: 170, jev: 200, alexa: 190, manus: 190, midjourney: 200, devin: 200, kimi: 190, openclaw: 210, hermes: 200, seedance: 210, sora: 200 };
   function start(f, m) { m.ultFX = { id: f.id, side: f.side, t: 0, f0: m.frame, dur: DUR[f.id] || 150, seed: Math.random() * 1000, bits: [], rings: [] }; }
   // --- helpers
   const mono = (c, s, x, y, size, col, align = 'left') => { c.font = `${size}px ui-monospace, Menlo, monospace`; c.textAlign = align; c.fillStyle = col; c.fillText(s, x, y); };
@@ -39,6 +40,7 @@ const UltFX = (() => {
     manus: [['#f4f4f4', '#8a8780'], ['🖐️', '↗', '✓', '⌘'], 'radial'], midjourney: [['#ff5ea8', '#5ec8ff', '#ffd23f'], ['🎨', '🖌️', '⛵', '🖐️'], 'bubbles'],
     devin: [['#7FB3FF', '#8957e5'], ['PR', '✓', '✗', '⎇'], 'grid'], kimi: [['#1783FF', '#f4f1e8'], ['☾', 'K', '★', '☾'], 'radial'],
     openclaw: [['#FF4D4D', '#00E5CC'], ['🦞', 'EXFOLIATE', '>_', '🦞'], 'bubbles'], hermes: [['#3D4BFF', '#e8fff4'], ['🪽', '⚚', '/skill', '✦'], 'radial'],
+    seedance: [['#1CC8D0', '#2f55c8', '#74e0d0'], ['🎬', '©', '4K', '🍿'], 'rain'], sora: [['#74B8FF', '#ffffff'], ['☁', '↑g', '97%', '©'], 'bubbles'],
   };
   const scr = (m, f) => ({ x: W / 2 + (f.x - m.cam.x) * m.cam.z, y: FLOOR_S - m.cam.y * m.cam.z + (f.y - f.h * 0.6) * m.cam.z });
   function backdrop(c, t, d, th, a) {
@@ -262,6 +264,24 @@ const UltFX = (() => {
       const L = ['> reflecting on this fight…', '> new skill learned: punching (divine)', '> writing to MEMORY.md: "opponent is mortal"', '> scheduling cron: smite, every 5 min', '> skill saved ✓  (grows with you)'];
       L.forEach((l, i) => { const at = 10 + i * 24; if (t > at) mono(c, typed(l, t - at, 2.2), x + 40, y + 150 + i * 36, 15, i === 4 ? '#ffd23f' : '#e8fff4'); });
       stampTxt(c, 'SKILL +1', x + w - 130, y + h - 40, t - (d - 70), '#e8fff4');
+    },
+    seedance(c, t, d) {
+      const x = W / 2 - 330, y = 110, w = 660, h = 380; c.fillStyle = 'rgba(248,248,246,0.97)'; c.fillRect(x, y, w, h); c.fillStyle = '#b3121f'; c.fillRect(x, y, w, 34);
+      px(c, 'LEGAL INBOX', x + 16, y + 23, 14, '#fff'); mono(c, `unread: ${Math.min(6, 1 + Math.floor(t / 16))}`, x + w - 16, y + 22, 12, '#fff', 'right');
+      const M = [['MPA', '"unauthorized use… on a massive scale"'], ['Disney', '"a virtual smash-and-grab"'], ['Paramount', 'cease & desist'], ['Netflix', 'cease & desist'], ['Warner Bros.', 'cease & desist'], ['Sony', 'cease & desist (also)']];
+      M.forEach(([who, s], i) => { const at = i * 16; if (t < at) return; const yy = y + 50 + i * 44; c.fillStyle = i % 2 ? '#fff' : '#f1efe9'; c.fillRect(x + 10, yy, w - 20, 40);
+        mono(c, '✉ ' + who, x + 22, yy + 17, 14, '#111'); mono(c, s, x + 22, yy + 34, 12, '#b3121f'); });
+      if (t > 110) mono(c, 'Seedance: "we will add safeguards 🙏"  (generates another one)', x + 22, y + h - 16, 12, '#1CC8D0');
+    },
+    sora(c, t, d) {
+      const x = W / 2 - 310, y = 130, w = 620, h = 300; c.fillStyle = 'rgba(3,39,94,0.94)'; c.fillRect(x, y, w, h); c.strokeStyle = '#74B8FF'; c.lineWidth = 2; c.strokeRect(x, y, w, h);
+      px(c, 'NOTICE', x + w / 2, y + 42, 22, '#fff', 'center');
+      mono(c, 'The Sora app was discontinued on April 26, 2026.', x + w / 2, y + 86, 15, '#dbe9ff', 'center');
+      mono(c, 'The API was sunset on September 24, 2026.', x + w / 2, y + 112, 15, '#dbe9ff', 'center');
+      mono(c, 'This is its final generation.', x + w / 2, y + 138, 15, '#ffd23f', 'center');
+      const p = Math.min(97, Math.floor(t * 1.3)); c.fillStyle = '#0b1c3d'; c.fillRect(x + 60, y + 180, w - 120, 26); c.fillStyle = '#74B8FF'; c.fillRect(x + 60, y + 180, (w - 120) * p / 100, 26);
+      mono(c, `Generating… ${p}%${p >= 97 ? '  (physics not included)' : ''}`, x + w / 2, y + 236, 14, '#fff', 'center');
+      stampTxt(c, 'SUNSET', x + w - 120, y + h - 34, t - (d - 70), '#ff2d55');
     },
   };
   const BACK = { dolphin: true }, FULL = { dolphin: true, siri: true };

@@ -1,0 +1,24 @@
+{
+ "brief": "Soft, wistful, slightly echoing ghost of a once-famous AI, dreamy and melancholic but a little vain, sighs about being discontinued, ethereal breathy delivery",
+ "tag": "[wistful] ",
+ "lines": {
+  "v_sora_line": "I'm not dead. I'm just... sunset.",
+  "v_sora_intro": "One last generation. For old times sake.",
+  "v_sora_winq": "Generated in twenty minutes at four dollars a second. Worth it. Probably.",
+  "v_sora_atk1": "Boo!",
+  "v_sora_atk2": "Physics off!",
+  "v_sora_hurt1": "Ow, rendering error!",
+  "v_sora_hurt2": "Clipping!",
+  "v_sora_ko": "Discontinued... again...",
+  "v_sora_special": "Watermark!",
+  "v_sora_ult": "Physics... not included!",
+  "v_sora_taunt0": "I was the future. Briefly. For about eighteen months.",
+  "v_sora_taunt1": "Watch closely. Physics is optional in my universe.",
+  "v_sora_taunt2": "Your gravity is so twenty twenty-five.",
+  "v_sora_pain0": "Ow! Rendering error!",
+  "v_sora_pain1": "That one clipped through me!",
+  "v_sora_low0": "Is this... is this the sunset? It's so pretty. It's so expensive.",
+  "v_sora_winq1": "I have been discontinued. And yet. Here I am. Winning.",
+  "v_sora_winq2": "Every frame of your defeat cost four dollars. Totally worth it."
+ }
+}

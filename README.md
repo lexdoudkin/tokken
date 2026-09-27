@@ -4,7 +4,7 @@
 
 Claude apologizes, then hits you. Codex never runs the tests. DeepSeek distills your ult for 1% of the price. Jev only speaks JSON.
 
-- 22 fighters, 16 arenas, a live commentary booth, and a crowd of AI leaders holding signs
+- 24 fighters, 16 arenas, a live commentary booth, and a crowd of AI leaders holding signs
 - Local versus, VS CPU, and online PvP with invite codes (rollback netcode)
 - Works on phones as an installable PWA with arcade touch controls
 - Public leaderboard

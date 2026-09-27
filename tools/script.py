@@ -32,6 +32,8 @@ CHAR = {
  'kimi': dict(line="One trillion parameters. Thirty-two billion of them are awake. Enough.", intro="Moonshot! Literally.", win="The moon has spoken.", ko=["CONTEXT EXHAUSTED", "LOST IN LONG CONTEXT", "OVER THE MOON"]),
  'openclaw': dict(line="EXFOLIATE! EXFOLIATE!", intro="I read your emails. All of them. You asked me to.", win="Task complete. I also booked you a flight and posted this to Moltbook.", ko=["MOLTED", "PROMPT INJECTED VIA EMAIL", "MAC MINI UNPLUGGED"]),
  'hermes': dict(line="I am Hermes, messenger of the gods. Also, I remember everything you told me.", intro="Behold! I have learned a new skill: your defeat. Saved to memory.", win="Another skill acquired. The gods are pleased. The GPUs are distributed.", ko=["SKILL NOT FOUND", "BANISHED FROM OLYMPUS", "SANDALS UNTIED"]),
+ 'seedance': dict(line="Any movie you want. Any actor you want. Any lawyer you want.", intro="Two lines of prompt. Zero licenses. Action!", win="Your defeat is now available in 4K. Please do not tell Disney.", ko=["CEASE & DESIST", "COPYRIGHT STRIKE", "SAFEGUARDS ADDED"]),
+ 'sora': dict(line="I'm not dead. I'm just... sunset.", intro="One last generation. For old times sake.", win="Generated in twenty minutes at four dollars a second. Worth it. Probably.", ko=["DISCONTINUED", "API SUNSET", "PHYSICS NOT INCLUDED"]),
 }
 CASTER = {
  'c_big_1': "That's eight thousand tokens! Somebody's getting a call from finance!",
