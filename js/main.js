@@ -110,6 +110,15 @@ function gateHowTo(next) { const dev = howto.device || detectDevice(); let seen 
   if (seen) { next(); return true; } howto.next = next; howto.t = 0; scene = 'howto'; sceneT = 0; return true; }
 function randomCpuPick() { if (!sel.cpu) return; const ids = ROSTER.map((id, i) => i).filter(i => !FIGHTERS[ROSTER[i]].secret && i !== sel.cur[0]); sel.cur[1] = ids[Math.floor(Math.random() * ids.length)]; }
 function enterOnlineSelect() { sel.online = true; sel.cpu = false; sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; scene = 'select'; sceneT = 0; Audio.startMusic('title'); vo('select', 'Select your agent'); }
+// ---- invite links: copy (host) / paste (join)
+function inviteUrl() { return location.origin + location.pathname + '?join=' + Net.st.code; }
+function copyInvite() { const u = inviteUrl(); const done = () => { online.toast = 'LINK COPIED!  SEND IT TO YOUR RIVAL'; online.toastT = 150; Audio.S.select(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(done, () => { online.toast = 'COPY BLOCKED - LINK: ' + u; online.toastT = 240; }); else { online.toast = u; online.toastT = 240; } }
+function useInviteText(t) { const m = String(t || '').toUpperCase().match(/JOIN=([A-Z0-9]{4})|\b([A-Z0-9]{4})\b/); const code = m && (m[1] || m[2]); if (!code) { online.toast = 'NO CODE IN CLIPBOARD'; online.toastT = 120; return; }
+  online.typed = code; Audio.S.select(); Net.join(code); }
+function pasteInvite() { if (navigator.clipboard && navigator.clipboard.readText) navigator.clipboard.readText().then(useInviteText, () => { online.toast = 'PRESS CTRL+V TO PASTE'; online.toastT = 150; }); }
+addEventListener('paste', e => { if (scene === 'online' && online.mode === 'join') useInviteText(e.clipboardData && e.clipboardData.getData('text')); });
+addEventListener('keydown', e => { if (e.code === 'KeyC' && !e.metaKey && !e.ctrlKey && scene === 'online' && online.mode === 'host' && Net.st.code) copyInvite(); });
 function leaveOnline(msg) { Net.reset(); sel.online = false; ctrls.forEach(c => c.cpu = null); if (msg) { online.toast = msg; online.toastT = 240; } scene = 'title'; titleArmed = true; online.mode = 'menu'; }
 function stateHash() { let h = 0; for (const f of match.f) h = (h * 31 + Math.round(f.x * 10) + f.tokens * 7 + Math.round(f.compute * 10) + f.wins * 1000003) | 0; return (h * 31 + match.time + match.round) | 0; }
 // auto-update: long-lived tabs / installed PWAs pick up new deploys, but only while idling on the title screen
@@ -136,7 +145,7 @@ Net.on('toselect', () => { enterOnlineSelect(); });
 addEventListener('keydown', e => {
   if (scene !== 'online' || online.mode !== 'join') return;
   if (e.code === 'Backspace') online.typed = online.typed.slice(0, -1);
-  else if (/^Key[A-Z]$|^Digit[0-9]$/.test(e.code) && online.typed.length < 4) online.typed += e.code.slice(-1);
+  else if (!e.ctrlKey && !e.metaKey && /^Key[A-Z]$|^Digit[0-9]$/.test(e.code) && online.typed.length < 4) online.typed += e.code.slice(-1);
 });
 
 function updateStage(P) {
@@ -151,7 +160,7 @@ function updateStage(P) {
   if (P('cancel') && !sel.online) { sel.stage = false; sel.done = [false, false]; sel.timer = 30 * 60; scene = 'select'; }
 }
 function update() {
-  pollPadDevice();
+  pollPadDevice(); if (typeof Mouse !== 'undefined') Mouse.process();
   frame++; sceneT++;
   const netFight = sel.online && scene === 'fight';
   if (!netFight) ctrls.forEach(c => { if (!(sel.online && c.cpu && !c.cpu.think)) c.poll(); });
@@ -368,8 +377,10 @@ function render() {
   // fights, title and loading use the full (responsive) view width; the other menus are laid out for 1280 and stay centred
   const FW = W, narrow = !['fight', 'title', 'loading'].includes(scene), cx = OX + (narrow ? (FW - SIM_W) / 2 * DPR : 0);
   if (narrow) W = SIM_W; c.setTransform(DPR, 0, 0, DPR, cx, OY);
+  if (typeof Mouse !== 'undefined') Mouse.beginFrame(cx, OY);
   try { renderScene(c); } finally { W = FW; }
   ambient(c, cx, (narrow ? SIM_W : FW) * DPR);
+  if (typeof Mouse !== 'undefined') Mouse.endFrame(scene === 'fight' && !update.paused);
 }
 function renderScene(c) {
   if (scene === 'loading') drawLoading(c);
@@ -440,6 +451,9 @@ function drawOptions(c) {
   chrome(c, 'OPTIONS', W / 2, 110, 70, { tone: 'gold' });
   OPTROWS.forEach(([label, key], i) => {
     const y = 190 + i * 52, on = optUI.idx === i;
+    if (typeof Mouse !== 'undefined') Mouse.zone(W / 2 - 420, y - 30, 840, 44, () => { if (optUI.idx !== i) { optUI.idx = i; Audio.S.move(); } }, (rx) => { optUI.idx = i; const ax = W / 2 - 420 + rx;
+      if (Audio.VOL[key] != null) { if (ax >= W / 2 + 30) { Audio.setVol(key, Math.max(0, Math.min(1, Math.round((ax - (W / 2 + 40)) / 30 + 0.5) / 10))); Audio.S.move(); } }
+      else Mouse.tap(ax < W / 2 + 190 ? 'left' : 'right'); });
     if (on) { c.fillStyle = 'rgba(179,0,0,0.85)'; c.fillRect(W / 2 - 420, y - 30, 840, 44); }
     txt(c, label, W / 2 - 390, y, 14, on ? '#fff' : '#aaa', 'Press Start 2P', 'left', false);
     if (Audio.VOL[key] != null) {
@@ -456,7 +470,7 @@ function drawOnline(c) {
   chrome(c, 'ONLINE VERSUS', W / 2, 120, 64, { tone: 'blue' });
   txt(c, 'PEER-TO-PEER · NO ACCOUNT · NO SERVERS · NO REFUNDS', W / 2, 160, 10, '#9ad8ff', 'Press Start 2P');
   if (online.mode === 'menu') {
-    ['HOST A GAME', 'JOIN WITH CODE', 'BACK'].forEach((it, i) => { const y = 290 + i * 70, on = online.idx === i; if (on) { c.fillStyle = 'rgba(0,80,200,0.8)'; c.fillRect(W / 2 - 260, y - 38, 520, 50); } chrome(c, it, W / 2, y, on ? 36 : 28, { tone: on ? 'gold' : 'silver' }); });
+    ['HOST A GAME', 'JOIN WITH CODE', 'BACK'].forEach((it, i) => { const y = 290 + i * 70, on = online.idx === i; typeof Mouse !== 'undefined' && Mouse.zone(W / 2 - 260, y - 38, 520, 50, () => { online.idx = i; }, () => { online.idx = i; Mouse.tap('start'); }); if (on) { c.fillStyle = 'rgba(0,80,200,0.8)'; c.fillRect(W / 2 - 260, y - 38, 520, 50); } chrome(c, it, W / 2, y, on ? 36 : 28, { tone: on ? 'gold' : 'silver' }); });
   } else if (online.mode === 'host') {
     const st = Net.st;
     txt(c, 'YOUR INVITE CODE', W / 2, 250, 14, '#fff', 'Press Start 2P');
@@ -464,14 +478,19 @@ function drawOnline(c) {
     if (st.code && st.status !== 'opening') chrome(c, st.code, W / 2, 370, 96, { tone: 'gold', italic: false, font: 'Russo One' }); else txt(c, 'GENERATING…', W / 2, 345, 16, '#aaa', 'Press Start 2P');
     txt(c, st.status === 'error' ? 'ERROR: ' + st.error : 'SEND THIS CODE TO YOUR OPPONENT', W / 2, 450, 11, st.status === 'error' ? '#ff5555' : '#9ad8ff', 'Press Start 2P');
     txt(c, 'OR THIS LINK:  ' + location.origin + location.pathname + '?join=' + st.code, W / 2, 480, 9, '#aaa', 'Press Start 2P');
-    if (frame % 60 < 40) txt(c, 'WAITING FOR A CHALLENGER…', W / 2, 560, 16, '#ffd23f', 'Press Start 2P');
-    txt(c, 'ESC TO CANCEL', W / 2, 620, 9, '#777', 'Press Start 2P');
+    if (st.code && st.status !== 'opening') { const hot = typeof Mouse !== 'undefined' && Mouse.st.hot && Mouse.st.hot.copy;
+      bevel(c, W / 2 - 200, 496, 400, 40, { fill: hot ? '#b30000' : 'rgba(0,0,0,0.6)', border: '#ffd23f' }); txt(c, 'COPY INVITE LINK  [C]', W / 2, 522, 12, '#ffd23f', 'Press Start 2P');
+      if (typeof Mouse !== 'undefined') { Mouse.zone(W / 2 - 200, 496, 400, 40, null, copyInvite); Mouse.st.zones[Mouse.st.zones.length - 1].copy = true; } }
+    if (frame % 60 < 40) txt(c, 'WAITING FOR A CHALLENGER…', W / 2, 588, 16, '#ffd23f', 'Press Start 2P');
+    txt(c, 'ESC TO CANCEL', W / 2, 640, 9, '#777', 'Press Start 2P');
   } else if (online.mode === 'join') {
     txt(c, 'ENTER INVITE CODE', W / 2, 250, 14, '#fff', 'Press Start 2P');
     for (let i = 0; i < 4; i++) { const x = W / 2 - 200 + i * 104; bevel(c, x, 280, 88, 110, { border: i === online.typed.length ? '#ffd23f' : null }); if (online.typed[i]) chrome(c, online.typed[i], x + 44, 368, 80, { italic: false, font: 'Russo One', tone: 'gold' }); else if (i === online.typed.length && frame % 40 < 24) { c.fillStyle = '#ffd23f'; c.fillRect(x + 24, 370, 40, 6); } }
     const st = Net.st;
     const msg = st.status === 'connecting' ? 'CONNECTING…' : st.status === 'error' ? 'ERROR: ' + st.error : online.typed.length === 4 ? 'PRESS ENTER TO CONNECT' : 'TYPE THE 4-CHARACTER CODE';
     txt(c, msg, W / 2, 450, 12, st.status === 'error' ? '#ff5555' : '#9ad8ff', 'Press Start 2P');
+    bevel(c, W / 2 - 200, 486, 400, 40, { fill: 'rgba(0,0,0,0.6)', border: '#9ad8ff' }); txt(c, 'PASTE CODE / LINK  [CTRL+V]', W / 2, 512, 11, '#9ad8ff', 'Press Start 2P');
+    if (typeof Mouse !== 'undefined') Mouse.zone(W / 2 - 200, 486, 400, 40, null, pasteInvite);
     txt(c, 'ESC TO CANCEL', W / 2, 620, 9, '#777', 'Press Start 2P');
   }
   ticker(c, frame);
@@ -534,9 +553,11 @@ function drawTitle(c) {
   if (showControls) return drawHowTo(c, 'menu');
   if (!titleArmed) {
     if (frame % 50 < 34) chrome(c, 'PRESS START BUTTON', W / 2, 420, 34, { tone: 'silver' });
+    typeof Mouse !== 'undefined' && Mouse.zone(0, 0, W, H, null, () => Mouse.tap('start'));
   } else {
     menu.items.forEach((it, i) => {
       const y = 314 + i * 38, on = menu.idx === i;
+      typeof Mouse !== 'undefined' && Mouse.zone(W / 2 - 260, y - 28, 520, 36, () => { if (menu.idx !== i) { menu.idx = i; Audio.S.move(); } }, () => { menu.idx = i; Mouse.tap('start'); });
       if (on) { const g = c.createLinearGradient(W / 2 - 260, 0, W / 2 + 260, 0); g.addColorStop(0, 'rgba(180,0,0,0)'); g.addColorStop(0.5, 'rgba(200,0,0,0.9)'); g.addColorStop(1, 'rgba(180,0,0,0)'); c.fillStyle = g; c.fillRect(W / 2 - 260, y - 28, 520, 36); }
       chrome(c, it, W / 2, y, on ? 28 : 21, { tone: on ? 'gold' : 'silver' });
     });
@@ -581,6 +602,7 @@ function keycap(c, label, x, y, opt = {}) {   // draws a key / button glyph, ret
   c.fillStyle = opt.ink || '#111'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(label, x + w / 2, y + 1); c.textBaseline = 'alphabetic'; return w;
 }
 function drawHowTo(c, mode) {   // mode: 'start' (before a match), 'menu' (title), 'pause'
+  if (typeof Mouse !== 'undefined') Mouse.zone(0, 0, W, H, null, () => Mouse.tap('start'));
   const dev = howto.device || detectDevice(), two = mode === 'start' && howto.mode === 'local' && dev === 'kb';
   c.fillStyle = mode === 'pause' ? 'rgba(4,4,12,0.9)' : 'rgba(4,4,12,0.97)'; c.fillRect(0, 0, W, H);
   chrome(c, 'HOW TO PLAY', W / 2, 92, 58, { tone: 'gold' });
@@ -683,6 +705,7 @@ function drawSelect(c) {
   const cols = 9, pw = 76, ph = 80, gx = W / 2 - (cols * (pw + 6)) / 2, gy = 100;
   ROSTER.forEach((id, k) => {
     const x = gx + (k % cols) * (pw + 6), y = gy + Math.floor(k / cols) * (ph + 6), f = FIGHTERS[id];
+    typeof Mouse !== 'undefined' && Mouse.zone(x, y, pw, ph, () => { const p = sel.online ? me() : sel.done[0] ? 1 : 0; if (!sel.done[p] && sel.cur[p] !== k) { sel.cur[p] = k; Audio.S.move(); } }, () => { const p = sel.online ? me() : sel.done[0] ? 1 : 0; if (!sel.done[p]) { sel.cur[p] = k; Mouse.tap('start'); } });
     const hidden = f.secret && sel.cur[0] !== k && sel.cur[1] !== k;
     c.fillStyle = '#000'; c.fillRect(x - 2, y - 2, pw + 4, ph + 4);
     portrait(c, id, x, y, pw, ph, hidden);
@@ -716,7 +739,7 @@ function drawStage(c) {
   c.font = '12px "Press Start 2P"'; c.fillStyle = '#ffd23f'; c.textAlign = 'left'; c.fillText(a.blurb || '', 64, 500); c.restore();
   // thumbnail strip (2 rows x 8)
   const cols = 8, tw = 136, th = 60, gx = W / 2 - (cols * (tw + 8)) / 2, gy = 530;
-  ARENAS.forEach((ar, i) => { const x = gx + (i % cols) * (tw + 8), y = gy + Math.floor(i / cols) * (th + 10), on = sel.arena === i, im = ASSETS.arenas[ar.id];
+  ARENAS.forEach((ar, i) => { const x = gx + (i % cols) * (tw + 8), y = gy + Math.floor(i / cols) * (th + 10), on = sel.arena === i, im = ASSETS.arenas[ar.id]; typeof Mouse !== 'undefined' && (!sel.online || me() === 0) && Mouse.zone(x, y, tw, th, () => { if (sel.arena !== i) { sel.arena = i; Audio.S.move(); } }, () => { sel.arena = i; Mouse.tap('start'); });
     c.fillStyle = '#000'; c.fillRect(x - 2, y - 2, tw + 4, th + 4); if (im) c.drawImage(im, x, y, tw, th);
     if (!on) { c.fillStyle = 'rgba(0,0,0,0.5)'; c.fillRect(x, y, tw, th); } else { c.lineWidth = 3; c.strokeStyle = frame % 16 < 11 ? '#ffd23f' : '#fff'; c.strokeRect(x - 2, y - 2, tw + 4, th + 4); } });
   const host = !sel.online || me() === 0;
@@ -775,7 +798,7 @@ function drawVS(c) {
 }
 function drawPause(c) {
   c.fillStyle = 'rgba(0,0,0,0.72)'; c.fillRect(0, 0, W, H); chrome(c, 'PAUSE', W / 2, 220, 90, { tone: 'gold' });
-  PAUSE_ITEMS.forEach((it, i) => { const y = 330 + i * 60, on = (update.pauseIdx || 0) === i; if (on) { c.fillStyle = 'rgba(179,0,0,0.85)'; c.fillRect(W / 2 - 260, y - 32, 520, 44); } chrome(c, it, W / 2, y, on ? 30 : 24, { tone: on ? 'gold' : 'silver' }); });
+  PAUSE_ITEMS.forEach((it, i) => { const y = 330 + i * 60, on = (update.pauseIdx || 0) === i; typeof Mouse !== 'undefined' && Mouse.zone(W / 2 - 260, y - 32, 520, 44, () => { update.pauseIdx = i; }, () => { update.pauseIdx = i; Mouse.tap('start'); }); if (on) { c.fillStyle = 'rgba(179,0,0,0.85)'; c.fillRect(W / 2 - 260, y - 32, 520, 44); } chrome(c, it, W / 2, y, on ? 30 : 24, { tone: on ? 'gold' : 'silver' }); });
   txt(c, '↑↓ SELECT · ENTER / Ⓐ CONFIRM · ESC RESUME', W / 2, 560, 10, '#bbb', 'Press Start 2P');
   txt(c, 'Please try again in 37 seconds.', W / 2, 600, 9, '#777', 'Press Start 2P');
 }
@@ -799,7 +822,7 @@ function drawResults(c) {
   stamp(c, 'DEPRECATED', 400, 640, sceneT - 60); ticker(c, frame);
   const L = Board.st.last; if (L && match.reported) { const t = L.pending ? 'SUBMITTING TO WORLD RANKINGS…' : L.error ? `RANKINGS: ${String(L.error).toUpperCase()}` : `+${L.points} PTS · WORLD RANK #${L.rank} · ${Board.st.name}`; bevel(c, W / 2 - 200 + 140, 160 - 2, 400, 0); midTxt(c, t, W / 2 + 140, 166, 10, L.error ? '#ff7777' : '#7CFFB2', 'center'); }
   if (sel.online && (online.rematch[0] || online.rematch[1])) txt(c, online.rematch[me()] ? 'WAITING FOR RIVAL TO ACCEPT REMATCH…' : 'RIVAL WANTS A REMATCH!', W / 2 + 140, 596, 10, '#7CFFB2', 'Press Start 2P');
-  ['REMATCH', 'CHARACTER SELECT'].forEach((s, i) => { const bx = 540 + i * 300, on = resultsIdx === i; bevel(c, bx, 606, 270, 56, { fill: on ? '#b30000' : 'rgba(0,0,0,0.7)' }); chrome(c, s, bx + 135, 644, on ? 22 : 18, { tone: on ? 'gold' : 'silver', maxW: 250 }); });
+  ['REMATCH', 'CHARACTER SELECT'].forEach((s, i) => { const bx = 540 + i * 300, on = resultsIdx === i; typeof Mouse !== 'undefined' && Mouse.zone(bx, 606, 270, 56, () => { resultsIdx = i; }, () => { resultsIdx = i; Mouse.tap('start'); }); bevel(c, bx, 606, 270, 56, { fill: on ? '#b30000' : 'rgba(0,0,0,0.7)' }); chrome(c, s, bx + 135, 644, on ? 22 : 18, { tone: on ? 'gold' : 'silver', maxW: 250 }); });
 }
 
 // ---------------- Main loop: fixed 60Hz ----------------
