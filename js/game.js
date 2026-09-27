@@ -210,7 +210,7 @@ class Fighter {
     if (key !== 'light') Audio.S.whoosh();
     if ((key === 'heavy' && Math.random() < 0.8) || (key === 'light' && Math.random() < 0.3) || (key === 'low' && Math.random() < 0.3) || key === 'slop') vo(`v_${this.id}_atk${key === 'heavy' ? 2 : 1}`, '', { who: 'char' });
   }
-  dmgMul() { return this.cfg.dmgMul * (this.status.think ? 1.8 : 1); }
+  dmgMul() { return this.cfg.dmgMul * (this.status.think ? 1.8 : 1) * (this.handicap || 1); }
   update(g, opp) {
     const c = this.ctrl; this.st++;
     for (const k in this.status) if (this.status[k] > 0) this.status[k]--;

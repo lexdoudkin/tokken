@@ -5,12 +5,15 @@ const menu = { idx: 0, items: ['VS CPU', 'LOCAL VERSUS', 'ONLINE', 'RANKINGS', '
 const OPT = { cpu: 1, crt: true };
 try { Object.assign(OPT, JSON.parse(localStorage.getItem('tokken.opt') || '{}')); } catch (e) {}
 const saveOpt = () => { try { localStorage.setItem('tokken.opt', JSON.stringify(OPT)); } catch (e) {} };
-const CPU_LEVELS = [['EASY', 0.35], ['NORMAL', 0.62], ['HARD', 0.85], ['AGI', 1.0]];
+const CPU_LEVELS = [['EASY', 0.25], ['NORMAL', 0.42], ['HARD', 0.7], ['AGI', 1.0]];
+const CPU_DMG = [0.75, 0.88, 1, 1.1];   // arcade handicap: the CPU hits softer on the lower difficulties
+let cpuAssist = 0;                       // invisible rubber band: every loss in a row eases the CPU a little, a win resets it
 const OPTROWS = [['MASTER', 'master'], ['MUSIC', 'music'], ['SFX', 'sfx'], ['ANNOUNCER', 'announcer'], ['COMMENTARY', 'commentary'], ['CHARACTER VOICES', 'voices'], ['CPU DIFFICULTY', 'cpu'], ['CRT SCANLINES', 'crt'], ['BACK', 'back']];
 const optUI = { idx: 0 };
 const nameUI = { buf: '', after: null };
 function reportMatch() {
   const mode = sel.online ? 'online' : sel.cpu ? 'cpu' : 'local'; if (mode === 'local' || !match || match.reported) return; match.reported = true;
+  if (mode === 'cpu') cpuAssist = match.winner === match.f[0] ? 0 : Math.min(4, cpuAssist + 1);   // rubber band
   const i = sel.online ? me() : 0, f = match.f[i], o = match.f[1 - i];
   const info = { fighter: f.id, opponent: o.id, mode, diff: OPT.cpu, won: match.winner === f, perfect: (match.perfects || [0, 0])[i] > 0, combo: f.stats.maxCombo };
   if (!Board.st.name) { nameUI.buf = ''; nameUI.after = () => Board.submit(info); scene = 'name'; sceneT = 0; return; }
@@ -40,7 +43,7 @@ class CPU {
     const oppAttacking = opp.state === 'attack' && opp.move && opp.mt <= (opp.move.startup + opp.move.active) && dist < 330;
     const projIncoming = g.projs.some(p => p.owner === opp && Math.abs(p.x - me.x) < 260 && Math.sign(me.x - p.x) === Math.sign(p.vx || 1));
     if ((oppAttacking || projIncoming) && Math.random() < this.level * 0.9 && me.free) {
-      if (this.react <= 0) this.react = 3 + Math.floor(Math.random() * 6);
+      if (this.react <= 0) this.react = 3 + Math.floor(Math.random() * 6) + Math.round((1 - this.level) * 18);   // humans need ~15-20 frames to react
       if (--this.react <= 0 || this.planT > 0) { o[away] = true; if (opp.move?.low || (!projIncoming && Math.random() < 0.3)) o.down = true; this.plan = 'block'; this.planT = 12; }
     }
     if (this.planT > 0) { this.planT--; if (this.plan === 'block') { o[away] = true; return; } if (this.plan === 'walk') o[toward] = true; if (this.plan === 'back') o[away] = true; if (this.plan === 'crouch') o.down = true; return; }
@@ -77,8 +80,9 @@ function startMatch(seed) {
   const cpu = sel.cpu && !sel.online;
   gseed(seed ?? Math.floor(Math.random() * 2 ** 31));
   if (sel.online) { ctrls[0].cpu = { out: {} }; ctrls[1].cpu = { out: {} }; ctrls[0].alsoPad = null; ctrls.forEach(c => { c.cur = {}; c.prev = {}; c.pressT = {}; c.frame = 0; }); Net.resetFrames(online.delay ?? 1); online.rematch = [false, false]; update.paused = false; }
-  else { ctrls[0].cpu = null; ctrls[1].cpu = cpu ? new CPU(CPU_LEVELS[OPT.cpu][1]) : null; ctrls[0].alsoPad = cpu ? 1 : null; ctrls[0].bothKB = !!cpu; }
+  else { ctrls[0].cpu = null; ctrls[1].cpu = cpu ? new CPU(Math.max(0.15, CPU_LEVELS[OPT.cpu][1] - cpuAssist * 0.07)) : null; ctrls[0].alsoPad = cpu ? 1 : null; ctrls[0].bothKB = !!cpu; }
   match = new Match(ROSTER[sel.cur[0]], ROSTER[sel.cur[1]], ARENAS[sel.arena], ctrls, cpu);
+  if (cpu) match.f[1].handicap = CPU_DMG[OPT.cpu] * Math.max(0.8, 1 - cpuAssist * 0.05);
   scene = 'fight'; sceneT = 0; Audio.startMusic('battle');
 }
 function preloadMatch(a, b, arena) {
