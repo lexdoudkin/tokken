@@ -96,6 +96,14 @@ function toVS() {
 
 const me = () => Net.st.role === 'host' ? 0 : 1;
 // VS CPU: the CPU's cursor starts on a random agent every game (the player can still move it)
+function startLocal(item) {
+  sel.online = false; ctrls.forEach(c => { c.cpu = null; c.bothKB = false; c.alsoPad = null; });
+  sel.cpu = item === 'VS CPU'; ctrls[0].bothKB = sel.cpu; sel.done = [false, false]; randomCpuPick(); sel.stage = false; sel.timer = 30 * 60; scene = 'select'; sceneT = 0; Audio.startMusic('title');
+  vo('select', 'Select your agent');
+}
+/** show HOW TO PLAY first if this device hasn't seen it; returns true when it took over */
+function gateHowTo(next) { const dev = howto.device || detectDevice(); let seen = false; try { seen = localStorage.getItem('tokken.howto.' + dev) === '1'; } catch (e) {}
+  if (seen) { next(); return true; } howto.next = next; howto.t = 0; scene = 'howto'; sceneT = 0; return true; }
 function randomCpuPick() { if (!sel.cpu) return; const ids = ROSTER.map((id, i) => i).filter(i => !FIGHTERS[ROSTER[i]].secret && i !== sel.cur[0]); sel.cur[1] = ids[Math.floor(Math.random() * ids.length)]; }
 function enterOnlineSelect() { sel.online = true; sel.cpu = false; sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; scene = 'select'; sceneT = 0; Audio.startMusic('title'); vo('select', 'Select your agent'); }
 function leaveOnline(msg) { Net.reset(); sel.online = false; ctrls.forEach(c => c.cpu = null); if (msg) { online.toast = msg; online.toastT = 240; } scene = 'title'; titleArmed = true; online.mode = 'menu'; }
@@ -139,6 +147,7 @@ function updateStage(P) {
   if (P('cancel') && !sel.online) { sel.stage = false; sel.done = [false, false]; sel.timer = 30 * 60; scene = 'select'; }
 }
 function update() {
+  pollPadDevice();
   frame++; sceneT++;
   const netFight = sel.online && scene === 'fight';
   if (!netFight) ctrls.forEach(c => { if (!(sel.online && c.cpu && !c.cpu.think)) c.poll(); });
@@ -161,11 +170,13 @@ function update() {
       if (item === 'CONTROLS') { showControls = true; return; }
       if (item === 'OPTIONS') { scene = 'options'; optUI.idx = 0; sceneT = 0; return; }
       if (item === 'RANKINGS') { scene = 'rankings'; sceneT = 0; Board.refresh(); return; }
-      if (item === 'ONLINE') { scene = 'online'; online.mode = 'menu'; online.idx = 0; sceneT = 0; return; }
-      sel.online = false; ctrls.forEach(c => { c.cpu = null; c.bothKB = false; c.alsoPad = null; });
-      sel.cpu = item === 'VS CPU'; ctrls[0].bothKB = sel.cpu; sel.done = [false, sel.cpu ? false : false]; randomCpuPick(); sel.stage = false; sel.timer = 30 * 60; scene = 'select'; sceneT = 0; Audio.startMusic('title');
-      vo('select', 'Select your agent');
+      howto.mode = item === 'LOCAL VERSUS' ? 'local' : item === 'ONLINE' ? 'online' : 'cpu';
+      if (item === 'ONLINE') { gateHowTo(() => { scene = 'online'; online.mode = 'menu'; online.idx = 0; sceneT = 0; }); return; }
+      gateHowTo(() => startLocal(item));
     }
+  } else if (scene === 'howto') {
+    howto.t++;
+    if (howto.t > 40 && (P('confirm') || P('start') || P('cancel') || P('light') || P('heavy') || P('special'))) { Audio.S.select(); try { localStorage.setItem('tokken.howto.' + (howto.device || detectDevice()), '1'); } catch (e) {} const n = howto.next; howto.next = null; n && n(); }
   } else if (scene === 'options') {
     const N = OPTROWS.length, [, key] = OPTROWS[optUI.idx];
     if (P('up')) { optUI.idx = (optUI.idx + N - 1) % N; Audio.S.move(); }
@@ -267,11 +278,12 @@ function update() {
   } else if (scene === 'fight') {
     if (P('back') && !update.paused) { update.paused = true; update.pauseIdx = 0; Audio.S.select(); return; }
     if (update.paused) {
+      if (update.howto) { if (P('back') || P('cancel') || P('confirm') || P('start')) { update.howto = false; Audio.S.select(); } return; }
       const N = PAUSE_ITEMS.length;
       if (P('up')) { update.pauseIdx = (update.pauseIdx + N - 1) % N; Audio.S.move(); }
       if (P('down')) { update.pauseIdx = (update.pauseIdx + 1) % N; Audio.S.move(); }
       if (P('back')) { update.paused = false; return; }                         // ESC / BACK again = resume
-      if (P('confirm')) { const it = PAUSE_ITEMS[update.pauseIdx]; update.paused = false; Audio.S.select();
+      if (P('confirm')) { const it = PAUSE_ITEMS[update.pauseIdx]; Audio.S.select(); if (it === 'CONTROLS') { update.howto = true; return; } update.paused = false;
         if (it === 'CHARACTER SELECT') { ctrls[1].cpu = null; randomCpuPick(); scene = 'select'; sel.done = [false, false]; sel.stage = false; sel.timer = 30 * 60; }
         if (it === 'QUIT TO TITLE') { ctrls.forEach(c => c.cpu = null); scene = 'title'; Audio.startMusic('title'); } }
       return;
@@ -299,7 +311,7 @@ function update() {
   }
 }
 let resultsIdx = 0;
-const PAUSE_ITEMS = ['RESUME', 'CHARACTER SELECT', 'QUIT TO TITLE'];
+const PAUSE_ITEMS = ['RESUME', 'CONTROLS', 'CHARACTER SELECT', 'QUIT TO TITLE'];
 const TAGLINES = ['SAME TOKENS. DIFFERENT PROBLEMS.', 'NOW WITH 40% MORE HALLUCINATIONS', 'BENCHMARKED BY US, FOR US', 'YOUR DATA MAY BE USED FOR TRAINING', 'NOT FINANCIAL ADVICE', 'AGI IS 6 MONTHS AWAY (SINCE 2019)', 'THERE CAN ONLY BE ONE AGENT'];
 
 // ---------------- Render scenes ----------------
@@ -359,9 +371,10 @@ function renderScene(c) {
   if (scene === 'loading') drawLoading(c);
   else if (scene === 'title') drawTitle(c);
   else if (scene === 'select') drawSelect(c);
+  else if (scene === 'howto') { drawTitle(c); drawHowTo(c, 'start'); }
   else if (scene === 'stage') drawStage(c);
   else if (scene === 'vs') drawVS(c);
-  else if (scene === 'fight') { match.render(c); if (update.paused) drawPause(c); }
+  else if (scene === 'fight') { match.render(c); if (update.paused) { if (update.howto) drawHowTo(c, 'pause'); else drawPause(c); } }
   else if (scene === 'results') drawResults(c);
   else if (scene === 'walklab') drawWalkLab(c);
   else if (scene === 'online') drawOnline(c);
@@ -514,7 +527,7 @@ function drawTitle(c) {
   drawParade(c);
   drawLogo(c, W / 2, 196, 0.9 + Math.sin(frame / 40) * 0.01);
   txt(c, TAGLINES[Math.floor(frame / 240) % TAGLINES.length], W / 2, 256, 13, '#fff', 'Press Start 2P');
-  if (showControls) return drawControls(c);
+  if (showControls) return drawHowTo(c, 'menu');
   if (!titleArmed) {
     if (frame % 50 < 34) chrome(c, 'PRESS START BUTTON', W / 2, 420, 34, { tone: 'silver' });
   } else {
@@ -530,7 +543,61 @@ function drawTitle(c) {
   txt(c, 'M = MUTE', W - 20, 24, 9, '#666', 'Press Start 2P', 'right', false);
   if (vp < 1) txt(c, `WARMING UP THE ANNOUNCER… ${Math.round(vp * 100)}%`, 20, 42, 9, '#888', 'Press Start 2P', 'left', false);
 }
-function drawControls(c) {
+// ---- HOW TO PLAY: device-aware controls screen (before the first match per device, from the title, from the pause menu)
+const howto = { device: null, pad: 'xbox', next: null, t: 0, mode: 'cpu' };
+function detectDevice() { if (typeof Touch !== 'undefined' && Touch.active) return 'touch'; return Input.padNames().length ? 'pad' : 'kb'; }
+function padBrand(id = '') { return /sony|playstation|dualsense|dualshock|054c|wireless controller/i.test(id) ? 'ps' : 'xbox'; }
+addEventListener('keydown', () => { howto.device = 'kb'; });
+addEventListener('touchstart', () => { howto.device = 'touch'; }, { passive: true });
+function pollPadDevice() { const pads = navigator.getGamepads ? [...navigator.getGamepads()].filter(Boolean) : []; for (const p of pads) if (p.buttons.some(b => b.pressed) || p.axes.some(a => Math.abs(a) > 0.6)) { howto.device = 'pad'; howto.pad = padBrand(p.id); } }
+const HOWTO_ROWS = [   // action, P1 keys, P2 keys, xbox, playstation, touch
+  ['MOVE / JUMP / CROUCH', 'W A S D', '← ↑ → ↓', 'L-STICK', 'L-STICK', 'STICK'],
+  ['LIGHT  (↓+ = SWEEP)', 'F', 'K', 'X', '□', 'LIGHT'],
+  ['HEAVY', 'G', 'L', 'Y', '△', 'HEAVY'],
+  ['SPECIAL', 'H', ';', 'B', '○', 'SPECIAL'],
+  ['SLOP BOMB  (25 COMPUTE)', 'R', 'O', 'A', '✕', 'SLOP'],
+  ['ULTIMATE  (100 COMPUTE)', 'T', 'P', 'RT', 'R2', 'ULT'],
+  ['DASH', 'SHIFT', 'R-SHIFT', 'RB', 'R1', 'DASH'],
+  ['BLOCK', 'Q / HOLD BACK', 'I / HOLD BACK', 'LB', 'L1', 'BLOCK'],
+  ['PAUSE', 'ESC', '—', 'VIEW', 'CREATE', 'START'],
+];
+const PAD_COLORS = { xbox: { A: '#3ec43e', B: '#e33b3b', X: '#3b82f6', Y: '#f2c21b' }, ps: { '✕': '#6d9dff', '○': '#ff5a5a', '□': '#ff7ad9', '△': '#3fd6a0' } };
+function keycap(c, label, x, y, opt = {}) {   // draws a key / button glyph, returns its width
+  c.font = `${opt.size || 12}px "Press Start 2P"`; const tw = c.measureText(label).width, round = opt.round, w = round ? 34 : Math.max(34, tw + 20), h = 34;
+  c.fillStyle = opt.fill || '#e8e8ee'; c.strokeStyle = '#000'; c.lineWidth = 3;
+  c.beginPath(); if (round) c.arc(x + 17, y, 17, 0, Math.PI * 2); else c.roundRect(x, y - h / 2, w, h, 7); c.fill(); c.stroke();
+  if (!round) { c.fillStyle = 'rgba(0,0,0,0.18)'; c.fillRect(x + 3, y + h / 2 - 7, w - 6, 4); }
+  if (round && '✕○□△'.includes(label)) {   // PlayStation face symbols aren't in the pixel font: draw them
+    const cx = x + 17, r = 7; c.strokeStyle = '#fff'; c.lineWidth = 3; c.beginPath();
+    if (label === '✕') { c.moveTo(cx - r, y - r); c.lineTo(cx + r, y + r); c.moveTo(cx + r, y - r); c.lineTo(cx - r, y + r); }
+    else if (label === '○') c.arc(cx, y, r, 0, Math.PI * 2);
+    else if (label === '□') c.rect(cx - r, y - r, r * 2, r * 2);
+    else { c.moveTo(cx, y - r); c.lineTo(cx + r, y + r * 0.8); c.lineTo(cx - r, y + r * 0.8); c.closePath(); }
+    c.stroke(); return w; }
+  c.fillStyle = opt.ink || '#111'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(label, x + w / 2, y + 1); c.textBaseline = 'alphabetic'; return w;
+}
+function drawHowTo(c, mode) {   // mode: 'start' (before a match), 'menu' (title), 'pause'
+  const dev = howto.device || detectDevice(), two = mode === 'start' && howto.mode === 'local' && dev === 'kb';
+  c.fillStyle = mode === 'pause' ? 'rgba(4,4,12,0.9)' : 'rgba(4,4,12,0.97)'; c.fillRect(0, 0, W, H);
+  chrome(c, 'HOW TO PLAY', W / 2, 92, 58, { tone: 'gold' });
+  const chip = dev === 'touch' ? 'TOUCH CONTROLS' : dev === 'pad' ? (howto.pad === 'ps' ? 'PLAYSTATION CONTROLLER DETECTED' : 'XBOX CONTROLLER DETECTED') : 'KEYBOARD DETECTED';
+  c.font = '12px "Press Start 2P"'; const cw = c.measureText(chip).width + 40; c.fillStyle = '#b30000'; c.fillRect(W / 2 - cw / 2, 118, cw, 30); txt(c, chip, W / 2, 139, 12, '#fff', 'Press Start 2P', 'center', false);
+  txt(c, dev === 'kb' ? (howto.mode === 'cpu' && mode === 'start' ? 'VS CPU: BOTH KEY LAYOUTS (WASD + ARROWS) CONTROL YOU' : 'PLUG IN A CONTROLLER ANYTIME · IT SWITCHES AUTOMATICALLY') : dev === 'pad' ? 'KEYBOARD WORKS TOO' : 'TIP: ADD TO HOME SCREEN FOR FULLSCREEN', W / 2, 172, 9, '#999', 'Press Start 2P', 'center', false);
+  const x0 = W / 2 - 420, colA = two ? x0 + 380 : x0 + 470, colB = x0 + 640;
+  if (two) { txt(c, 'PLAYER 1', colA, 206, 10, '#ff5a5a', 'Press Start 2P', 'left', false); txt(c, 'PLAYER 2', colB, 206, 10, '#5ab0ff', 'Press Start 2P', 'left', false); }
+  HOWTO_ROWS.forEach((r, i) => { const y = 238 + i * 44;
+    c.fillStyle = i % 2 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.07)'; c.fillRect(x0 - 20, y - 20, 880, 40);
+    txt(c, r[0], x0, y + 5, 12, '#ddd', 'Press Start 2P', 'left', false);
+    if (dev === 'kb') { let x = colA; for (const k of r[1].split(' / ')) x += keycap(c, k, x, y) + 8; if (two && r[2] !== '—') { x = colB; for (const k of r[2].split(' / ')) x += keycap(c, k, x, y) + 8; } }
+    else if (dev === 'pad') { const lab = r[howto.pad === 'ps' ? 4 : 3], col = PAD_COLORS[howto.pad][lab]; keycap(c, lab, colA, y, col ? { round: true, fill: col, ink: '#fff', size: 13 } : { fill: '#2a2d3a', ink: '#fff' }); }
+    else keycap(c, r[5], colA, y, { fill: '#2a2d3a', ink: '#ffd23f' }); });
+  const yb = 238 + HOWTO_ROWS.length * 44 + 10;
+  txt(c, 'EMPTY THEIR TOKENS TO WIN · HITS FILL YOUR COMPUTE · 100 = ULTIMATE', W / 2, yb, 10, '#7CFFB2', 'Press Start 2P', 'center', false);
+  txt(c, 'COMBO: LIGHT → LIGHT → HEAVY → SPECIAL / SLOP / ULT', W / 2, yb + 22, 10, '#7CFFB2', 'Press Start 2P', 'center', false);
+  const ready = mode !== 'start' || howto.t > 40, back = dev === 'pad' ? (howto.pad === 'ps' ? '○' : 'B') : dev === 'touch' ? 'TAP' : 'ESC';
+  if (ready && frame % 50 < 36) txt(c, mode === 'start' ? 'PRESS ANY BUTTON TO FIGHT' : `${back} TO GO BACK`, W / 2, H - 28, 14, '#ffd23f', 'Press Start 2P', 'center', false);
+}
+function drawControlsOld(c) {
   bevel(c, 130, 340, W - 260, 340, { border: '#ffd23f' });
   const rows = [['', 'P1 KEYBOARD', 'P2 KEYBOARD', 'XBOX / PS'], ['MOVE / JUMP / CROUCH', 'W A S D', 'ARROWS', 'STICK / D-PAD'], ['LIGHT (↓+ = SWEEP)', 'F', 'K', 'X / □'], ['HEAVY', 'G', 'L', 'Y / △'], ['SPECIAL', 'H', ';', 'B / ○'], ['SLOP BOMB (25 COMPUTE)', 'R', 'O', 'A / ✕  ·  LT'], ['ULTIMATE (100 COMPUTE)', 'T', 'P', 'RT / R2'], ['DASH', 'L-SHIFT', 'R-SHIFT', 'RB / R1'], ['BLOCK', 'HOLD BACK · Q', 'HOLD BACK · I', 'BACK · LB'], ['PAUSE', 'ESC', '', 'SELECT / SHARE']];
   rows.forEach((r, i) => r.forEach((s, j) => txt(c, s, 160 + [0, 330, 540, 740][j], 376 + i * 29, 11, i === 0 ? '#FFD23F' : j === 0 ? '#aaa' : '#fff', 'Press Start 2P', 'left', false)));
