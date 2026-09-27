@@ -19,3 +19,6 @@ tools/balance_last.json
 .DS_Store
 worker/.env.turn
 promo/
+trailer/node_modules/
+trailer/out/
+trailer/public/shots/

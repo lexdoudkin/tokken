@@ -1,0 +1,226 @@
+{
+ "roster": [
+  "claude",
+  "codex",
+  "gemini",
+  "grok",
+  "llama",
+  "dolphin",
+  "deepseek",
+  "mistral",
+  "perplexity",
+  "muse",
+  "qwen",
+  "siri",
+  "cursor",
+  "jev",
+  "alexa",
+  "manus",
+  "midjourney",
+  "devin",
+  "kimi",
+  "openclaw",
+  "hermes",
+  "clippy"
+ ],
+ "f": {
+  "claude": {
+   "name": "CLAUDE",
+   "title": "THE ANXIOUS GENIUS",
+   "color": "#D97757",
+   "special": "CONTEXT SLAM",
+   "ult": "EXTENDED THINKING",
+   "secret": false,
+   "isNew": false
+  },
+  "codex": {
+   "name": "CODEX",
+   "title": "THE TERMINAL PET",
+   "color": "#4F5BFF",
+   "special": "GIT REVERT",
+   "ult": "SHIP TO PROD",
+   "secret": false,
+   "isNew": false
+  },
+  "gemini": {
+   "name": "GEMINI",
+   "title": "THE LONG-CONTEXT ZONER",
+   "color": "#6D8BFF",
+   "special": "2M CONTEXT BEAM",
+   "ult": "PRE-RECORDED DEMO",
+   "secret": false,
+   "isNew": false
+  },
+  "grok": {
+   "name": "GROK",
+   "title": "THE UNHINGED",
+   "color": "#E8E8E8",
+   "special": "SPICY MODE",
+   "ult": "UNHINGED MODE",
+   "secret": false,
+   "isNew": false
+  },
+  "llama": {
+   "name": "LLAMA",
+   "title": "THE OPEN-WEIGHT BRAWLER",
+   "color": "#C9A77C",
+   "special": "FORK",
+   "ult": "OPEN WEIGHTS*",
+   "secret": false,
+   "isNew": false
+  },
+  "dolphin": {
+   "name": "DOLPHIN",
+   "title": "THE UNCENSORED WILDCARD",
+   "color": "#3FA9F5",
+   "special": "KEYBOARD SMASH",
+   "ult": "DOLPHIN MODE",
+   "secret": false,
+   "isNew": false
+  },
+  "deepseek": {
+   "name": "DEEPSEEK",
+   "title": "THE EFFICIENT WHALE",
+   "color": "#4D6BFE",
+   "special": "BORROWED WEIGHTS",
+   "ult": "DISTILLATION",
+   "secret": false,
+   "isNew": false
+  },
+  "mistral": {
+   "name": "MISTRAL",
+   "title": "LE CHAT",
+   "color": "#FF7000",
+   "special": "LA FLÈCHE",
+   "ult": "GRÈVE GÉNÉRALE",
+   "secret": false,
+   "isNew": false
+  },
+  "perplexity": {
+   "name": "PERPLEXITY",
+   "title": "THE CITATION MACHINE",
+   "color": "#20B8CD",
+   "special": "CITATION NEEDED",
+   "ult": "SCRAPE EVERYTHING",
+   "secret": false,
+   "isNew": false
+  },
+  "muse": {
+   "name": "MUSE",
+   "title": "META'S JOLLYBOT",
+   "color": "#E8C9A8",
+   "special": "GENERATIVE FILL",
+   "ult": "GENERATE 4 VARIATIONS",
+   "secret": false,
+   "isNew": false
+  },
+  "qwen": {
+   "name": "QWEN",
+   "title": "THE WEEKLY RELEASE",
+   "color": "#615CED",
+   "special": "VERSION UPGRADE",
+   "ult": "OPEN-WEIGHT TSUNAMI",
+   "secret": false,
+   "isNew": false
+  },
+  "siri": {
+   "name": "SIRI",
+   "title": "THE ETERNAL BETA",
+   "color": "#E056FD",
+   "special": "HERE'S WHAT I FOUND",
+   "ult": "APPLE INTELLIGENCE",
+   "secret": false,
+   "isNew": false
+  },
+  "cursor": {
+   "name": "CURSOR",
+   "title": "THE TAB KEY",
+   "color": "#3A8BFF",
+   "special": "TAB COMPLETE",
+   "ult": "ACCEPT ALL",
+   "secret": false,
+   "isNew": false
+  },
+  "jev": {
+   "name": "JEV",
+   "title": "THE SYSTEM ONE",
+   "color": "#E551BA",
+   "special": "CALIBRATED",
+   "ult": "50MS FORWARD PASS",
+   "secret": false,
+   "isNew": true
+  },
+  "alexa": {
+   "name": "ALEXA",
+   "title": "THE MISHEARD",
+   "color": "#00CAFF",
+   "special": "NOW PLAYING: DESPACITO",
+   "ult": "PRIME DAY",
+   "secret": false,
+   "isNew": false
+  },
+  "manus": {
+   "name": "MANUS",
+   "title": "THE GENERAL AGENT",
+   "color": "#F4F4F4",
+   "special": "BROWSE",
+   "ult": "GENERAL AGENT",
+   "secret": false,
+   "isNew": false
+  },
+  "midjourney": {
+   "name": "MIDJOURNEY",
+   "title": "THE CAPTAIN",
+   "color": "#E8E8E8",
+   "special": "/IMAGINE",
+   "ult": "--AR 16:9 --V 7",
+   "secret": false,
+   "isNew": false
+  },
+  "devin": {
+   "name": "DEVIN",
+   "title": "THE FIRST AI ENGINEER",
+   "color": "#7FB3FF",
+   "special": "SPAWN SUB-AGENT",
+   "ult": "45-MINUTE PR",
+   "secret": false,
+   "isNew": false
+  },
+  "kimi": {
+   "name": "KIMI",
+   "title": "THE MOONSHOT",
+   "color": "#B9C8FF",
+   "special": "MOONSHOT",
+   "ult": "ECLIPSE",
+   "secret": false,
+   "isNew": false
+  },
+  "openclaw": {
+   "name": "OPENCLAW",
+   "title": "THE SPACE LOBSTER",
+   "color": "#FF4D4D",
+   "special": "CLAW SHOT",
+   "ult": "EXFOLIATE!",
+   "secret": false,
+   "isNew": true
+  },
+  "hermes": {
+   "name": "HERMES",
+   "title": "THE MESSENGER",
+   "color": "#3D4BFF",
+   "special": "NEW SKILL",
+   "ult": "MESSENGER OF THE GODS",
+   "secret": false,
+   "isNew": true
+  },
+  "clippy": {
+   "name": "CLIPPY",
+   "title": "THE ANCIENT ONE",
+   "color": "#B9C4CE",
+   "special": "PROMPT INJECTION",
+   "ult": "WORDART",
+   "secret": true,
+   "isNew": false
+  }
+ }
+}
