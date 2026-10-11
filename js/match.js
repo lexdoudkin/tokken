@@ -426,7 +426,7 @@ function drawStrollers(c, backY) {
     s.x += s.dir * s.speed; s.dist += s.speed;
     const hgt = 60, step = Math.floor(s.dist / (hgt * 0.3)) % 4, img = ASSETS.crowd[`eng${s.id}_w${step}`]; if (!img) continue;
     const sc = hgt / img.height, bob = step % 2 ? -1.5 : 0;
-    c.save(); c.translate(s.x, backY - 6 + bob); c.scale(s.dir * sc, sc); c.filter = 'brightness(0.6) saturate(0.85)'; c.drawImage(img, -img.width / 2, -img.height); c.restore(); c.filter = 'none';
+    c.save(); c.translate(s.x, backY - 6 + bob); c.scale(s.dir * sc, sc); c.drawImage(baked(img, 'brightness(0.6) saturate(0.85)'), -img.width / 2, -img.height); c.restore();
   }
   STROLL.list = STROLL.list.filter(s => s.x > -60 && s.x < W + 60);
 }
@@ -479,7 +479,7 @@ function drawRow(c, row, frame, excited, backY, midX, base, filter, avoid = []) 
         c.fillStyle = '#f4f1e8'; c.fillRect(-tw / 2, -bh, tw, bh); c.strokeStyle = '#000'; c.lineWidth = 2; c.strokeRect(-tw / 2, -bh, tw, bh);
         c.fillStyle = '#111'; c.textAlign = 'center'; c.fillText(p.sign, 0, -5); c.restore(); };
     }
-    c.save(); c.translate(p.x, backY - hop); c.scale(face * s, s * (1 + Math.sin(frame / 22 + p.ph) * 0.01)); c.filter = filter; c.drawImage(img, -img.width / 2, -img.height); c.restore(); c.filter = 'none';
+    c.save(); c.translate(p.x, backY - hop); c.scale(face * s, s * (1 + Math.sin(frame / 22 + p.ph) * 0.01)); c.drawImage(baked(img, filter), -img.width / 2, -img.height); c.restore();
     if (banner) banner();
   }
 }

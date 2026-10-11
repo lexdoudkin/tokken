@@ -332,7 +332,7 @@ const TAGLINES = ['SAME TOKENS. DIFFERENT PROBLEMS.', 'NOW WITH 40% MORE HALLUCI
 // ---------------- Render scenes ----------------
 function drawBG(c, id = 'colosseum', blur = true, dim = 0.55) {
   const img = ASSETS.arenas[id];
-  if (img) { const s = Math.max(W / img.width, H / img.height) * 1.08, ox = Math.sin(frame / 400) * 30; c.save(); if (blur) c.filter = 'blur(3px)'; c.drawImage(img, W / 2 - img.width * s / 2 + ox, H / 2 - img.height * s / 2, img.width * s, img.height * s); c.restore(); }
+  if (img) { const s = Math.max(W / img.width, H / img.height) * 1.08, ox = Math.sin(frame / 400) * 30; c.save(); c.drawImage(blur ? baked(img, 'blur(3px)') : img, W / 2 - img.width * s / 2 + ox, H / 2 - img.height * s / 2, img.width * s, img.height * s); c.restore(); }
   c.fillStyle = `rgba(5,5,15,${dim})`; c.fillRect(0, 0, W, H);
 }
 function txt(c, s, x, y, size, color = '#fff', font = 'Bungee', align = 'center', stroke = true) {
@@ -353,7 +353,7 @@ function presH(id, hgt) { const m = ASSETS.meta[id]?.idle; if (!m) return hgt; c
 function drawSprite(c, id, pose, x, y, hgt, flip = false, filter) {
   const img = ASSETS.sprites[id]?.[pose], m = ASSETS.meta[id]?.[pose]; if (!img || !m) return;
   const s = hgt / ASSETS.meta[id].idle[1];
-  c.save(); c.translate(x, y); c.scale((flip ? -1 : 1) * s, s); if (filter) c.filter = filter; c.drawImage(img, -m[3], -m[2]); c.restore();
+  c.save(); c.translate(x, y); c.scale((flip ? -1 : 1) * s, s); c.drawImage(baked(img, filter), -m[3], -m[2]); c.restore();
 }
 function drawLogo(c, x, y, s = 1) {
   c.save(); c.translate(x, y); c.scale(s, s); c.rotate(-0.04);
@@ -370,8 +370,8 @@ function portrait(c, id, x, y, w, h, hidden) {
   c.save(); c.beginPath(); c.rect(x, y, w, h); c.clip();
   const g = c.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, '#2a2f45'); g.addColorStop(1, '#07080f'); c.fillStyle = g; c.fillRect(x, y, w, h);
   c.fillStyle = FIGHTERS[id].color + '55'; c.fillRect(x, y + h - 22, w, 22);
-  const s = Math.min((w - 10) / img.width, (h - 20) / img.height); if (hidden) c.filter = 'brightness(0)';
-  c.drawImage(img, x + w / 2 - img.width * s / 2, y + h - 16 - img.height * s, img.width * s, img.height * s); c.restore();
+  const s = Math.min((w - 10) / img.width, (h - 20) / img.height); 
+  c.drawImage(hidden ? baked(img, 'brightness(0)') : img, x + w / 2 - img.width * s / 2, y + h - 16 - img.height * s, img.width * s, img.height * s); c.restore();
 }
 
 function render() {
@@ -537,9 +537,8 @@ function drawParade(c) {
   if (!PARADE) { const stub = { held: () => false, pressed: () => false, buffered: () => false, consume() {} };
     PARADE = ids.map((id, i) => { const f = new Fighter(id, 0, stub); f.x = i * loopW / ids.length; f.setState('walk'); f.facing = 1; f.vx = f.cfg.speed * 0.5; return f; }); }
   const g = { phase: 'intro', frame };
-  c.save(); c.translate(-130, 676); c.scale(sc, sc); c.filter = 'brightness(0.55)';
-  for (const f of PARADE) { f.update(g, f); f.state = 'walk'; f.vx = f.cfg.speed * 0.5; if (f.x > loopW) f.x -= loopW; f.draw(c, g); }
-  c.restore(); c.filter = 'none';
+  for (const f of PARADE) { f.update(g, f); f.state = 'walk'; f.vx = f.cfg.speed * 0.5; if (f.x > loopW) f.x -= loopW; }
+  dimmed(c, 0.55, l => { l.translate(-130, 676); l.scale(sc, sc); for (const f of PARADE) f.draw(l, g); });
   if (FX.parts.length > 60) FX.parts.length = 0;   // parade dust isn't rendered here
 }
 function drawTitle(c) {
@@ -547,7 +546,7 @@ function drawTitle(c) {
   drawBG(c, 'colosseum', true, 0.55);
   c.fillStyle = 'rgba(0,0,0,0.35)'; c.fillRect(0, 0, W, H); drawCRT(c);
   // the fight-night grandstand (signs included) behind the parade, dimmed so logo + menu stay readable
-  c.save(); c.filter = 'brightness(0.7)'; drawCrowd(c, frame, titleArmed && frame % 600 < 40, 628, W / 2, 'colosseum'); c.restore(); c.filter = 'none';
+  dimmed(c, 0.7, l => drawCrowd(l, frame, titleArmed && frame % 600 < 40, 628, W / 2, 'colosseum'));
   const fade = c.createLinearGradient(0, 470, 0, 560); fade.addColorStop(0, 'rgba(5,5,15,0)'); fade.addColorStop(1, 'rgba(5,5,15,0.35)'); c.fillStyle = fade; c.fillRect(0, 470, W, 250);
   drawParade(c);
   drawLogo(c, W / 2, 196, 0.9 + Math.sin(frame / 40) * 0.01);

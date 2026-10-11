@@ -137,7 +137,7 @@ const UltFX = (() => {
       const o = m.f[1 - fx.side], img = ASSETS.sprites[o.id]?.idle, fx0 = W / 2, fy = 330, k = Math.max(0.12, 1 - t / 70);
       c.fillStyle = 'rgba(0,10,40,0.55)'; c.fillRect(0, 0, W, H);
       c.strokeStyle = '#9ad8ff'; c.lineWidth = 4; c.fillStyle = 'rgba(120,180,255,0.18)'; c.beginPath(); c.moveTo(fx0 - 40, fy - 150); c.lineTo(fx0 + 40, fy - 150); c.lineTo(fx0 + 40, fy - 60); c.lineTo(fx0 + 140, fy + 110); c.lineTo(fx0 - 140, fy + 110); c.lineTo(fx0 - 40, fy - 60); c.closePath(); c.fill(); c.stroke();
-      if (img) { const s = 160 / img.height * k; c.save(); c.globalAlpha = 0.9; c.filter = 'brightness(0) invert(1) sepia(1) hue-rotate(180deg)'; c.drawImage(img, fx0 - img.width * s / 2, fy + 40 - img.height * s - (1 - k) * 120, img.width * s, img.height * s); c.restore(); c.filter = 'none'; }
+      if (img) { const s = 160 / img.height * k; c.save(); c.globalAlpha = 0.9; c.drawImage(baked(img, 'brightness(0) invert(1) sepia(1) hue-rotate(180deg)'), fx0 - img.width * s / 2, fy + 40 - img.height * s - (1 - k) * 120, img.width * s, img.height * s); c.restore(); c.filter = 'none'; }
       px(c, 'FRONTIER MODEL', fx0 - 260, fy - 40, 14, '#fff', 'center'); px(c, '→', fx0 - 160, fy - 40, 20, '#ffd23f', 'center'); px(c, '7B', fx0 + 200, fy + 60, 30, '#ffd23f', 'center');
       mono(c, 'TRAINING COST: $5.6M*   (*excluding everything)', W / 2, 520, 16, '#fff', 'center');
       stampTxt(c, '蒸馏', W / 2 + 280, 200, t - 60, '#ff3a3a', 0.2);

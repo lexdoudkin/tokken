@@ -44,6 +44,31 @@ const rectHit = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h 
 
 // ---------------- Assets ----------------
 const ASSETS = { sprites: {}, meta: {}, arenas: {}, flash: {}, crowd: {} };
+// Canvas `filter` re-runs the filter on every draw call and is very slow (it dominated frame time: ~20 filtered draws/frame).
+// baked(img, filter) applies a filter once per (image, filter) pair and caches the result as a canvas.
+const _baked = new WeakMap();
+function baked(img, filter) {
+  if (!img || !filter || filter === 'none') return img;
+  let m = _baked.get(img); if (!m) _baked.set(img, m = new Map());
+  let b = m.get(filter);
+  if (!b) { b = document.createElement('canvas'); b.width = img.width; b.height = img.height; const x = b.getContext('2d'); x.filter = filter; x.drawImage(img, 0, 0); m.set(filter, b); }
+  return b;
+}
+// dimmed(c, k, draw): run draw() on an offscreen layer, then scale its RGB by k (same result as filter 'brightness(k)'), then composite.
+// One full-layer darken per call instead of a filter pass on every draw inside it.
+let _dimLayer = null;
+function dimmed(c, k, draw) {
+  const cw = c.canvas.width, ch = c.canvas.height;
+  if (!_dimLayer) _dimLayer = document.createElement('canvas');
+  if (_dimLayer.width !== cw || _dimLayer.height !== ch) { _dimLayer.width = cw; _dimLayer.height = ch; }
+  const l = _dimLayer.getContext('2d');
+  l.setTransform(1, 0, 0, 1, 0, 0); l.globalCompositeOperation = 'source-over'; l.globalAlpha = 1; l.clearRect(0, 0, cw, ch);
+  l.setTransform(c.getTransform()); l.imageSmoothingEnabled = c.imageSmoothingEnabled;
+  draw(l);
+  l.setTransform(1, 0, 0, 1, 0, 0); l.globalCompositeOperation = 'source-atop'; l.globalAlpha = 1; l.fillStyle = `rgba(0,0,0,${1 - k})`; l.fillRect(0, 0, cw, ch);
+  l.globalCompositeOperation = 'source-over';
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(_dimLayer, 0, 0); c.restore();
+}
 function loadImg(src) { return new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src + (window.VQ || ''); }); }
 async function loadAll(progress) {
   const jobs = [];
